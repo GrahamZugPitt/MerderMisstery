@@ -77,7 +77,9 @@ int main() {
 	std::vector <std::string> imgstrs{"Alex", "Bove", "Brindock", "Bryan", "Darpun", "dves", "Griffin", "Jahnke", "Jiang", "ShawnBlake", "Zug"};
 	for(auto name: imgstrs){
 		std::string full = dir + name + ext;
-		gImg = IMG_Load(full.c_str());//"Credit Pictures/BrindockCreditPicture.png");
+		// Using IMG_Load to load png images
+		// NOTE: the total lack of error checking
+		gImg = IMG_Load(full.c_str());
 		// Apply the image
 		SDL_BlitSurface(gImg, NULL, gScreenSurface, NULL );
 		// Update the window surface
