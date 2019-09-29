@@ -9,5 +9,8 @@ all: $(OUT_NAMES)
 %.o: %.cpp
 	$(CC) $^ $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $@
 
+npcd: npc.cpp
+	$(CC) npc.cpp -o npcd -DDEBUG -DLOGGING
+
 clean:
-	rm *.o
+	rm *.o npcd
