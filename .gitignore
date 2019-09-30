@@ -36,14 +36,12 @@
 *.x86_64
 *.hex
 
-# Ignore all extensionless files (ie. Linux executables)
-[^\.]*
-
 # Debug files
 *.dSYM/
 *.su
 *.idb
 *.pdb
+*.log
 
 # Kernel Module Compile Results
 *.mod*
