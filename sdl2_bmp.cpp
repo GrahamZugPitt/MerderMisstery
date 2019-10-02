@@ -87,7 +87,13 @@ int main() {
 		// Wait 5 seconds
 		SDL_Delay(1000);
 	}
-	
+	gImg = IMG_Load("Art/Assets.png");
+	// Apply the image
+	SDL_BlitSurface(gImg, NULL, gScreenSurface, NULL );
+	// Update the window surface
+	SDL_UpdateWindowSurface(gWindow);
+	// Wait 5 seconds
+	SDL_Delay(5000);
 	
 	close();
 }
