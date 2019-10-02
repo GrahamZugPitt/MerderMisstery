@@ -6,6 +6,8 @@
 
 #include <typeinfo>
 
+
+#include "npc.cpp"
 constexpr int SCREEN_WIDTH = 1280;
 constexpr int SCREEN_HEIGHT = 720;
 
@@ -71,7 +73,8 @@ int main() {
 		close();
 		return 1;
 	}
-
+	NPC npc("This is a test.", "This is only a test.");
+	npc.print();
 	std::string dir = "Credit Pictures/";
 	std::string ext = "CreditPicture.png";
 	std::vector <std::string> imgstrs{"Alex", "Bove", "Brindock", "Bryan", "Darpun", "dves", "Griffin", "Jahnke", "Jiang", "ShawnBlake", "Zug"};
