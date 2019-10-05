@@ -142,7 +142,32 @@ class BMPMod{
 			outfile->write(green, 1);
 			outfile->write(red, 1);
 			outfile->seekp(0, std::ios::beg);
+			return 0;
 		}
+
+	unsigned int swapColor(unsigned char ri, unsigned char gi, unsigned char bi, unsigned char ai,
+					unsigned char ro, unsigned char go, unsigned char bo, unsigned char ao){
+		unsigned int in, out;
+		in = (unsigned int)ai << 24 | (unsigned int)bi << 16 | (unsigned int)gi << 8 |(unsigned int)ri;
+		out = (unsigned int)ao << 24 | (unsigned int)bo << 16 | (unsigned int)go << 8 |(unsigned int)ro;
+		std::cout << "in " << std::hex << in <<std::endl;
+		std::cout << "out " << std::hex << out <<std::endl;
+		outfile->seekg(bmp.offset, std::ios::beg);
+		unsigned int currPix = 0;
+		int ip, op;
+		while(!(outfile->eof())){
+			outfile->read((char *)&currPix, sizeof(currPix));
+			if(currPix == in){
+				ip = outfile->tellg();
+				outfile->seekp(ip-4, std::ios::beg);
+				outfile->write((char *)&out, sizeof(out));
+				std::cout << "ip " << std::dec << ip <<std::endl;
+			}
+		}
+		
+		return in;
+	}		
+
 };
 
 
@@ -154,12 +179,13 @@ int main(int argc, char **argv){
 	}
 
 	BMPMod img(argv[1], argv[2]);
-	char r, g, b, a;
-	r = 0;
+	unsigned char r, g, b, a;
+	r = 0x00;
 	g = 255;
 	b = 0;
 	a = 255;
-	img.setPixel(1,1, &r, &g, &b, &a);
-	img.setPixel(1,2, &r, &g, &b, &a);
-	
+	unsigned int in = 0;
+	img.swapColor(255, 255, 255, 255, 255, 0, 0, 255);
+	//img.setPixel(1,1, &r, &g, &b, &a);
+	//img.setPixel(1,2, &r, &g, &b, &a);
 }
