@@ -45,6 +45,12 @@ class BMPMod{
 			// open output file in in/out mode
 			// in/out needed to avoid truncation of file when writing a byte
 			outfile = new std::fstream(ofilename, std::ios::binary | std::ios::out | std::ios::in);
+			if (!outfile->is_open()){
+				// ouflie DNE so make it, close it and open it as iofile
+				std::ofstream makefile(ofilename, std::ios::out);
+				makefile.close();
+				outfile = new std::fstream(ofilename, std::ios::binary | std::ios::out | std::ios::in);	
+			}
 			if(infile->is_open()){
 				if(validateBMP(infile) != 0){
 					// throw exception if file is not a valid format
@@ -149,10 +155,11 @@ int main(int argc, char **argv){
 
 	BMPMod img(argv[1], argv[2]);
 	char r, g, b, a;
-	r = 255;
+	r = 0;
 	g = 255;
-	b = 255;
+	b = 0;
 	a = 255;
 	img.setPixel(1,1, &r, &g, &b, &a);
+	img.setPixel(1,2, &r, &g, &b, &a);
 	
 }
