@@ -212,11 +212,19 @@ int main(int argc, char **argv){
 	unsigned char b = 0;
 	unsigned char a = 255;
 	
-	unsigned int in = 0xFFFFFFFF;
-	unsigned int out = 0xFFFF0000;
+	unsigned int in = 0xFF0000FF;
+	unsigned int out = 0xFFAAAAAA;
+	img.swapColor(in, out);
+
+	in = 0xFF00FF00;
+	out = 0xFFFFFFFF;
+	img.swapColor(in, out);
+
+	in = 0xFFFFFF00;
+	out = 0xFF674434;
 	img.swapColor(in, out);
 	//img.swapColor(0,0, 0, 255, 0, 0, 255, 125);
 
-	img.setPixel(1,1, r, g, b, a);
-	img.setPixel(1,2, r, g, b, a);
+	//img.setPixel(1,1, r, g, b, a);
+	//img.setPixel(1,2, r, g, b, a);
 }
