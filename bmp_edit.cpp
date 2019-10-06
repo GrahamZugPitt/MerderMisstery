@@ -123,50 +123,78 @@ class BMPMod{
 		// Notes on bmp files:
 		//		.bmp files start their coordinates with (0, 0) being the lower left corner.
 		//		This is like cartesian coordinates instead of normal computer graphics coordiane systems
-		//		Another quirk of bmp file is that the pixel data is written backwards
-		//		This means pixels are written alpha, blue, green, red
-		//
+		//		Another quirk of the bmp format is that the bytes are written "backwards".
+		//		Thus, they should written in the order blue, green, red, alpha.
+		//          
 		//		For example an N x M image would be stored as:
 		//			(N,0)-------------------------(N,M)
 		//			|								  |
-		//			|								  | where p = [alpha, blue, green , red]
+		//			|								  | where p = [blue, green, red, alpha]
 		//			|								  |
 		//			(0,0)-p-----------------------(0,M)
 		//		https://en.wikipedia.org/wiki/BMP_file_format has an ok explaination of this file format
 		//		The format this class supports uses the BITMAPV5HEADER format.
 		//		If you have any questions on the format, ask me although I'M NO EXPERT ON IT.
-		int setPixel(int x, int y, const char *red, const char *green, const char *blue, const char *alpha){
+		int setPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
+			if (x > dib.width) {std::cerr << "x dim exceeded" << std::endl; return 1;}
+			if (y > dib.height) {std::cerr << "y dim exceeded" << std::endl; return 2;}
 			outfile->seekp(bmp.offset + (y * dib.width + x) * 4, std::ios::beg);
-			outfile->write(alpha, 1);
-			outfile->write(blue, 1);
-			outfile->write(green, 1);
-			outfile->write(red, 1);
-			outfile->seekp(0, std::ios::beg);
+			outfile->write((char *)&b, 1);
+			outfile->write((char *)&g, 1);
+			outfile->write((char *)&r, 1);
+			outfile->write((char *)&a, 1);
 			return 0;
 		}
-
+	// Overloaded version of swapColor allowing definition of the colors according to their specific channels.
+	// Args:
+	//	ri, gi, bi, ai: the red, green, blue, and alpha channels respectively of the color to be changed
+	//	ro, go, bo, ao: the red, green, blue, and alpha channels respectively of the color to change it to
 	unsigned int swapColor(unsigned char ri, unsigned char gi, unsigned char bi, unsigned char ai,
 					unsigned char ro, unsigned char go, unsigned char bo, unsigned char ao){
+		// convert the channels to the proper integer values
 		unsigned int in, out;
-		in = (unsigned int)ai << 24 | (unsigned int)bi << 16 | (unsigned int)gi << 8 |(unsigned int)ri;
-		out = (unsigned int)ao << 24 | (unsigned int)bo << 16 | (unsigned int)go << 8 |(unsigned int)ro;
-		std::cout << "in " << std::hex << in <<std::endl;
-		std::cout << "out " << std::hex << out <<std::endl;
+		in = (unsigned int)ai << 24 | (unsigned int)ri << 16 | (unsigned int)gi << 8 | (unsigned int)bi;
+		out = (unsigned int)ao << 24 | (unsigned int)ro << 16 | (unsigned int)go << 8 | (unsigned int)bo;
+		// pass the values to the overloaded method
+		return swapColor(in , out);
+	}
+
+	// Swaps all the pixels of one color to naother in the image
+	//	Args:
+	//	in: the color to change
+	//	out: the color to change to
+	//		The bits of these functions should be 0xAARRGGBB where AA is alpha RR is red
+	//		GG is green, BB is blue
+	//
+	//	PROGRAMMING NOTE:-----------------------------------------------------------------------------
+	//		It seems that the write method writes data bytewise in a "small endian" style.
+	//		This means the least significant byte (BB) is written first. This is followed by (GG).
+	//		Then (RR), and finally (AA).
+	//
+	//		Another way to think of this using pointer arithmetic.
+	//		Picture and unsigned int as an array of 4 chars (char[4]).
+	//		Then writing an int is like:
+	//		char *cptr = &intVal;
+	//		for(int i = 0; i < 4; i++){
+	//			outfile->write(cptr++, 1);
+	//		}
+	unsigned int swapColor(unsigned int in, unsigned int out){
+		// Ignore header info
 		outfile->seekg(bmp.offset, std::ios::beg);
 		unsigned int currPix = 0;
-		int ip, op;
 		while(!(outfile->eof())){
+			// get pixel color
 			outfile->read((char *)&currPix, sizeof(currPix));
 			if(currPix == in){
-				ip = outfile->tellg();
-				outfile->seekp(ip-4, std::ios::beg);
+				// replace pixel of desired color
+				outfile->seekp((int)(outfile->tellg())-4, std::ios::beg);
 				outfile->write((char *)&out, sizeof(out));
-				std::cout << "ip " << std::dec << ip <<std::endl;
 			}
 		}
-		
-		return in;
-	}		
+		// Clear end of file flag to allow further operations
+		outfile->clear();
+		return 0;
+	}	
 
 };
 
@@ -179,13 +207,16 @@ int main(int argc, char **argv){
 	}
 
 	BMPMod img(argv[1], argv[2]);
-	unsigned char r, g, b, a;
-	r = 0x00;
-	g = 255;
-	b = 0;
-	a = 255;
-	unsigned int in = 0;
-	img.swapColor(255, 255, 255, 255, 255, 0, 0, 255);
-	//img.setPixel(1,1, &r, &g, &b, &a);
-	//img.setPixel(1,2, &r, &g, &b, &a);
+	unsigned char r = 255;
+	unsigned char g = 255;
+	unsigned char b = 0;
+	unsigned char a = 255;
+	
+	unsigned int in = 0xFFFFFFFF;
+	unsigned int out = 0xFFFF0000;
+	img.swapColor(in, out);
+	//img.swapColor(0,0, 0, 255, 0, 0, 255, 125);
+
+	img.setPixel(1,1, r, g, b, a);
+	img.setPixel(1,2, r, g, b, a);
 }
