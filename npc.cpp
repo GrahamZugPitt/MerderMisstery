@@ -27,12 +27,17 @@ class NPC {
 		float relationships[NUM_NPCS];
 
 		//Constructor
-		NPC(std::string name, std::string spriteFileName) :name{name}, spriteFileName{spriteFileName},
-															mood{0.0f}, murderiness{0.0f} {
-			for (auto r : relationships){
-				r = 0.0f;
+		NPC(std::string name, std::string spriteFileName) :mood{0.0f}, murderiness{0.0f},
+															name{name}, spriteFileName{spriteFileName} {
+			for (int i = 0; i<NUM_NPCS; i++){
+				relationships[i] = 0.0f;
 			}
-			personality.insert({"Openness", 0.75});
+			personality.insert({"Openness", 1.00});
+			personality.insert({"Conscientiousness", 0.99});
+			personality.insert({"Extroversion", 0.98});
+			personality.insert({"Agreeableness", 0.97});
+			personality.insert({"Neuroticism", 0.96});
+			
 			#ifdef LOGGING
 			std::string str = "--Constructor Called--\n";
 			str += toString();
@@ -54,12 +59,19 @@ class NPC {
 			//  If a bottle neck is noticed we could redo this with sprintf equivalent
 			std::string str = "Name: " + name;
 			str += "\nSprite file: " + spriteFileName;
-			str += "\nOpenness" + std::to_string(personality["Openness"]);
-			str += "\nMood " + std::to_string(mood);
-			str += "\nMurderiness: " + std::to_string(murderiness);
+			str += "\nPersonality:";
+			str += "\n  Openness: " + std::to_string(personality["Openness"]);
+			str += "\n  Conscientiousness: " + std::to_string(personality["Conscientiousness"]);
+			str += "\n  Extroversion: " + std::to_string(personality["Extroversion"]);
+			str += "\n  Agreeableness: " + std::to_string(personality["Agreeableness"]);
+			str += "\n  Neuroticism: " + std::to_string(personality["Neuroticism"]);
+			str += "\nEmotional State: ";
+			str += "\n  Mood: " + std::to_string(mood);
+			str += "\n  Murderiness: " + std::to_string(murderiness);
+			str += "\nRelationships:";
 			int i = 0;
 			for (i = 0; i < NUM_NPCS; i++){
-				str += "\n" + names[i] + ": " + std::to_string(relationships[i]);
+				str += "\n  " + names[i] + ": " + std::to_string(relationships[i]);
 			}
 			str += "\n";
 			return str;
@@ -104,17 +116,3 @@ class NPC {
 		std::string spriteFileName;
 		std::map <std::string, float> personality;
 };
-
-int main(int argc, char **argv){
-	//clean file for new run
-	std::ofstream logf;
-	logf.open(lfName);
-	logf.close();
-
-	// Create test objects
-	NPC a("B. J. Blaskowicz", "image not found");
-	NPC b("GLaDOS", "--FILE CORRUPTED--");
-
-	std::cout << a.toString();
-	std::cout << b.getName();
-}

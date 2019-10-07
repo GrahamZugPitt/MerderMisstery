@@ -4,13 +4,16 @@ CC = clang++
 COMPILER_FLAGS = -Wall -I/usr/include/SDL2
 LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf
 
-all: $(OUT_NAMES)
+all: murder
 
-%.o: %.cpp
-	$(CC) $^ $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $@
+sdl2_bmp.o: sdl2_bmp.cpp
+	$(CC) -c $^ $(COMPILER_FLAGS)
 
-npcd: npc.cpp
-	$(CC) npc.cpp -o npcd -DDEBUG -DLOGGING
+npc.o: npc.cpp
+	$(CC) -c $^ $(COMPILER_FLAGS)
 
+murder: npc.o sdl2_bmp.o
+	$(CC) -o $@ $^ $(COMPILER_FLAGS) $(LINKER_FLAGS)
+	
 clean:
-	rm *.o npcd
+	rm *.o murder
