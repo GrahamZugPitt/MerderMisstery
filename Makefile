@@ -17,9 +17,9 @@ COMPILER_FLAGS = -Wall -I/usr/include/SDL2
 LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf -F/Library/Frameworks -framework SDL2 -framework SDL2_image -framework SDL2_ttf
 
 #TARGET
-all : start
+all: start run
 
-start : $(START_FILES)
+start: $(START_FILES)
 	$(CC) $(START_FILES) -w $(LINKER_FLAGS)
 
 sdl2_bmp.o: sdl2_bmp.cpp
@@ -30,6 +30,9 @@ npc.o: npc.cpp
 
 murder: npc.o sdl2_bmp.o
 	$(CC) -o $@ $^ $(COMPILER_FLAGS) $(LINKER_FLAGS)
+
+run: a.out
+	./a.out
 
 clean:
 	rm *.o start
