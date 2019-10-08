@@ -1,0 +1,48 @@
+﻿An NPC is defined as follows:
+* Personality: dictionary of values
+* Mood: a scalar
+* Goal: an Event object
+* Memory: a list of Event objects
+* Relationships: a list of scalars
+* Murderiness: a scalar
+
+
+Personality:
+* Used to determine reactions towards participating in events
+* Traits:
+   * Lust
+   * Disloyalty
+   * Greed
+   * Wrath
+   * Dishonesty
+
+
+Mood:
+* Simply a  number, will be used to make choices in dialogue / event trees
+* Should decay back to neutral over time
+
+
+Goal: 
+* An event object, more on that later, that dictates an event that the NPC is actively attempting to make occur
+
+
+Memory:
+* A list of events that an NPC can run through when making decisions about which events to pick
+
+
+Relationships:
+* A list of scalar values, each of which determines how one NPC feels about another
+* Related to the murderiness scalar as described below
+
+
+Murderiness:
+* if an NPC has a relationship below the murderiness factor with another, than NPC will trigger the murder event and kickstart the mystery
+
+
+Event:
+* A class involving two NPCs and an action
+* The list of actions will be authored by us
+* Dialogues will take the form of “event trees”
+* Actions can also be represented in this way (X steals from Y)
+* Which event tree / event an NPC picks at any given time will be a determination of their personality, mood, relationships, etc.
+   * The exact trees will be specified in the ISD document
