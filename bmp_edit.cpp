@@ -38,18 +38,17 @@ class BMPMod{
 		}
 
 	public:
-		BMPMod(char *ifilename, char *ofilename) {
-			char *byte;  // buffer to hold file
+		BMPMod(std::string ifilename, std::string ofilename) {
 			// open input file
-			infile = new std::ifstream(ifilename, std::ios::binary | std::ios::in);
+			infile = new std::ifstream(ifilename.c_str(), std::ios::binary | std::ios::in);
 			// open output file in in/out mode
 			// in/out needed to avoid truncation of file when writing a byte
-			outfile = new std::fstream(ofilename, std::ios::binary | std::ios::out | std::ios::in);
+			outfile = new std::fstream(ofilename.c_str(), std::ios::binary | std::ios::out | std::ios::in);
 			if (!outfile->is_open()){
 				// ouflie DNE so make it, close it and open it as iofile
-				std::ofstream makefile(ofilename, std::ios::out);
+				std::ofstream makefile(ofilename.c_str(), std::ios::out);
 				makefile.close();
-				outfile = new std::fstream(ofilename, std::ios::binary | std::ios::out | std::ios::in);	
+				outfile = new std::fstream(ofilename.c_str(), std::ios::binary | std::ios::out | std::ios::in);	
 			}
 			if(infile->is_open()){
 				if(validateBMP(infile) != 0){
@@ -180,6 +179,7 @@ class BMPMod{
 	//		}
 	unsigned int swapColor(unsigned int in, unsigned int out){
 		// Ignore header info
+		std::cout << "color swapped bmp" << std::endl;
 		outfile->seekg(bmp.offset, std::ios::beg);
 		unsigned int currPix = 0;
 		while(!(outfile->eof())){
@@ -197,34 +197,3 @@ class BMPMod{
 	}	
 
 };
-
-
-int main(int argc, char **argv){
-	
-	if (argc < 2){
-		std::cout << "No file specified...Exiting" << std::endl;
-		return 1;
-	}
-
-	BMPMod img(argv[1], argv[2]);
-	unsigned char r = 255;
-	unsigned char g = 255;
-	unsigned char b = 0;
-	unsigned char a = 255;
-	
-	unsigned int in = 0xFF0000FF;
-	unsigned int out = 0xFFAAAAAA;
-	img.swapColor(in, out);
-
-	in = 0xFF00FF00;
-	out = 0xFFFFFFFF;
-	img.swapColor(in, out);
-
-	in = 0xFFFFFF00;
-	out = 0xFF674434;
-	img.swapColor(in, out);
-	//img.swapColor(0,0, 0, 255, 0, 0, 255, 125);
-
-	//img.setPixel(1,1, r, g, b, a);
-	//img.setPixel(1,2, r, g, b, a);
-}

@@ -10,34 +10,68 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <SDL2/SDL_image.h>
+#include <time.h>
+#include <stdlib.h>
+
+//include "bmp_edit.hpp"
+#include "bmp_edit.cpp"
 
 
 const std::string lfName = "NPC.log";
 const int NUM_NPCS = 10;
 
+const std::string traits[5] = {"Lust", "Disloyalty", "Greed", "Wrath", "Dishonesty"}; 
+
 const std::string names[NUM_NPCS] = {"alpha", "bravo", "charlie", "delta", "echo", "foxtrot",
 									"golf", "hotel", "india", "juliett"};
+
+// This is just a dummy event until we can include an actual event
+class Event{
+	public:
+		std::string event;
+		Event(std::string str) :event{str}{};
+		Event(){
+			event = "NONE";
+		}
+};
+
 class NPC {
 	public:
 		// public fields
 		// these are public to allow easy mutation by isd team
 		// This may be bad practice but avoids the overhead of method calls.
-		float mood;
-		float murderiness;
-		float relationships[NUM_NPCS];
-
+		int mood;
+		int murderiness;
+		int relationships[NUM_NPCS];
+		Event goal;
+		SDL_Surface *surface = nullptr;
 		//Constructor
-		NPC(std::string name, std::string spriteFileName) :mood{0.0f}, murderiness{0.0f},
+		NPC(std::string name, std::string spriteFileName) :mood{0}, murderiness{0},
 															name{name}, spriteFileName{spriteFileName} {
-			for (int i = 0; i<NUM_NPCS; i++){
-				relationships[i] = 0.0f;
-			}
-			personality.insert({"Openness", 1.00});
-			personality.insert({"Conscientiousness", 0.99});
-			personality.insert({"Extroversion", 0.98});
-			personality.insert({"Agreeableness", 0.97});
-			personality.insert({"Neuroticism", 0.96});
 			
+			// Seed RNG
+			srand(time(NULL));
+			// set relationships to random value
+			for (int i = 0; i<NUM_NPCS; i++){
+				relationships[i] = rand() % 201 - 100;
+			}
+			// set personality to random values
+			for (auto trait: traits){
+				personality.insert({trait, rand() % 201 - 100});
+			}
+			
+			std::string oname = "out" + spriteFileName;
+			
+			BMPMod img(spriteFileName, oname);
+			if (personality["lust"] < 25){
+				std::cout << "colors swapped" << std::endl;
+				img.swapColor((unsigned int)0xFF0000FF, (unsigned int)0xFFFF00FF);
+			}else{
+				std::cout << "colors swapped 2" << std::endl;
+				img.swapColor((unsigned int)0xFFFF0000, (unsigned int)0xFFFFFF);
+			}
+	
 			#ifdef LOGGING
 			std::string str = "--Constructor Called--\n";
 			str += toString();
@@ -59,12 +93,10 @@ class NPC {
 			//  If a bottle neck is noticed we could redo this with sprintf equivalent
 			std::string str = "Name: " + name;
 			str += "\nSprite file: " + spriteFileName;
-			str += "\nPersonality:";
-			str += "\n  Openness: " + std::to_string(personality["Openness"]);
-			str += "\n  Conscientiousness: " + std::to_string(personality["Conscientiousness"]);
-			str += "\n  Extroversion: " + std::to_string(personality["Extroversion"]);
-			str += "\n  Agreeableness: " + std::to_string(personality["Agreeableness"]);
-			str += "\n  Neuroticism: " + std::to_string(personality["Neuroticism"]);
+			str += "\nPersonality:\n";
+			for( auto trait: traits){
+				str += trait + ": " + std::to_string(personality[trait]) + "\n";
+			}
 			str += "\nEmotional State: ";
 			str += "\n  Mood: " + std::to_string(mood);
 			str += "\n  Murderiness: " + std::to_string(murderiness);
@@ -114,5 +146,10 @@ class NPC {
 	private:
 		std::string name;
 		std::string spriteFileName;
-		std::map <std::string, float> personality;
+		std::map <std::string, int> personality;
 };
+
+int main(){
+	NPC a("HI", "suit.bmp");
+	std::cout << a.toString() << std::endl;
+}

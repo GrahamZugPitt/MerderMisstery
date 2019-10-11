@@ -28,6 +28,12 @@ sdl2_bmp.o: sdl2_bmp.cpp
 npc.o: npc.cpp
 	$(CC) -c $^ $(COMPILER_FLAGS)
 
+bmp_edit.o: bmp_edit.cpp
+	$(CC) -c $^ $(COMPILER_FLAGS)
+
+npc: bmp_edit.o npc.o
+	$(CC) -o $@ $^ $(COMPILER_FLAGS) $(LINKER_FLAGS)
+
 murder: npc.o sdl2_bmp.o
 	$(CC) -o $@ $^ $(COMPILER_FLAGS) $(LINKER_FLAGS)
 
