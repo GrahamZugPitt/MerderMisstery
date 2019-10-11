@@ -14,13 +14,13 @@
 #include <time.h>
 #include <stdlib.h>
 
-//include "bmp_edit.hpp"
-#include "bmp_edit.cpp"
+#include "bmp_edit.hpp"
+//#include "bmp_edit.cpp"
 
 
 const std::string lfName = "NPC.log";
 const int NUM_NPCS = 10;
-
+//
 const std::string traits[5] = {"Lust", "Disloyalty", "Greed", "Wrath", "Dishonesty"}; 
 
 const std::string names[NUM_NPCS] = {"alpha", "bravo", "charlie", "delta", "echo", "foxtrot",
@@ -64,14 +64,24 @@ class NPC {
 			std::string oname = "out" + spriteFileName;
 			
 			BMPMod img(spriteFileName, oname);
-			if (personality["lust"] < 25){
-				std::cout << "colors swapped" << std::endl;
-				img.swapColor((unsigned int)0xFF0000FF, (unsigned int)0xFFFF00FF);
-			}else{
-				std::cout << "colors swapped 2" << std::endl;
-				img.swapColor((unsigned int)0xFFFF0000, (unsigned int)0xFFFFFF);
+			if (personality[traits[0]] >= 25){
+				std::cout << "lust colors swapped" << std::endl;
+				img.swapColor((unsigned int)0xFF00FF00, (unsigned int)0xFFdbb0a0);
+			} else {
+				img.swapColor((unsigned int)0xFF00FF00, (unsigned int)0xFFFFFFFF);
 			}
-	
+			if (personality[traits[1]] >= 25){
+				std::cout << "disloyalty colors swapped" << std::endl;
+				img.swapColor((unsigned int) 0xFF0000FF, (unsigned int)0xFF000000);
+			} else {
+				img.swapColor((unsigned int)0xFF0000FF, (unsigned int)0xFF111111);
+			}
+			if (personality[traits[3]] >= 25){
+				std::cout << "wrath colors swapped" << std::endl;
+				img.swapColor((unsigned int) 0xFFFF0000, (unsigned int)0xFFEEEE11);
+			} else {
+				img.swapColor((unsigned int) 0xFFFF0000, (unsigned int)0xFFFF0000);
+			}
 			#ifdef LOGGING
 			std::string str = "--Constructor Called--\n";
 			str += toString();
@@ -80,6 +90,7 @@ class NPC {
 			#ifdef VERBOSE
 			std::cout << str << std::endl;
 			#endif
+			printf("exiting\n");
 		}
 		
 		// A method to print NPC info to the console
@@ -95,7 +106,7 @@ class NPC {
 			str += "\nSprite file: " + spriteFileName;
 			str += "\nPersonality:\n";
 			for( auto trait: traits){
-				str += trait + ": " + std::to_string(personality[trait]) + "\n";
+				str += "  " + trait + ": " + std::to_string(personality[trait]) + "\n";
 			}
 			str += "\nEmotional State: ";
 			str += "\n  Mood: " + std::to_string(mood);

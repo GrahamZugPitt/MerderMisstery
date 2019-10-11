@@ -1,3 +1,6 @@
+#ifndef BMP_EDIT_H_
+#define BMP_EDIT_H_
+
 #include <fstream>
 #include <iostream>
 class BMPMod{
@@ -35,3 +38,5 @@ public:
 
 	unsigned int swapColor(unsigned int in, unsigned int out);
 };
+
+#endif
