@@ -47,7 +47,7 @@ class NPC {
 		Event goal;
 		SDL_Surface *surface = nullptr;
 		//Constructor
-		NPC(std::string name, std::string spriteFileName) :mood{0}, murderiness{0},
+		NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsigned int dLoyal, unsigned int dWrath) :mood{0}, murderiness{0},
 															name{name}, spriteFileName{spriteFileName} {
 			
 			// Seed RNG
@@ -61,26 +61,26 @@ class NPC {
 				personality.insert({trait, rand() % 201 - 100});
 			}
 			
-			std::string oname = "out" + spriteFileName;
+			std::string oname = spriteFileName.substr(0,spriteFileName.length()-4) + "m.bmp";
 			
 			BMPMod img(spriteFileName, oname);
 			if (personality[traits[0]] >= 25){
 				std::cout << "lust colors swapped" << std::endl;
-				img.swapColor((unsigned int)0xFF00FF00, (unsigned int)0xFFdbb0a0);
+				img.swapColor((unsigned int)0xFF00FF00, (unsigned int)0xFFE1B09F);
 			} else {
-				img.swapColor((unsigned int)0xFF00FF00, (unsigned int)0xFFFFFFFF);
+				img.swapColor((unsigned int)0xFF00FF00, dLust);
 			}
 			if (personality[traits[1]] >= 25){
 				std::cout << "disloyalty colors swapped" << std::endl;
 				img.swapColor((unsigned int) 0xFF0000FF, (unsigned int)0xFF000000);
 			} else {
-				img.swapColor((unsigned int)0xFF0000FF, (unsigned int)0xFF111111);
+				img.swapColor((unsigned int)0xFF0000FF, dLoyal);
 			}
 			if (personality[traits[3]] >= 25){
 				std::cout << "wrath colors swapped" << std::endl;
-				img.swapColor((unsigned int) 0xFFFF0000, (unsigned int)0xFFEEEE11);
+				img.swapColor((unsigned int) 0xFFFF0000, (unsigned int)0xFFEE1111);
 			} else {
-				img.swapColor((unsigned int) 0xFFFF0000, (unsigned int)0xFFFF0000);
+				img.swapColor((unsigned int) 0xFFFF0000, dWrath);
 			}
 			#ifdef LOGGING
 			std::string str = "--Constructor Called--\n";
@@ -161,6 +161,10 @@ class NPC {
 };
 
 int main(){
-	NPC a("HI", "suit.bmp");
+	unsigned int wrath, lust, loyalty;
+	wrath = 0xFF6d4433;  	// Apron
+	lust = 0xFF11EE22;		// shirt
+	loyalty = 0xFF888899;	// pants
+	NPC a("HI", "Art/NPCs/Blacksmith.bmp", lust, loyalty, wrath);
 	std::cout << a.toString() << std::endl;
 }

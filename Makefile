@@ -22,13 +22,10 @@ all: start run
 start: $(START_FILES)
 	$(CC) $(START_FILES) -w $(LINKER_FLAGS)
 
-sdl2_bmp.o: sdl2_bmp.cpp
+npc.o: NPC_Gen/npc.cpp
 	$(CC) -c $^ $(COMPILER_FLAGS)
 
-npc.o: npc.cpp
-	$(CC) -c $^ $(COMPILER_FLAGS)
-
-bmp_edit.o: bmp_edit.cpp
+bmp_edit.o: NPC_Gen/bmp_edit.cpp
 	$(CC) -c $^ $(COMPILER_FLAGS)
 
 npc: bmp_edit.o npc.o
