@@ -1,0 +1,43 @@
+﻿General Gameplay Flow:
+	1) Generate People
+	2) Interaction Simulation
+	3) Murder Simulation
+	4) Player interaction
+	5) "Solve the murder" portion
+	6) End of play
+
+Part 1: Generate people is specified mostly by the AI team document
+
+Part 2: Interaction Simulation
+	* Event Trees
+		- Relationship (Romantic)
+		- Relationship (Friendly)
+		- Conflict
+	* NPC's are allowed to interact with whoever they choose to in the place they are in
+		- So two NPC's in the church may interact, but an NPC in the church may not interact with an NPC in the Market
+	* Which event tree an NPC enters will be determined by their relationship and memories
+	* The conflict tree is technically an option from anywhere on either of the relationship graphs
+	* NPC's will attempt to enter certain trees that contain their goals
+	* Murder simulation is tripped when one NPC's relationship variable (to another NPC) drops below their murderiness variable
+
+Part 3: Murder Simulation
+	1) Force Murderer and Vic into separate rooms
+	2) Continue simulating until Murderer and Vic enter same room
+	3) Stop simulation
+	4) Pick a weapon from one of the rooms murderer was in
+	5) Generate event that someone noticed the weapon was gone
+	6) Begin play
+
+Part 4: Player Interaction
+	* Top down, speak to NPC's in town
+	* May talk to judge in town hall when you're ready to convict the perp
+
+Part 5: Solve the Murder
+	* Interact with a jury, present evidence
+	* Eventually rest your case
+	* If the Jury is convinced, sentence the person
+	* If not, they go free
+
+Part 6: End of play
+	* If you convicted the right person, quick animation of the murder victim's ghost smiling and dissapearing, finally at peace
+	* Else, make it clear they can't rest yet because their murderer is not behind bars
