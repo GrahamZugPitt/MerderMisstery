@@ -19,6 +19,11 @@ const int SCREEN_HEIGHT = 720;
 const int PLAYER_WIDTH = 64;
 const int PLAYER_HEIGHT = 88;
 
+//Smith dimensions
+const int SMITH_WIDTH = 60;
+const int SMITH_HEIGHT = 88;
+
+
 //Window pointer
 SDL_Window *window = NULL;
 
@@ -86,6 +91,15 @@ int main(int argc, char *argv[])
     //Set player configuration and send to Player class
     Player player1(renderer, "Art/Player/PlayerSpriteSheet.png", initial_x, initial_y);
     
+    // Blacksmith
+    SDL_Rect smithCrop;
+    smithCrop.x = 7;
+    smithCrop.y = 0;
+    smithCrop.w = SMITH_WIDTH;
+    smithCrop.h = SMITH_HEIGHT;
+    float smithcounter =0;
+    SDL_Surface *blacksmith = IMG_Load("Art/NPCs/Blacksmithm.bmp");
+    SDL_Texture *smithObject = SDL_CreateTextureFromSurface(renderer, blacksmith);
     //Quit and next flags
     bool quit = false;
     bool next = false;
@@ -166,6 +180,21 @@ int main(int argc, char *argv[])
         //Well
         SDL_RenderCopy(renderer, wellObject, &objRect, &objPosition);
         
+        // Animated Blacksmith
+        objPosition.x += 300;
+        objPosition.y -= 100;
+
+        objPosition.w = SMITH_WIDTH;
+        objPosition.h = SMITH_HEIGHT;
+        smithcounter += time_change;
+        if(smithcounter >= 0.3f)
+        {
+            smithcounter = 0;
+            smithCrop.x += SMITH_WIDTH;
+            if(smithCrop.x >= 3*SMITH_WIDTH)
+                smithCrop.x = 7;
+        }
+        SDL_RenderCopy(renderer, smithObject, &smithCrop, &objPosition);
         /***** Object rendering DEMO ******/
         
         //Render player
