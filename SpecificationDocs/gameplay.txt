@@ -1,0 +1,15 @@
+Interaction Specification Doc, as decided on by the ISD / AI team:
+	- Conversation will take place across 4 templated questions
+	1) Who do you think killed 'the victim'
+		-NPC will look through their memories and make a guess if they have a certainty above a certain value
+		-Certainty will be affected by finding memories that involved the victim and a negative interaction with another NPC
+		-Obviously no NPC will accuse themselves or the victim
+		-If the NPC makes a pick, will relate the three most relevant incidences
+	2) What is your last memory of the victim?
+		-Fairly straightforward
+		-Will relate any memory, even if it was not a direct interaction
+	3) How does "x" feel about "y"?
+		-Will use a certainty threshold similar to 1
+		-May relate a particular memory (if it is particularly relevant, e.g. they recently fought, got married, etc)
+	4) Where were you at 'time t'?
+		-Not particularly useful if you have the schedules memorized, but can help paint a picture of who was where, when
