@@ -1,0 +1,30 @@
+Routines as decided by AI / ISD teams:
+
+Note: 4 Workers and 4 Merchants, that travel together unless otherwise specified.
+
+Workday Routine:
+	-Morning
+		-Police and Mayor in Town Hall
+		-Workers at factory
+		-Merchants in Market
+		-Priest and Inkeeper at Inn
+	-Noon
+		-Everyone at the Market
+	-Afternoon
+		-Police and Workers at factory
+		-Priest and Mayor at church
+		-Inkeeper and Merchants at Inn
+		-Police and Inkeeper do not interact with others
+	-Evening
+		-Merchants, Mayor, Priest in Market
+		-Workers, Police, and Inkeeper at inn
+
+Weekend Routine:
+	-Morning
+		-Everyone goes to Church
+	-Noon
+		-Everyone goes to Market
+	-Afternoon
+		-Everyone goes to Town Hall
+	-Evening
+		-Identical to Week Evening
