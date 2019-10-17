@@ -17,7 +17,7 @@ COMPILER_FLAGS = -Wall -I/usr/include/SDL2
 LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf #-F/Library/Frameworks -framework SDL2 -framework SDL2_image -framework SDL2_ttf
 
 #TARGET
-all: start run
+all: start
 
 start: $(START_FILES)
 	$(CC) $(START_FILES) -w $(LINKER_FLAGS)
