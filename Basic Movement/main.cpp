@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     // Blacksmith
     SDL_Rect smithCrop;
     smithCrop.x = 7;
-    smithCrop.y = 0;
+    smithCrop.y = 0;//SMITH_HEIGHT;
     smithCrop.w = SMITH_WIDTH;
     smithCrop.h = SMITH_HEIGHT;
     float smithcounter =0;

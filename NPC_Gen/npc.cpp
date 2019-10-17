@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <string>
 #include <SDL2/SDL_image.h>
 #include <time.h>
 #include <stdlib.h>
