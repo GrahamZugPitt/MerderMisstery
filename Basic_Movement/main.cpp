@@ -11,6 +11,11 @@
 #include<iostream>
 #include"Player.hpp"
 
+#include "../NPC_Gen/npc.hpp"
+//#include "../NPC_Gen/npc.cpp"
+#include "../NPC_Gen/bmp_edit.hpp"
+//#include "../NPC_Gen/bmp_edit.cpp"
+
 //Screen dimension constants
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
@@ -18,6 +23,11 @@ const int SCREEN_HEIGHT = 720;
 //Player image dimensions
 const int PLAYER_WIDTH = 64;
 const int PLAYER_HEIGHT = 88;
+
+//Smith dimensions
+const int SMITH_WIDTH = 60;
+const int SMITH_HEIGHT = 88;
+
 
 //Window pointer
 SDL_Window *window = NULL;
@@ -86,6 +96,10 @@ int main(int argc, char *argv[])
     //Set player configuration and send to Player class
     Player player1(renderer, "Art/Player/PlayerSpriteSheet.png", initial_x, initial_y);
     
+    // Blacksmith
+    NPC blm("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF6d4433, 0xFF11EE22, 0xFF888899);
+    blm.initSprite(renderer, 60, 88, 800, 250);
+
     //Quit and next flags
     bool quit = false;
     bool next = false;
@@ -165,9 +179,9 @@ int main(int argc, char *argv[])
         
         //Well
         SDL_RenderCopy(renderer, wellObject, &objRect, &objPosition);
-        
+
         /***** Object rendering DEMO ******/
-        
+        blm.renderToScreen(renderer, time_change);
         //Render player
         player1.RenderOnScreen(renderer);
         
