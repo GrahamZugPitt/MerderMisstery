@@ -42,6 +42,7 @@ NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsig
 	std::string oname = spriteFileName.substr(0,spriteFileName.length()-4) + "m.bmp";
 	
 	BMPMod img(spriteFileName, oname);
+	
 	if (personality[traits[0]] >= 25){
 		std::cout << "lust colors swapped" << std::endl;
 		img.swapColor((unsigned int)0xFF00FF00, (unsigned int)0xFFE1B09F);
@@ -65,7 +66,7 @@ NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsig
 	} if (personality[traits[4]] >= 25){
 		std::cout << "Dishonesty sprite used" << std::endl;
 		spriteRow += 2;
-	}	
+	}
 	spriteFileName = oname;
 	#ifdef LOGGING
 	std::string str = "--Constructor Called--\n";

@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     Player player1(renderer, "Art/Player/PlayerSpriteSheet.png", initial_x, initial_y);
     
     // Blacksmith
-    NPC blm("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF6d4433, 0xFF11EE22, 0xFF888899);
+    NPC blm("Benedict", "Art/NPCs/Worker210.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
     blm.initSprite(renderer, 60, 88, 800, 250);
 
     //Quit and next flags
