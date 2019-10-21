@@ -11,6 +11,11 @@
 #include<iostream>
 #include"Player.hpp"
 
+#include "../NPC_Gen/npc.hpp"
+//#include "../NPC_Gen/npc.cpp"
+#include "../NPC_Gen/bmp_edit.hpp"
+//#include "../NPC_Gen/bmp_edit.cpp"
+
 //Screen dimension constants
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
@@ -92,14 +97,19 @@ int main(int argc, char *argv[])
     Player player1(renderer, "Art/Player/PlayerSpriteSheet.png", initial_x, initial_y);
     
     // Blacksmith
-    SDL_Rect smithCrop;
-    smithCrop.x = 7;
-    smithCrop.y = 0;
-    smithCrop.w = SMITH_WIDTH;
-    smithCrop.h = SMITH_HEIGHT;
-    float smithcounter =0;
-    SDL_Surface *blacksmith = IMG_Load("Art/NPCs/Blacksmithm.bmp");
-    SDL_Texture *smithObject = SDL_CreateTextureFromSurface(renderer, blacksmith);
+    srand(time(NULL));
+    NPC blm("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    blm.initSprite(renderer, 60, 88, 800, 250);
+    NPC work1("a", "Art/NPCs/Worker1.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    work1.initSprite(renderer, 60, 88, 880, 250);
+    NPC work2("a", "Art/NPCs/Worker2.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    work2.initSprite(renderer, 60, 88, 960, 250);
+    NPC work3("a", "Art/NPCs/Worker3.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    work3.initSprite(renderer, 60, 88, 880, 350);
+    NPC work4("a", "Art/NPCs/Worker4.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    work4.initSprite(renderer, 60, 88, 960, 350);
+    NPC vicar("a", "Art/NPCs/Vicar.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    vicar.initSprite(renderer, 60, 88, 800, 350);
     //Quit and next flags
     bool quit = false;
     bool next = false;
@@ -179,24 +189,14 @@ int main(int argc, char *argv[])
         
         //Well
         SDL_RenderCopy(renderer, wellObject, &objRect, &objPosition);
-        
-        // Animated Blacksmith
-        objPosition.x += 300;
-        objPosition.y -= 100;
 
-        objPosition.w = SMITH_WIDTH;
-        objPosition.h = SMITH_HEIGHT;
-        smithcounter += time_change;
-        if(smithcounter >= 0.3f)
-        {
-            smithcounter = 0;
-            smithCrop.x += SMITH_WIDTH;
-            if(smithCrop.x >= 3*SMITH_WIDTH)
-                smithCrop.x = 7;
-        }
-        SDL_RenderCopy(renderer, smithObject, &smithCrop, &objPosition);
         /***** Object rendering DEMO ******/
-        
+        blm.renderToScreen(renderer, time_change);
+        work1.renderToScreen(renderer, time_change);
+        work2.renderToScreen(renderer, time_change);
+        work3.renderToScreen(renderer, time_change);
+        work4.renderToScreen(renderer, time_change);
+        vicar.renderToScreen(renderer, time_change);
         //Render player
         player1.RenderOnScreen(renderer);
         
