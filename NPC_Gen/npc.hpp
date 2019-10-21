@@ -25,6 +25,8 @@ const std::string traits[5] = {"Lust", "Disloyalty", "Greed", "Wrath", "Dishones
 const std::string names[NUM_NPCS] = {"alpha", "bravo", "charlie", "delta", "echo", "foxtrot",
 									"golf", "hotel", "india", "juliett"};
 
+constexpr unsigned int fleshtones[5] = {0xffffdbac, 0xfff1c27d, 0xffe0ac69, 0xffc68642, 0xff8d5524};
+
 class NPC {
 	public:
 		// public fields
