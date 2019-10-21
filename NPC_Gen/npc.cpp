@@ -29,7 +29,6 @@ NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsig
 	prevTime = 0;
 	goingRight = true;
 	// Seed RNG
-	srand(time(NULL));
 	// set relationships to random value
 	for (int i = 0; i<NUM_NPCS; i++){
 		relationships[i] = rand() % 201 - 100;
@@ -43,9 +42,13 @@ NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsig
 	
 	BMPMod img(spriteFileName, oname);
 	
+	unsigned int fleshtone = fleshtones[rand() % 5];
+	std::cout << std::hex << fleshtone << std::endl;
+	img.swapColor((unsigned int)0x80FFFFFF, fleshtone);
+
 	if (personality[traits[0]] >= 25){
 		std::cout << "lust colors swapped" << std::endl;
-		img.swapColor((unsigned int)0xFF00FF00, (unsigned int)0xFFE1B09F);
+		img.swapColor((unsigned int)0xFF00FF00, fleshtone);
 	} else {
 		img.swapColor((unsigned int)0xFF00FF00, dLust);
 	}
@@ -80,7 +83,7 @@ NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsig
 }
 // Initializes the sprite size and position on the map	
 int NPC::initSprite(SDL_Renderer *renderer, int sizeX, int sizeY, int posX, int posY){
-	crop.x = 7; //TODO: fix this offset in the sprite sheet
+	crop.x = 7 + rand() % 3; //TODO: fix this offset in the sprite sheet
 	crop.y = spriteRow * sizeY;
 	crop.w = sizeX;
 	crop.h = sizeY;

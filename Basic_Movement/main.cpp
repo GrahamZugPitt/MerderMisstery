@@ -97,9 +97,19 @@ int main(int argc, char *argv[])
     Player player1(renderer, "Art/Player/PlayerSpriteSheet.png", initial_x, initial_y);
     
     // Blacksmith
-    NPC blm("Benedict", "Art/NPCs/Worker210.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    srand(time(NULL));
+    NPC blm("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
     blm.initSprite(renderer, 60, 88, 800, 250);
-
+    NPC work1("a", "Art/NPCs/Worker1.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    work1.initSprite(renderer, 60, 88, 880, 250);
+    NPC work2("a", "Art/NPCs/Worker2.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    work2.initSprite(renderer, 60, 88, 960, 250);
+    NPC work3("a", "Art/NPCs/Worker3.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    work3.initSprite(renderer, 60, 88, 880, 350);
+    NPC work4("a", "Art/NPCs/Worker4.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    work4.initSprite(renderer, 60, 88, 960, 350);
+    NPC vicar("a", "Art/NPCs/Vicar.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    vicar.initSprite(renderer, 60, 88, 800, 350);
     //Quit and next flags
     bool quit = false;
     bool next = false;
@@ -182,6 +192,11 @@ int main(int argc, char *argv[])
 
         /***** Object rendering DEMO ******/
         blm.renderToScreen(renderer, time_change);
+        work1.renderToScreen(renderer, time_change);
+        work2.renderToScreen(renderer, time_change);
+        work3.renderToScreen(renderer, time_change);
+        work4.renderToScreen(renderer, time_change);
+        vicar.renderToScreen(renderer, time_change);
         //Render player
         player1.RenderOnScreen(renderer);
         
