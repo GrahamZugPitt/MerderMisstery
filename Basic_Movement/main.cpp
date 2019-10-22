@@ -28,6 +28,9 @@ const int PLAYER_HEIGHT = 88;
 const int SMITH_WIDTH = 60;
 const int SMITH_HEIGHT = 88;
 
+// Key state pointer for user input
+const Uint8 *keys = SDL_GetKeyboardState(NULL);
+
 
 //Window pointer
 SDL_Window *window = NULL;
@@ -47,10 +50,10 @@ void close()
 {
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
-    
+
     window = NULL;
     renderer = NULL;
-    
+
     IMG_Quit();
     SDL_Quit();
 }
@@ -63,39 +66,39 @@ int main(int argc, char *argv[])
     int last_time = 0;
     float time_change = 0.0f;
     const Uint8 *keyPressed;
-    
+
     //Player set to center of screen
     int initial_x = (SCREEN_WIDTH / 2) - (PLAYER_WIDTH / 2);
     int initial_y = (SCREEN_HEIGHT / 2) - (PLAYER_HEIGHT / 2);
-    
+
     //Start SDL video subsystem
     SDL_Init(SDL_INIT_VIDEO);
-    
+
     //Create window and center on page at 1280x720
     window = SDL_CreateWindow("Merder Misstery", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    
+
     //Initialize renderer
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    
+
     //Logo background
     SDL_Surface *logo = IMG_Load("Art/Logo/Logo.png");
     SDL_Texture *logoScreen = SDL_CreateTextureFromSurface(renderer, logo);
-    
+
     //Grass background
     SDL_Surface *grass = IMG_Load("Art/Tiles/TemporaryGrass.png");
     SDL_Texture *grassBackground = SDL_CreateTextureFromSurface(renderer, grass);
-    
+
     //Horse
     SDL_Surface *horse = IMG_Load("Art/Decor/Horse.png");
     SDL_Texture *horseObject = SDL_CreateTextureFromSurface(renderer, horse);
-    
+
     //Well
     SDL_Surface *well = IMG_Load("Art/Decor/WaterWell.png");
     SDL_Texture *wellObject = SDL_CreateTextureFromSurface(renderer, well);
-    
+
     //Set player configuration and send to Player class
     Player player1(renderer, "Art/Player/PlayerSpriteSheet.png", initial_x, initial_y);
-    
+
     // Blacksmith
     srand(time(NULL));
     NPC blm("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
@@ -113,21 +116,26 @@ int main(int argc, char *argv[])
     //Quit and next flags
     bool quit = false;
     bool next = false;
-    
+
     //SDL event
     SDL_Event e;
-    
+
     //Logo screen loop
     while(!next && !quit) {
-        
-        //Quit application
+
+        //Getting event
         while(SDL_PollEvent(&e) != 0)
         {
-            //Getting event
+            //Quit application
             if(e.type == SDL_QUIT)
                 quit = true;
+
+            //If char 'C' is pressed
+            if (keys[SDL_SCANCODE_C]){
+              std::cout << "C is being pressed\n";
+            }
         }
-        
+
         switch (e.button.button)
         {
             case SDL_BUTTON_LEFT:
@@ -135,58 +143,63 @@ int main(int argc, char *argv[])
                 next = true;
                 break;
         }
-        
+
         //Logo screen render
         SDL_RenderCopy(renderer, logoScreen, NULL, NULL);
         SDL_RenderPresent(renderer);
     }
-    
-    
+
+
     //Enter game loop
     while(!quit) {
-        
+
         //SDL time and delta value
         last_time = curr_time;
         curr_time = SDL_GetTicks();
         time_change = (curr_time - last_time) / 500.0f;
-        
-        //Quit application
+
+        //Getting event
         while(SDL_PollEvent(&e) != 0)
         {
-            //Getting event
+            //Quit application
             if(e.type == SDL_QUIT)
                 quit = true;
+
+            //If char 'C' is pressed
+            if (keys[SDL_SCANCODE_C]){
+              std::cout << "C is being pressed\n";
+            }
         }
-        
+
         //Get current state of keyboard
         keyPressed = SDL_GetKeyboardState(NULL);
-        
+
         //Update player movement
         player1.Update(time_change, keyPressed);
-        
+
         //Rendering
         SDL_RenderClear(renderer);
-        
+
         //Static grass image
         SDL_RenderCopy(renderer, grassBackground, NULL, NULL);
-        
+
         /***** Object rendering DEMO ******/
         /*TODO: Collision with objects as well as ensuring player appears behind object if player's x position is less than that
          of the object*/
-        
+
          objRect.w = 160;
          objRect.h = 96;
          objPosition.w = objRect.w;
          objPosition.h = objRect.h;
          objPosition.x = 200;
          objPosition.y = 200;
-        
+
         //Horse
         SDL_RenderCopy(renderer, horseObject, &objRect, &objPosition);
-        
+
         objPosition.x += 250;
         objPosition.y += 100;
-        
+
         //Well
         SDL_RenderCopy(renderer, wellObject, &objRect, &objPosition);
 
@@ -199,12 +212,12 @@ int main(int argc, char *argv[])
         vicar.renderToScreen(renderer, time_change);
         //Render player
         player1.RenderOnScreen(renderer);
-        
+
         SDL_RenderPresent(renderer);
     }
-    
+
     //Free memory and close subsystems
     close();
-    
+
     return 0;
 }
