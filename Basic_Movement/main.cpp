@@ -31,6 +31,9 @@ const int SMITH_HEIGHT = 88;
 // Key state pointer for user input
 const Uint8 *keys = SDL_GetKeyboardState(NULL);
 
+// Chat font
+// const TTF_Font *bahiana = TTF
+
 
 //Window pointer
 SDL_Window *window = NULL;
@@ -96,6 +99,10 @@ int main(int argc, char *argv[])
     SDL_Surface *well = IMG_Load("Art/Decor/WaterWell.png");
     SDL_Texture *wellObject = SDL_CreateTextureFromSurface(renderer, well);
 
+    //Chat Coming Soon
+    SDL_Surface *chatSoon = IMG_Load("Art/chat_soon.png");
+    SDL_Texture *chatSoonObject = SDL_CreateTextureFromSurface(renderer, chatSoon);
+
     //Set player configuration and send to Player class
     Player player1(renderer, "Art/Player/PlayerSpriteSheet.png", initial_x, initial_y);
 
@@ -132,7 +139,34 @@ int main(int argc, char *argv[])
 
             //If char 'C' is pressed
             if (keys[SDL_SCANCODE_C]){
-              std::cout << "C is being pressed\n";
+              std::cout << "Entering Chat\n";
+              //inChat boolean value
+              bool inChat = true;
+
+              // //Select background to black.
+              // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+              //
+              // //Clear the entire screen to selected color.
+              // SDL_RenderClear(renderer);
+              //
+              // //Output
+              // SDL_RenderPresent(renderer);
+              //Logo screen render
+              SDL_RenderCopy(renderer, chatSoonObject, NULL, NULL);
+              SDL_RenderPresent(renderer);
+
+              //Wait for user to exit chat
+              while (SDL_PollEvent(&e) != 0 || (inChat == true && !quit))
+              {
+                //Quit application
+                if(e.type == SDL_QUIT)
+                    quit = true;
+
+                if (keys[SDL_SCANCODE_E]){
+                  inChat = false;
+                  std::cout << "Exiting Chat\n";
+                }
+              }
             }
         }
 
