@@ -31,10 +31,6 @@ const int SMITH_HEIGHT = 88;
 // Key state pointer for user input
 const Uint8 *keys = SDL_GetKeyboardState(NULL);
 
-// Chat font
-// const TTF_Font *bahiana = TTF
-
-
 //Window pointer
 SDL_Window *window = NULL;
 
@@ -137,21 +133,13 @@ int main(int argc, char *argv[])
             if(e.type == SDL_QUIT)
                 quit = true;
 
-            //If char 'C' is pressed
+            //If char 'C' is pressed (this will later become its on method/class)
             if (keys[SDL_SCANCODE_C]){
               std::cout << "Entering Chat\n";
               //inChat boolean value
               bool inChat = true;
 
-              // //Select background to black.
-              // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-              //
-              // //Clear the entire screen to selected color.
-              // SDL_RenderClear(renderer);
-              //
-              // //Output
-              // SDL_RenderPresent(renderer);
-              //Logo screen render
+              //Render chat coming soon page
               SDL_RenderCopy(renderer, chatSoonObject, NULL, NULL);
               SDL_RenderPresent(renderer);
 
@@ -199,10 +187,29 @@ int main(int argc, char *argv[])
             if(e.type == SDL_QUIT)
                 quit = true;
 
-            //If char 'C' is pressed
-            if (keys[SDL_SCANCODE_C]){
-              std::cout << "C is being pressed\n";
-            }
+                //If char 'C' is pressed (this will later become its on method/class)
+                if (keys[SDL_SCANCODE_C]){
+                  std::cout << "Entering Chat\n";
+                  //inChat boolean value
+                  bool inChat = true;
+
+                  //Render chat coming soon page
+                  SDL_RenderCopy(renderer, chatSoonObject, NULL, NULL);
+                  SDL_RenderPresent(renderer);
+
+                  //Wait for user to exit chat
+                  while (SDL_PollEvent(&e) != 0 || (inChat == true && !quit))
+                  {
+                    //Quit application
+                    if(e.type == SDL_QUIT)
+                        quit = true;
+
+                    if (keys[SDL_SCANCODE_E]){
+                      inChat = false;
+                      std::cout << "Exiting Chat\n";
+                    }
+                  }
+                }
         }
 
         //Get current state of keyboard
