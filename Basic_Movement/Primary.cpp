@@ -13,12 +13,18 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include "../NPC_Gen/npc.hpp"
+//#include "../NPC_Gen/npc.cpp"
+#include "../NPC_Gen/bmp_edit.hpp"
+//#include "../NPC_Gen/bmp_edit.cpp"
 
 //Function Declarations
 bool initialize();
 SDL_Texture* loadFiles(std::string name);
 void setCamera();
 void clean();
+//int initSprite(SDL_Renderer *renderer, int sizeX, int sizeY, int posX, int posY);
+//void renderToScreen(SDL_Renderer *renderer, float timechange, float posX, float posY);
 
 //Declaring Global Variables
 const int MAP_WIDTH = 3840;
@@ -35,26 +41,45 @@ const Uint8 *keyIn = SDL_GetKeyboardState(NULL);
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
+
 SDL_Rect objRect;
 SDL_Rect objPosition;
+
 SDL_Texture* playerTexture;
+SDL_Texture* bg;
+
 SDL_Rect cropPNG;
 SDL_Rect positionPNG;
+
 SDL_Rect cam;
 SDL_Scancode keys[4];
+SDL_Rect tempRect;
 
+SDL_Rect positionCastle;
+
+SDL_Texture* interact;
+SDL_Rect messageDestination;
+
+SDL_Texture* churchMessage;
+SDL_Rect churchDestination;
+
+SDL_Texture* exitMessage;
+
+float time_change = 0.0f;
 bool isRunning;
 float playerSpeed;
 int frameWidth;
 int frameHeight;
 float counter;
 int textureWidth;
+int keyed = 0;
 
 class Player {
     public:
         Player();
         void move(float change, const Uint8 *keyState);
         void render();
+        bool collision();
         ~Player();
         int xPosition = 0;
         int yPosition = 0;
@@ -69,16 +94,24 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    
     SDL_Texture* bg = loadFiles("Art/Tiles/Map.png");
     SDL_Texture* logoScreen = loadFiles("Art/Logo/Logo.png");
     playerTexture = loadFiles("Art/Player/PlayerSpriteSheet.png");
-
+    interact = loadFiles("Art/Messages/interact.png");
+    churchMessage = loadFiles("Art/Messages/churchMessage.png");
+    exitMessage = loadFiles("Art/Messages/exitMessage.png");
+    
     //Chat Coming Soon
     SDL_Surface *chatSoon = IMG_Load("Art/chat_soon.png");
     SDL_Texture *chatSoonObject = SDL_CreateTextureFromSurface(renderer, chatSoon);
 
-
     Player player;
+
+    //NPC Generation (not ready yet)
+    //NPC blm("Benedict", "Art/NPCs/Blacksmithm.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    //blm.initSprite(renderer, 60, 88, 800, 250);
+    //std::cout << blm.initSprite(renderer, 60, 88, 800, 250);
 
     srand(time(NULL));
 
@@ -88,7 +121,7 @@ int main(int argc, char *argv[]) {
     bool next = false;
     int curr_time = 0;
     int last_time = 0;
-    float time_change = 0.0f;
+    time_change = 0.0f;
     const Uint8 *keyPressed;
 
     cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
@@ -199,6 +232,11 @@ int main(int argc, char *argv[]) {
         //Render Player
         player.render();
 
+        //Render NPC (not ready yet)
+        //blm.renderToScreen(renderer, time_change, 50, 60);
+
+        player.collision();
+        
         //Update Screen
         SDL_RenderPresent(renderer);
     }
@@ -212,9 +250,10 @@ Player::Player() {
 
     //Query attributes of texture
     SDL_QueryTexture(playerTexture, NULL, NULL, &cropPNG.w, &cropPNG.h);
+    SDL_QueryTexture(bg, NULL, NULL, &positionCastle.w, &positionCastle.h);
 
     //Speed of player
-    playerSpeed = 250.0f;
+    playerSpeed = 175.0f;
 
     //Position of player sprite
     positionPNG.x = (MAP_WIDTH / 2) - (PLAYER_WIDTH / 2);
@@ -232,6 +271,12 @@ Player::Player() {
     positionPNG.h = cropPNG.h;
     frameWidth = positionPNG.w;
     frameHeight = positionPNG.h;
+
+    //Castle rect positions and widths
+    positionCastle.x = 1915;
+    positionCastle.y = 815;
+    positionCastle.w = 38;
+    positionCastle.h = 60;
 
     //Running flag
     isRunning = false;
@@ -340,6 +385,48 @@ bool initialize() {
 
     // Set renderer draw/clear color
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+
+    return true;
+}
+
+bool Player::collision()
+{
+    if(positionPNG.x + positionPNG.w <= positionCastle.x || positionPNG.x >= positionCastle.x + positionCastle.w ||
+        positionPNG.y + positionPNG.h <= positionCastle.y || positionPNG.y >= positionCastle.y + positionCastle.h)
+    {
+        keyed = 0;
+        SDL_SetTextureColorMod(playerTexture, 255, 255, 255);
+        return false;
+    }
+
+        SDL_SetTextureColorMod(playerTexture, 255, 0, 0);
+
+        if (keyIn[SDL_SCANCODE_X] || keyed == 1){
+            keyed = 1;
+            //Display messages
+            messageDestination.x = (SCREEN_WIDTH / 2) - 450;
+            messageDestination.y = 600;
+            messageDestination.w = 900;
+            messageDestination.h = 100;
+            SDL_RenderCopy(renderer, churchMessage, NULL, &messageDestination);
+            messageDestination.x = 0;
+            messageDestination.y = 0;
+            messageDestination.w = 300;
+            messageDestination.h = 100;
+            SDL_RenderCopy(renderer, exitMessage, NULL, &messageDestination);
+            SDL_SetTextureColorMod(playerTexture, 255, 0, 0);
+        }
+        
+        if(keyIn[SDL_SCANCODE_Z] || keyed == 0) {
+            keyed = 0;
+            //Display interaction message and highlight character red when collision occurs
+            messageDestination.x = 0;
+            messageDestination.y = 0;
+            messageDestination.w = 300;
+            messageDestination.h = 100;
+            SDL_RenderCopy(renderer, interact, NULL, &messageDestination);
+        }
+
 
     return true;
 }
