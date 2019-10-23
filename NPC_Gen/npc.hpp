@@ -48,7 +48,7 @@ class NPC {
 		~NPC();
 		std::string getName();
 		std::string getSpriteName();
-		void renderToScreen(SDL_Renderer *renderer, float timechange);
+		void renderToScreen(SDL_Renderer *renderer, float timechange, float posX, float posY);
 	private:
 		int spriteRow;
 		std::string name;
