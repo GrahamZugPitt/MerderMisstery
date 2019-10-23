@@ -335,8 +335,3 @@ void clean() {
     IMG_Quit();
     SDL_Quit();
 }
-
-
-
-
-
