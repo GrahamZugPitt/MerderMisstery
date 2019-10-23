@@ -13,7 +13,7 @@
 
 //Function Declarations
 bool initialize();
-SDL_Texture* loadFiles(std::string name);
+SDL_Texture* loadFiles(std::string name, SDL_Renderer *renderer);
 void setCamera();
 void clean();
 

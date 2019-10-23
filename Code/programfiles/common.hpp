@@ -21,21 +21,4 @@ const int PLAYER_HEIGHT = 88;
 const int X_FRAMES = 3;
 const int Y_FRAMES = 4;
 
-inline SDL_Window* window = NULL;
-SDL_Renderer* renderer = NULL;
-SDL_Rect objRect;
-SDL_Rect objPosition;
-SDL_Texture* playerTexture;
-SDL_Rect cropPNG;
-SDL_Rect positionPNG;
-SDL_Rect cam;
-SDL_Scancode keys[4];
-
-bool isRunning;
-float playerSpeed;
-int frameWidth;
-int frameHeight;
-float counter;
-int textureWidth;
-
 #endif

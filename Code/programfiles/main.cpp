@@ -1,6 +1,4 @@
 //
-//  Primary.cpp
-//  Game Design
 //
 //  Original File created by Darpun Kohli
 //  Scrolling Added by Shawn Blake
@@ -10,14 +8,31 @@
 #include "gameloop.hpp"
 #include "Player.hpp"
 
+
+// Declaring variables that will be used later
+SDL_Window* window = NULL;
+SDL_Renderer* renderer = NULL;
+SDL_Rect objRect;
+SDL_Rect objPosition;
+SDL_Rect cam;
+SDL_Scancode keys[4];
+
+bool isRunning;
+float playerSpeed;
+int frameWidth;
+int frameHeight;
+float counter;
+int textureWidth;
+
+
 int main(int argc, char *argv[]) {
-    if (!initialize()) {
+    if (!initialize(window, renderer)) {
         std::cout <<  "Couldn't Initialize. Cleaning and exiting now." << std::endl;
         clean();
         return 1;
     }
     
-    SDL_Texture* logoScreen = loadFiles("Art/Logo/Logo.png");
+    SDL_Texture* logoScreen = loadFiles("Art/Logo/Logo.png", renderer);
     
     srand(time(NULL));
     
@@ -52,7 +67,7 @@ int main(int argc, char *argv[]) {
         SDL_RenderPresent(renderer);
     }
     
-    gameloop(e, quit, curr_time, last_time, time_change, keyPressed);
+    gameloop(e, quit, curr_time, last_time, time_change, keyPressed, renderer, cam);
 
     clean();
     

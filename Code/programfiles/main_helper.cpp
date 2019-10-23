@@ -9,7 +9,7 @@
 #include "main_helper.hpp"
 
 //Functions as declared
-bool initialize() {
+bool initialize(SDL_Window *window, SDL_Renderer* renderer) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cout << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
         return false;
@@ -44,7 +44,7 @@ bool initialize() {
     return true;
 }
 
-SDL_Texture* loadFiles(std::string name) {
+SDL_Texture* loadFiles(std::string name, SDL_Renderer *renderer) {
     SDL_Texture* newText = nullptr;
 
     SDL_Surface* startSurf = IMG_Load(name.c_str());

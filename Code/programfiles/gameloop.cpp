@@ -2,12 +2,15 @@
 #include "main_helper.hpp"
 #include "Player.hpp"
 
-void gameloop(SDL_Event e, bool quit, int curr_time, int last_time, float time_change, const Uint8 *keyPressed){
+void gameloop(SDL_Event e, bool quit, int curr_time, int last_time, float time_change, const Uint8 *keyPressed, SDL_Renderer* renderer, SDL_Rect cam){
 
     SDL_Texture* bg = loadFiles("Art/Tiles/Map.png");
-    playerTexture = loadFiles("Art/Player/PlayerSpriteSheet.png");
+    SDL_Texture* playerTexture = loadFiles("Art/Player/PlayerSpriteSheet.png");
+	SDL_Rect cropPNG;
+	SDL_Rect positionPNG;
 
-    Player *player = new Player(playerTexture, &cropPNG);
+
+    Player *player = new Player(playerTexture, cropPNG);
 
 	//Enter Game Loop
     while(!quit) {
