@@ -2,13 +2,13 @@
 #OUT_NAMES = $(patsubst %.cpp,%.o,$(CPP_FILES))
 
 #FILES TO COMPILE
-START_FILES = Basic_Movement/Primary.cpp
-SOURCE_FILES = bmp_edit npc Primary
+START_FILES = Code/mainwork/mainone
+SOURCE_FILES = bmp_edit npc gameloop main_helper Player main
 #OUTPUT
 OUT_NAMES = $(patsubst %.cpp,%.o,$(START_FILES))
-OBJDIR := Basic_Movement
-NPC_DIR := NPC_Gen
-NPC_HEADERS = NPC_Gen/bmp_edit.hpp NPC_Gen/npc.hpp
+OBJDIR := Code/programfiles/
+NPC_DIR := Code/NPC_Gen
+NPC_HEADERS = Code/NPC_Gen/bmp_edit.hpp Code/NPC_Gen/npc.hpp
 
 OBJ_FILES = $(patsubst %,%.o, $(SOURCE_FILES))
 
