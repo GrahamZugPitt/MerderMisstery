@@ -30,6 +30,9 @@ const int PLAYER_HEIGHT = 88;
 const int X_FRAMES = 3;
 const int Y_FRAMES = 4;
 
+// Key state pointer for user input
+const Uint8 *keyIn = SDL_GetKeyboardState(NULL);
+
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 SDL_Rect objRect;
@@ -65,15 +68,20 @@ int main(int argc, char *argv[]) {
         clean();
         return 1;
     }
-    
+
     SDL_Texture* bg = loadFiles("Art/Tiles/Map.png");
     SDL_Texture* logoScreen = loadFiles("Art/Logo/Logo.png");
     playerTexture = loadFiles("Art/Player/PlayerSpriteSheet.png");
-    
+
+    //Chat Coming Soon
+    SDL_Surface *chatSoon = IMG_Load("Art/chat_soon.png");
+    SDL_Texture *chatSoonObject = SDL_CreateTextureFromSurface(renderer, chatSoon);
+
+
     Player player;
-    
+
     srand(time(NULL));
-    
+
     //Declare and Initialize Variables
     SDL_Event e;
     bool quit = false;
@@ -82,56 +90,104 @@ int main(int argc, char *argv[]) {
     int last_time = 0;
     float time_change = 0.0f;
     const Uint8 *keyPressed;
-    
+
     cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-    
+
     //Logo Screen Loop
     while(!next && !quit) {
-        
+
         while(SDL_PollEvent(&e) != 0) {
             if(e.type == SDL_QUIT) {
                quit = true;
             }
+
+            //If char 'C' is pressed (this will later become its on method/class)
+            if (keyIn[SDL_SCANCODE_C]){
+              std::cout << "Entering Chat\n";
+              //inChat boolean value
+              bool inChat = true;
+
+              //Render chat coming soon page
+              SDL_RenderCopy(renderer, chatSoonObject, NULL, NULL);
+              SDL_RenderPresent(renderer);
+
+              //Wait for user to exit chat
+              while (SDL_PollEvent(&e) != 0 || (inChat == true && !quit))
+              {
+                //Quit application
+                if(e.type == SDL_QUIT)
+                    quit = true;
+
+                if (keyIn[SDL_SCANCODE_E]){
+                  inChat = false;
+                  std::cout << "Exiting Chat\n";
+                }
+              }
+            }
         }
-        
+
         switch (e.button.button) {
             case SDL_BUTTON_LEFT:
                 next = true;
                 break;
         }
-        
+
         //Logo Screen Render
         SDL_RenderCopy(renderer, logoScreen, NULL, NULL);
         SDL_RenderPresent(renderer);
     }
-    
+
     //Enter Game Loop
     while(!quit) {
         //SDL time and delta value
         last_time = curr_time;
         curr_time = SDL_GetTicks();
         time_change = (curr_time - last_time) / 500.0f;
-        
-        //Quit application
+
+        //Getting event
         while(SDL_PollEvent(&e) != 0)
         {
-            //Getting event
+            //Quit application
             if(e.type == SDL_QUIT)
                 quit = true;
+
+            //If char 'C' is pressed (this will later become its on method/class)
+            if (keyIn[SDL_SCANCODE_C]){
+              std::cout << "Entering Chat\n";
+              //inChat boolean value
+              bool inChat = true;
+
+              //Render chat coming soon page
+              SDL_RenderCopy(renderer, chatSoonObject, NULL, NULL);
+              SDL_RenderPresent(renderer);
+
+              //Wait for user to exit chat
+              while (SDL_PollEvent(&e) != 0 || (inChat == true && !quit))
+              {
+                //Quit application
+                if(e.type == SDL_QUIT)
+                    quit = true;
+
+                if (keyIn[SDL_SCANCODE_E]){
+                  inChat = false;
+                  std::cout << "Exiting Chat\n";
+                }
+              }
+            }
         }
-        
+
         //Get current state of keyboard
         keyPressed = SDL_GetKeyboardState(NULL);
-        
+
         //Move Player
         player.move(time_change, keyPressed);
-        
+
         setCamera();
-        
+
         //Clear screen
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(renderer);
-        
+
         //Grass image
         SDL_Rect tempRect;
         tempRect.x = 0;
@@ -139,50 +195,50 @@ int main(int argc, char *argv[]) {
         tempRect.w = cam.w;
         tempRect.h = cam.h;
         SDL_RenderCopy(renderer, bg, &cam, &tempRect);
-        
+
         //Render Player
         player.render();
-        
+
         //Update Screen
         SDL_RenderPresent(renderer);
     }
-    
+
     clean();
-    
+
     return 0;
 }
 
 Player::Player() {
-    
+
     //Query attributes of texture
     SDL_QueryTexture(playerTexture, NULL, NULL, &cropPNG.w, &cropPNG.h);
-    
+
     //Speed of player
     playerSpeed = 250.0f;
-    
+
     //Position of player sprite
     positionPNG.x = (MAP_WIDTH / 2) - (PLAYER_WIDTH / 2);
     positionPNG.y = (MAP_HEIGHT / 2) - (PLAYER_HEIGHT / 2);
-    
+
     //Set textureWidth to current crop width
     textureWidth = cropPNG.w;
-    
+
     //Crop player sprite surface based on number of image types (in this case 12; 3x4)
     cropPNG.w = cropPNG.w / X_FRAMES;
     cropPNG.h = cropPNG.h / Y_FRAMES;
-    
+
     //Constant width of our frame
     positionPNG.w = cropPNG.w;
     positionPNG.h = cropPNG.h;
     frameWidth = positionPNG.w;
     frameHeight = positionPNG.h;
-    
+
     //Running flag
     isRunning = false;
 }
 
 void Player::move(float change, const Uint8 *keyState) {
-    
+
     //Set isRunning flag to true
     isRunning = true;
 
@@ -217,13 +273,13 @@ void Player::move(float change, const Uint8 *keyState) {
                 cropPNG.x = 0;
         }
     }
-    
+
     //Reset to original position since inactive
     else {
         counter = 0;
         cropPNG.x = frameWidth;
     }
-    
+
     if (positionPNG.x < 0) {
         positionPNG.x += playerSpeed * change;
     }
@@ -236,7 +292,7 @@ void Player::move(float change, const Uint8 *keyState) {
     if (positionPNG.y + PLAYER_HEIGHT > MAP_HEIGHT) {
         positionPNG.y -= playerSpeed * change;
     }
-    
+
 }
 
 void Player::render() {
@@ -245,7 +301,7 @@ void Player::render() {
     tempRect.y = positionPNG.y - cam.y;
     tempRect.w = cropPNG.w;
     tempRect.h = cropPNG.h;
-    
+
     SDL_RenderCopy(renderer, playerTexture, &cropPNG, &tempRect);
 }
 
@@ -262,7 +318,7 @@ bool initialize() {
     if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
         std::cout << "Warning: Linear texture filtering not enabled!" << std::endl;
     }
-    
+
     window = SDL_CreateWindow("Merder Misstery", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == nullptr) {
         std::cout << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
@@ -284,7 +340,7 @@ bool initialize() {
 
     // Set renderer draw/clear color
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
-            
+
     return true;
 }
 
@@ -310,7 +366,7 @@ SDL_Texture* loadFiles(std::string name) {
 void setCamera() {
     cam.x = (positionPNG.x + PLAYER_WIDTH / 2) - SCREEN_WIDTH / 2;
     cam.y = (positionPNG.y + PLAYER_HEIGHT / 2) - SCREEN_HEIGHT / 2;
-    
+
     if (cam.x < 0) {
         cam.x = 0;
     }
@@ -328,10 +384,10 @@ void setCamera() {
 void clean() {
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
-    
+
     window = NULL;
     renderer = NULL;
-    
+
     IMG_Quit();
     SDL_Quit();
 }
