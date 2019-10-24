@@ -14,5 +14,5 @@
 //Function Declarations
 bool initialize(SDL_Window **window, SDL_Renderer **renderer);
 SDL_Texture* loadFiles(std::string name, SDL_Renderer *renderer);
-void setCamera(SDL_Rect cam, SDL_Rect positionPNG);
+void setCameraPosition(SDL_Rect *cam, SDL_Rect positionPNG);
 void clean(SDL_Window *window, SDL_Renderer *renderer);

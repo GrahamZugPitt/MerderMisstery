@@ -4,15 +4,13 @@
 
 // Add some vars to be used below
 std::string mapImgPath = "Art/Tiles/Map.png";
-std::string playerImgPath = "Art/Player/player_sprite_sheet.png";
+std::string playerImgPath = "Art/Player/PlayerSpriteSheet.png";
 
-void gameloop(SDL_Event e, bool quit, int curr_time, int last_time, float time_change, const Uint8 *keyPressed, SDL_Renderer* renderer, SDL_Rect cam){
+void gameloop(SDL_Event e, bool quit, int curr_time, int last_time, float time_change, const Uint8 *keyPressed, SDL_Renderer* renderer){
 
     SDL_Texture* bg = loadFiles(mapImgPath, renderer);
-	  SDL_Rect cropPNG;
-    SDL_Rect positionPNG;
-
-    Player *player = new Player(playerImgPath, &cropPNG, &positionPNG, renderer);
+    Player *player = new Player(playerImgPath, renderer);
+    SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
     //Enter Game Loop
     while(!quit) {
@@ -33,9 +31,9 @@ void gameloop(SDL_Event e, bool quit, int curr_time, int last_time, float time_c
         keyPressed = SDL_GetKeyboardState(NULL);
 
         //Move Player
-        player->move(time_change, keyPressed, &cropPNG, &positionPNG);
+        player->move(time_change, keyPressed);
 
-        setCamera(cam, positionPNG);
+        setCameraPosition(&cam, player->positionPNG);
 
         //Clear screen
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -49,10 +47,8 @@ void gameloop(SDL_Event e, bool quit, int curr_time, int last_time, float time_c
         tempRect.h = cam.h;
         SDL_RenderCopy(renderer, bg, &cam, &tempRect);
 
-        printf("Running player.render()\n");
-
         //Render Player
-        player->render(&cropPNG, &positionPNG, renderer, &cam);
+        player->render(renderer, &cam);
 
         //Update Screen
         SDL_RenderPresent(renderer);

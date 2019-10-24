@@ -8,13 +8,11 @@
 #include "gameloop.hpp"
 #include "Player.hpp"
 
-
 // Declaring variables that will be used later
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 SDL_Rect objRect;
 SDL_Rect objPosition;
-SDL_Rect cam;
 SDL_Scancode keys[4];
 std::string logoImgPath = "Art/Logo/Logo.png";
 
@@ -38,7 +36,7 @@ int main(int argc, char *argv[]) {
     float time_change = 0.0f;
     const Uint8 *keyPressed;
 
-    cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+    keyPressed = SDL_GetKeyboardState(NULL);
 
     //Logo Screen Loop
     while(!next && !quit) {
@@ -60,7 +58,7 @@ int main(int argc, char *argv[]) {
         SDL_RenderPresent(renderer);
     }
 
-    gameloop(e, quit, curr_time, last_time, time_change, keyPressed, renderer, cam);
+    gameloop(e, quit, curr_time, last_time, time_change, keyPressed, renderer);
 
     clean(window, renderer);
 

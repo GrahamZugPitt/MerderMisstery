@@ -63,21 +63,21 @@ SDL_Texture* loadFiles(std::string name, SDL_Renderer *renderer) {
     return newText;
 }
 
-void setCamera(SDL_Rect cam, SDL_Rect positionPNG) {
-    cam.x = (positionPNG.x + PLAYER_WIDTH / 2) - SCREEN_WIDTH / 2;
-    cam.y = (positionPNG.y + PLAYER_HEIGHT / 2) - SCREEN_HEIGHT / 2;
+void setCameraPosition(SDL_Rect *cam, SDL_Rect positionPNG) {
+    (*cam).x = (positionPNG.x + PLAYER_WIDTH / 2) - SCREEN_WIDTH / 2;
+    (*cam).y = (positionPNG.y + PLAYER_HEIGHT / 2) - SCREEN_HEIGHT / 2;
 
-    if (cam.x < 0) {
-        cam.x = 0;
+    if ((*cam).x < 0) {
+        (*cam).x = 0;
     }
-    if (cam.y < 0) {
-        cam.y = 0;
+    if ((*cam).y < 0) {
+        (*cam).y = 0;
     }
-    if (cam.x > MAP_WIDTH - cam.w) {
-        cam.x = MAP_WIDTH - cam.w;
+    if ((*cam).x > MAP_WIDTH - (*cam).w) {
+        (*cam).x = MAP_WIDTH - (*cam).w;
     }
-    if (cam.y > MAP_HEIGHT - cam.h) {
-        cam.y = MAP_HEIGHT - cam.h;
+    if ((*cam).y > MAP_HEIGHT - (*cam).h) {
+        (*cam).y = MAP_HEIGHT - (*cam).h;
     }
 }
 
