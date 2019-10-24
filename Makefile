@@ -2,7 +2,7 @@
 #OUT_NAMES = $(patsubst %.cpp,%.o,$(CPP_FILES))
 
 #FILES TO COMPILE
-START_FILES = Code/mainwork/mainone
+START_FILES = murder.o
 SOURCE_FILES = bmp_edit npc gameloop main_helper Player main
 #OUTPUT
 OUT_NAMES = $(patsubst %.cpp,%.o,$(START_FILES))
@@ -38,3 +38,7 @@ murder.o: $(OBJ_FILES)#bmp_edit.o npc.o main.o Player.o#$(START_FILES)
 
 clean:
 	rm *.o
+
+rebuild:
+	make clean
+	make

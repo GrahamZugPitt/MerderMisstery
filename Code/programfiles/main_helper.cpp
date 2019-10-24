@@ -9,7 +9,7 @@
 #include "main_helper.hpp"
 
 //Functions as declared
-bool initialize(SDL_Window *window, SDL_Renderer* renderer) {
+bool initialize(SDL_Window **window, SDL_Renderer **renderer) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cout << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
         return false;
@@ -19,13 +19,13 @@ bool initialize(SDL_Window *window, SDL_Renderer* renderer) {
         std::cout << "Warning: Linear texture filtering not enabled!" << std::endl;
     }
 
-    window = SDL_CreateWindow("Merder Misstery", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    *window = SDL_CreateWindow("Merder Misstery", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == nullptr) {
         std::cout << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
         return  false;
     }
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (renderer == nullptr) {
         std::cout << "Renderer could not be created! SDL_Error: " << SDL_GetError() << std::endl;
         return  false;
@@ -39,7 +39,7 @@ bool initialize(SDL_Window *window, SDL_Renderer* renderer) {
     }
 
     // Set renderer draw/clear color
-    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+    SDL_SetRenderDrawColor(*renderer, 0x00, 0x00, 0x00, 0xFF);
 
     return true;
 }
@@ -63,7 +63,7 @@ SDL_Texture* loadFiles(std::string name, SDL_Renderer *renderer) {
     return newText;
 }
 
-void setCamera() {
+void setCamera(SDL_Rect cam, SDL_Rect positionPNG) {
     cam.x = (positionPNG.x + PLAYER_WIDTH / 2) - SCREEN_WIDTH / 2;
     cam.y = (positionPNG.y + PLAYER_HEIGHT / 2) - SCREEN_HEIGHT / 2;
 
@@ -81,7 +81,7 @@ void setCamera() {
     }
 }
 
-void clean() {
+void clean(SDL_Window *window, SDL_Renderer *renderer) {
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
 
@@ -91,4 +91,3 @@ void clean() {
     IMG_Quit();
     SDL_Quit();
 }
-

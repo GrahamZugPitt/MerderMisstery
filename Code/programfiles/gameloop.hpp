@@ -3,4 +3,4 @@
 #include "common.hpp"
 #endif
 
-void gameloop(SDL_Event e, bool quit, int c, int l, float del, const Uint8 *kp);
+void gameloop(SDL_Event e, bool quit, int curr_time, int last_time, float time_change, const Uint8 *keyPressed, SDL_Renderer* renderer, SDL_Rect cam);
