@@ -10,8 +10,6 @@ class Player {
 		~Player();
 		void render(SDL_Renderer *renderer, SDL_Rect *cam);
 		void move(float change, const Uint8 *keyState);
-		int xPosition = 0;
-		int yPostition = 0;
 		// playerSpeed measured in px / s
 		float playerSpeed = 250.f;
 
@@ -22,5 +20,5 @@ class Player {
 		float counter;
 		SDL_Texture *playerTexture;
 		SDL_Rect cropPNG;
-    SDL_Rect positionPNG;
+    		SDL_Rect positionPNG;
 };

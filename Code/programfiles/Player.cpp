@@ -2,8 +2,8 @@
 #include "main_helper.hpp"
 
 Player::Player(std::string playerTexturePath, SDL_Renderer *renderer){
-	    // Query attributes of texture
-      playerTexture = loadFiles(playerTexturePath, renderer);
+	// Query attributes of texture
+	playerTexture = loadFiles(playerTexturePath, renderer);
    	  SDL_QueryTexture(playerTexture, NULL, NULL, &(cropPNG.w), &(cropPNG.h));
 
     	//Position of player sprite
@@ -28,7 +28,7 @@ Player::Player(std::string playerTexturePath, SDL_Renderer *renderer){
 }
 
 void Player::move(float change, const Uint8 *keyState){
-	  //True by default, animation is stopped if not running
+    //True by default, animation is stopped if not running
     // Should probably revisit this code
     isRunning = true;
 
