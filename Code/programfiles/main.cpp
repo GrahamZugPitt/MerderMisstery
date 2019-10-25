@@ -1,20 +1,17 @@
 //
 //
-//  Original File created by Darpun Kohli
-//  Scrolling Added by Shawn Blake
+//  Main File for the MerderMisstery Game
+//  Team Alpha Game Collective
 //
 
 #include "main_helper.hpp"
 #include "gameloop.hpp"
 #include "Player.hpp"
+#include "menuloop.hpp"
 
-// Declaring variables that will be used later
+// Need a window and a renderer, for obvious purposes
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
-SDL_Rect objRect;
-SDL_Rect objPosition;
-SDL_Scancode keys[4];
-std::string logoImgPath = "Art/Logo/Logo.png";
 
 int main(int argc, char *argv[]) {
     if (!initialize(&window, &renderer)) {
@@ -23,42 +20,17 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    SDL_Texture* logoScreen = loadFiles(logoImgPath, renderer);
-
-    srand(time(NULL));
-
     //Declare and Initialize Variables
     SDL_Event e;
     bool quit = false;
-    bool next = false;
-    int curr_time = 0;
-    int last_time = 0;
-    float time_change = 0.0f;
-    const Uint8 *keyPressed;
+    const Uint8 *keyState;
 
-    keyPressed = SDL_GetKeyboardState(NULL);
+    // Set the keystate just to suppress an error
+    keyState = SDL_GetKeyboardState(NULL);
 
-    //Logo Screen Loop
-    while(!next && !quit) {
+    menuloop(e, &quit, keyState, renderer);
 
-        while(SDL_PollEvent(&e) != 0) {
-            if(e.type == SDL_QUIT) {
-               quit = true;
-            }
-        }
-
-        switch (e.button.button) {
-            case SDL_BUTTON_LEFT:
-                next = true;
-                break;
-        }
-
-        //Logo Screen Render
-        SDL_RenderCopy(renderer, logoScreen, NULL, NULL);
-        SDL_RenderPresent(renderer);
-    }
-
-    gameloop(e, quit, curr_time, last_time, time_change, keyPressed, renderer);
+    gameloop(e, &quit, keyState, renderer);
 
     clean(window, renderer);
 

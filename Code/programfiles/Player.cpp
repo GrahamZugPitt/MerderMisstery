@@ -1,10 +1,15 @@
 #include "Player.hpp"
 #include "main_helper.hpp"
+#include "worldObjects.hpp"
 
 Player::Player(std::string playerTexturePath, SDL_Renderer *renderer){
-	// Query attributes of texture
-	playerTexture = loadFiles(playerTexturePath, renderer);
-   	  SDL_QueryTexture(playerTexture, NULL, NULL, &(cropPNG.w), &(cropPNG.h));
+			// Load several textures
+			playerTexture = loadFiles(playerTexturePath, renderer);
+			SDL_QueryTexture(playerTexture, NULL, NULL, &cropPNG.w, &cropPNG.h);
+			// These need to find a new home asap
+    	interactTexture = loadFiles("Art/Messages/interact.png", renderer);
+    	churchMessageTexture = loadFiles("Art/Messages/churchMessage.png", renderer);
+    	exitMessageTexture = loadFiles("Art/Messages/exitMessage.png", renderer);
 
     	//Position of player sprite
     	positionPNG.x = (MAP_WIDTH / 2) - (PLAYER_WIDTH / 2);
@@ -93,6 +98,51 @@ void Player::render(SDL_Renderer *rendererPointer, SDL_Rect *cam) {
     screenPos.h = cropPNG.h;
 
     SDL_RenderCopy(rendererPointer, playerTexture, &cropPNG, &screenPos);
+}
+
+bool Player::collision(SDL_Renderer *rendererPointer, const Uint8 *keyState){
+		SDL_Rect castlePosition = getCastle();
+		SDL_Rect messageDestination;
+
+	  // If we're not colliding, return false;
+    if(positionPNG.x + positionPNG.w <= castlePosition.x || positionPNG.x >= castlePosition.x + castlePosition.w ||
+        positionPNG.y + positionPNG.h <= castlePosition.y || positionPNG.y >= castlePosition.y + castlePosition.h)
+    {
+        colorKeyed = 0;
+        SDL_SetTextureColorMod(playerTexture, 255, 255, 255);
+        return false;
+    }
+
+    SDL_SetTextureColorMod(playerTexture, 255, 0, 0);
+
+    if (keyState[SDL_SCANCODE_X] || colorKeyed == 1){
+        colorKeyed = 1;
+
+        //Display messages
+        messageDestination.x = (SCREEN_WIDTH / 2) - 450;
+        messageDestination.y = 600;
+        messageDestination.w = 900;
+        messageDestination.h = 100;
+        SDL_RenderCopy(rendererPointer, churchMessageTexture, NULL, &messageDestination);
+        messageDestination.x = 0;
+        messageDestination.y = 0;
+        messageDestination.w = 300;
+        messageDestination.h = 100;
+        SDL_RenderCopy(rendererPointer, exitMessageTexture, NULL, &messageDestination);
+        SDL_SetTextureColorMod(playerTexture, 255, 0, 0);
+    }
+
+    if(keyState[SDL_SCANCODE_Z] || colorKeyed == 0) {
+        colorKeyed = 0;
+        //Display interaction message and highlight character red when collision occurs
+        messageDestination.x = 0;
+        messageDestination.y = 0;
+        messageDestination.w = 300;
+        messageDestination.h = 100;
+        SDL_RenderCopy(rendererPointer, interactTexture, NULL, &messageDestination);
+    }
+
+    return true;
 }
 
 Player::~Player() {
