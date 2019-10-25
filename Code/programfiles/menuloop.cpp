@@ -2,7 +2,7 @@
 #include "main_helper.hpp"
 #include "chat.hpp"
 
-std::string logoImgPath = "Art/Logo/Logo.png";
+std::string logoImgPath = "Art/Logo/Logo_Space.png";
 
 void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
   // Load the title screens

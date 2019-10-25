@@ -41,7 +41,7 @@ clean:
 
 farnan:
 	make
-	./murder.o farnen
+	./murder.o farnan
 
 rebuild:
 	make clean
