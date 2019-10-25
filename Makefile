@@ -7,7 +7,7 @@ SOURCE_FILES = bmp_edit worldObjects chat npc gameloop menuloop main_helper Play
 #OUTPUT
 OUT_NAMES = $(patsubst %.cpp,%.o,$(START_FILES))
 OBJDIR := Code/programfiles/
-NPC_DIR := Code/NPC_Gen
+NPC_DIR := Code/NPC_Gen/
 NPC_HEADERS = Code/NPC_Gen/bmp_edit.hpp Code/NPC_Gen/npc.hpp
 
 OBJ_FILES = $(patsubst %,%.o, $(SOURCE_FILES))
@@ -38,6 +38,10 @@ murder.o: $(OBJ_FILES)#bmp_edit.o npc.o main.o Player.o#$(START_FILES)
 
 clean:
 	rm *.o
+
+farnan:
+	make
+	./murder.o farnen
 
 rebuild:
 	make clean

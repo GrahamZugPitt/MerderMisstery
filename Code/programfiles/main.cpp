@@ -12,8 +12,14 @@
 // Need a window and a renderer, for obvious purposes
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
+bool farnan = false;
 
 int main(int argc, char *argv[]) {
+
+    if(argc == 2){
+      farnan = true;
+    }
+
     if (!initialize(&window, &renderer)) {
         std::cout <<  "Couldn't Initialize. Cleaning and exiting now." << std::endl;
         clean(window, renderer);
@@ -30,7 +36,7 @@ int main(int argc, char *argv[]) {
 
     menuloop(e, &quit, keyState, renderer);
 
-    gameloop(e, &quit, keyState, renderer);
+    gameloop(e, &quit, keyState, renderer, farnan);
 
     clean(window, renderer);
 

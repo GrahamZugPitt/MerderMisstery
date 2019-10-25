@@ -7,7 +7,7 @@
 std::string mapImgPath = "Art/Tiles/Map.png";
 std::string playerImgPath = "Art/Player/PlayerSpriteSheet.png";
 
-void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
+void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan){
     // Set variables
     int curr_time = 0;
     int last_time = 0;
@@ -39,7 +39,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
             enter_chat(e, &(*quit), keyState, renderer);
 
         //Move Player
-        player->move(time_change, keyState);
+        player->move(time_change, keyState, farnan);
 
         setCameraPosition(&cam, player->positionPNG);
 

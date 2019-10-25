@@ -32,32 +32,57 @@ Player::Player(std::string playerTexturePath, SDL_Renderer *renderer){
     	isRunning = false;
 }
 
-void Player::move(float change, const Uint8 *keyState){
+void Player::move(float change, const Uint8 *keyState, bool farnan){
     //True by default, animation is stopped if not running
     // Should probably revisit this code
     isRunning = true;
 
-    //Determine which directional keypad arrow is clicked and apply appropriate movement / image
-    if(keyState[SDL_SCANCODE_UP] || keyState[SDL_SCANCODE_W]) {
-        positionPNG.y -= playerSpeed * change;
-        cropPNG.y = frameHeight * 3;
-    }
-    else if(keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_S]) {
-        positionPNG.y += playerSpeed * change;
-        cropPNG.y = 0;
-    }
-    else if(keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_A]) {
-        positionPNG.x -= playerSpeed * change;
-        cropPNG.y = frameHeight;
-    }
-    else if(keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_D]) {
-        positionPNG.x += playerSpeed * change;
-        cropPNG.y = frameHeight * 2;
-    }
+		if(!farnan){
+    		//Determine which directional keypad arrow is clicked and apply appropriate movement / image
+    		if(keyState[SDL_SCANCODE_UP] || keyState[SDL_SCANCODE_W]) {
+        		positionPNG.y -= playerSpeed * change;
+        		cropPNG.y = frameHeight * 3;
+    		}
+    		else if(keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_S]) {
+        		positionPNG.y += playerSpeed * change;
+        		cropPNG.y = 0;
+    		}
+    		else if(keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_A]) {
+        		positionPNG.x -= playerSpeed * change;
+        		cropPNG.y = frameHeight;
+    		}
+    		else if(keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_D]) {
+        		positionPNG.x += playerSpeed * change;
+        		cropPNG.y = frameHeight * 2;
+    		}
+				else {
+		        isRunning = false;
+		    }
+		}
+		else{
+				//Determine which directional keypad arrow is clicked and apply appropriate movement / image
+    		if(keyState[SDL_SCANCODE_UP] && keyState[SDL_SCANCODE_W] && keyState[SDL_SCANCODE_M]) {
+        		positionPNG.y -= playerSpeed * change;
+        		cropPNG.y = frameHeight * 3;
+    		}
+    		else if(keyState[SDL_SCANCODE_DOWN] && keyState[SDL_SCANCODE_S] && keyState[SDL_SCANCODE_M]) {
+        		positionPNG.y += playerSpeed * change;
+        		cropPNG.y = 0;
+    		}
+    		else if(keyState[SDL_SCANCODE_LEFT] && keyState[SDL_SCANCODE_A] && keyState[SDL_SCANCODE_M]) {
+        		positionPNG.x -= playerSpeed * change;
+        		cropPNG.y = frameHeight;
+    		}
+    		else if(keyState[SDL_SCANCODE_RIGHT] && keyState[SDL_SCANCODE_D] && keyState[SDL_SCANCODE_M]) {
+        		positionPNG.x += playerSpeed * change;
+        		cropPNG.y = frameHeight * 2;
+    		}
+				else {
+		        isRunning = false;
+		    }
+			}
     //User is not clicking key, so player is no longer running
-    else {
-        isRunning = false;
-    }
+
 
     //Animate the player sprite by flashing frames
     if(isRunning) {

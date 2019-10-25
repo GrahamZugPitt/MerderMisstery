@@ -8,7 +8,7 @@ class Player {
 		Player(std::string playerTexturePath, SDL_Renderer *renderer);
 		~Player();
 		void render(SDL_Renderer *renderer, SDL_Rect *cam);
-		void move(float change, const Uint8 *keyState);
+		void move(float change, const Uint8 *keyState, bool farnan);
 		bool collision(SDL_Renderer *renderer, const Uint8 *keyState);
 
 		// playerSpeed measured in px / s
