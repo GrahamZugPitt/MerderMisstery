@@ -3,7 +3,7 @@
 
 #FILES TO COMPILE
 START_FILES = murder.o
-SOURCE_FILES = bmp_edit worldObjects chat npc gameloop menuloop main_helper Player main 
+SOURCE_FILES = bmp_edit worldObjects chat npc gameloop menuloop main_helper Player main
 #OUTPUT
 OUT_NAMES = $(patsubst %.cpp,%.o,$(START_FILES))
 OBJDIR := Code/programfiles/
@@ -46,3 +46,7 @@ farnan:
 rebuild:
 	make clean
 	make
+
+run:
+	make
+	./murder.o
