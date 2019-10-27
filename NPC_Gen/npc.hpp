@@ -36,11 +36,12 @@ class NPC {
 		int murderiness;
 		int relationships[NUM_NPCS];
 		Event goal;
-		SDL_Rect position;
+		SDL_Rect mapPos;
+		SDL_Rect screenPos;
 		SDL_Texture *texture;
 		//Constructor
 		NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsigned int dLoyal, unsigned int dWrath);
-		
+		NPC();
 		int initSprite(SDL_Renderer *renderer, int sizeX, int sizeY, int posX, int posY);
 		void print();
 		std::string toString();
@@ -48,7 +49,9 @@ class NPC {
 		~NPC();
 		std::string getName();
 		std::string getSpriteName();
-		void renderToScreen(SDL_Renderer *renderer, float timechange, float posX, float posY);
+		void setName(std::string name);
+		void setSpriteName(std::string filename);
+		void renderToScreen(SDL_Renderer *renderer, float timechange, SDL_Rect camPos);
 	private:
 		int spriteRow;
 		std::string name;
