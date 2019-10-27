@@ -2,7 +2,7 @@
 #include "main_helper.hpp"
 #include "Player.hpp"
 #include "chat.hpp"
-
+#include "../NPC_Gen/npc.hpp"
 // Add some vars to be used below
 std::string mapImgPath = "Art/Tiles/Map.png";
 std::string playerImgPath = "Art/Player/PlayerSpriteSheet.png";
@@ -15,6 +15,16 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     SDL_Texture* bg = loadFiles(mapImgPath, renderer);
     Player *player = new Player(playerImgPath, renderer);
     SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+
+    //display an npc
+    #ifdef NPCS_AS_VECTOR
+    std::vector<NPC> npcs;
+    npcs.emplace_back("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    npcs[0].initSprite(renderer, 60, 88, 500, 1000);
+    #else
+    NPC blm("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    blm.initSprite(renderer, 60, 88, 500, 1000);
+    #endif
 
     //Enter Game Loop
     while(!(*quit)) {
@@ -54,6 +64,14 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         bgRect.w = cam.w;
         bgRect.h = cam.h;
         SDL_RenderCopy(renderer, bg, &cam, &bgRect);
+
+        //render npc
+
+        #ifdef NPCS_AS_VECTOR
+        npcs[0].renderToScreen(renderer, time_change, cam);
+        #else
+        blm.renderToScreen(renderer, time_change, cam);
+        #endif
 
         // Render Player
         player->render(renderer, &cam);
