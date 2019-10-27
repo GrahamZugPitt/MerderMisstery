@@ -17,10 +17,23 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
     //display an npc
-    #ifdef NPCS_AS_VECTOR
-    std::vector<NPC> npcs;
-    npcs.emplace_back("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
-    npcs[0].initSprite(renderer, 60, 88, 500, 1000);
+    #ifndef NPCS_AS_VECTOR
+    NPC npcs[6];
+    
+    npcs[0].initSprite("Benedict", "Art/NPCs/Blacksmith.bmp", BROWN, GRAY, BLACK,
+                        renderer, 60, 88, 1400, 1000);
+    npcs[1].initSprite("Charles", "Art/NPCs/Vicar.bmp", WHITE, WHITE, PURPLE,
+                        renderer, 60, 88, 1600, 1000);
+    npcs[2].initSprite("David", "Art/NPCs/Worker1.bmp", ORANGE, DARK_BLUE, WHITE,
+                        renderer, 60, 88, 1800, 1000);
+    npcs[3].initSprite("Erick", "Art/NPCs/Worker2.bmp", ORANGE, LIGHT_BLUE, WHITE,
+                        renderer, 60, 88, 1400, 1200);
+    npcs[4].initSprite("Frank", "Art/NPCs/Worker3.bmp", ORANGE, BLACK, WHITE,
+                        renderer, 60, 88, 1600, 1200);//npcs[3].initSprite(renderer, 60, 88, 3000, 4100);
+    npcs[5].initSprite("Gail", "Art/NPCs/Worker4.bmp", ORANGE, LIGHT_BLUE, WHITE,
+                        renderer, 60, 88, 1800, 1200);//npcs[4].initSprite(renderer, 60, 88, 3250, 4000);
+    //npcs[5].initSprite(renderer, 60, 88, 3250, 4100);
+
     #else
     NPC blm("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
     blm.initSprite(renderer, 60, 88, 500, 1000);
@@ -67,11 +80,14 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
         //render npc
 
-        #ifdef NPCS_AS_VECTOR
-        npcs[0].renderToScreen(renderer, time_change, cam);
-        #else
-        blm.renderToScreen(renderer, time_change, cam);
-        #endif
+        int i=0;
+        SDL_Rect collide;
+        for(i = 0; i < 6; i++){
+            npcs[i].renderToScreen(renderer, time_change, cam);
+            if( SDL_IntersectRect(&npcs[i].mapPos, &(player->positionPNG), &collide)){
+                std::cout << "Player collision with " << npcs[i].getName() << std::endl;
+            }
+        }
 
         // Render Player
         player->render(renderer, &cam);
