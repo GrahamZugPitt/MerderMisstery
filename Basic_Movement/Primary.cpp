@@ -112,10 +112,10 @@ int main(int argc, char *argv[]) {
     std::vector<NPC> npcs;
     npcs.emplace_back("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
     npcs[0].initSprite(renderer, 60, 88, 500, 1000);
-    //NPC blm("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    NPC blm("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
     //blm.initSprite(renderer, 60, 88, 500, 1000);
     //std::cout << blm.initSprite(renderer, 60, 88, 800, 250);
-
+    npcs.push_back(blm);
     srand(time(NULL));
 
     //Declare and Initialize Variables

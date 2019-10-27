@@ -19,7 +19,6 @@
 #include "npc.hpp"
 
 
-
 //Constructor
 /* Creates an Instance of an NPC
 	Args:
@@ -90,6 +89,9 @@ NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsig
 	#endif
 	printf("exiting\n");
 }
+
+// Constructor with no arguments
+NPC::NPC() :NPC("", "", 0xFF888888,0xFF111111,0xFFEEEEEE){}
 /* Initializes the sprite size and position on the map
 	Args:
 		renderer: a pointer to the renderer
@@ -105,10 +107,14 @@ int NPC::initSprite(SDL_Renderer *renderer, int sizeX, int sizeY, int posX, int 
 	crop.y = spriteRow * sizeY;
 	crop.w = sizeX;
 	crop.h = sizeY;
-	position.x = posX;
-	position.y = posY;
-	position.w = sizeX;
-	position.h = sizeY;
+	mapPos.x = posX;
+	mapPos.y = posY;
+	mapPos.w = sizeX;
+	mapPos.h = sizeY;
+	screenPos.x = -100;
+	screenPos.y = -100;
+	screenPos.w = sizeX;
+	screenPos.h = sizeY;
 	std::string oname = spriteFileName.substr(0,spriteFileName.length()-4) + "m.bmp";
     SDL_Surface *surface = IMG_Load(oname.c_str());
     
@@ -165,7 +171,7 @@ std::string NPC::toString(){
 		posX: the absolute x position relative to the window to display the sprite
 		posY: the absolute y position relative to the window to display the sprite
 */
-void NPC::renderToScreen(SDL_Renderer *renderer, float timechange, float posX, float posY){
+void NPC::renderToScreen(SDL_Renderer *renderer, float timechange, SDL_Rect camPos){
 	prevTime += timechange;
 	if(prevTime >= 0.5f){
 		prevTime = 0.0;
@@ -196,9 +202,11 @@ void NPC::renderToScreen(SDL_Renderer *renderer, float timechange, float posX, f
 		}
 	}
 	if(renderer != NULL && texture != NULL){
-		position.x = posX;
-		position.y = posY;
-		SDL_RenderCopy(renderer, texture, &crop, &position);
+		screenPos.x = mapPos.x - camPos.x;
+		screenPos.y = mapPos.y - camPos.y;
+		if (screenPos.x >= -NPC_WIDTH && screenPos.x <= 1280 + NPC_WIDTH &&
+			screenPos.y >= - NPC_HEIGHT && screenPos.y <= 720 + NPC_HEIGHT)
+			SDL_RenderCopy(renderer, texture, &crop, &screenPos);
 	}
 }
 
