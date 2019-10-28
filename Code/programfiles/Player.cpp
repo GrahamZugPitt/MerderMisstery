@@ -5,7 +5,7 @@
 Player::Player(std::string playerTexturePath, SDL_Renderer *renderer){
 			// Load several textures
 			playerTexture = loadFiles(playerTexturePath, renderer);
-			SDL_QueryTexture(playerTexture, NULL, NULL, &cropPNG.w, &cropPNG.h);
+            SDL_QueryTexture(playerTexture, NULL, NULL, &cropPNG.w, &cropPNG.h);
 			// These need to find a new home asap
     	interactTexture = loadFiles("Art/Messages/interact.png", renderer);
     	churchMessageTexture = loadFiles("Art/Messages/churchMessage.png", renderer);
@@ -18,10 +18,12 @@ Player::Player(std::string playerTexturePath, SDL_Renderer *renderer){
     	//Set textureWidth to current crop width
     	textureWidth = cropPNG.w;
 
+
     	//Crop player sprite surface based on number of image types (in this case 12; 3x4)
     	cropPNG.w = cropPNG.w / X_FRAMES;
     	cropPNG.h = cropPNG.h / Y_FRAMES;
-
+        cropPNG.x = 64;
+        cropPNG.y = 0;
     	//Constant width of our frame
     	positionPNG.w = cropPNG.w;
     	positionPNG.h = cropPNG.h;
