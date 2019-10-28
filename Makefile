@@ -2,13 +2,13 @@
 #OUT_NAMES = $(patsubst %.cpp,%.o,$(CPP_FILES))
 
 #FILES TO COMPILE
-START_FILES = Basic_Movement/Primary.cpp
-SOURCE_FILES = bmp_edit npc Primary
+START_FILES = murder.o
+SOURCE_FILES = bmp_edit worldObjects chat npc gameloop menuloop main_helper Player main
 #OUTPUT
 OUT_NAMES = $(patsubst %.cpp,%.o,$(START_FILES))
-OBJDIR := Basic_Movement
-NPC_DIR := NPC_Gen
-NPC_HEADERS = NPC_Gen/bmp_edit.hpp NPC_Gen/npc.hpp
+OBJDIR := Code/programfiles/
+NPC_DIR := Code/NPC_Gen/
+NPC_HEADERS = Code/NPC_Gen/bmp_edit.hpp Code/NPC_Gen/npc.hpp
 
 OBJ_FILES = $(patsubst %,%.o, $(SOURCE_FILES))
 
@@ -37,4 +37,16 @@ murder.o: $(OBJ_FILES)#bmp_edit.o npc.o main.o Player.o#$(START_FILES)
 	$(CC) -o $@ $^ $(LINKER_FLAGS) -std=c++14
 
 clean:
-	rm *.o
+	rm *.o ./Art/NPCs/*m.bmp
+
+farnan:
+	make
+	./murder.o farnan
+
+rebuild:
+	make clean
+	make
+
+run:
+	make
+	./murder.o

@@ -109,10 +109,13 @@ int main(int argc, char *argv[]) {
     Player player;
 
     //NPC Generation (not ready yet)
-    //NPC blm("Benedict", "Art/NPCs/Blacksmithm.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
-    //blm.initSprite(renderer, 60, 88, 800, 250);
+    std::vector<NPC> npcs;
+    npcs.emplace_back("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    npcs[0].initSprite(renderer, 60, 88, 500, 1000);
+    NPC blm("Benedict", "Art/NPCs/Blacksmith.bmp", 0xFF000000, 0xFF000000, 0xFF888888);
+    //blm.initSprite(renderer, 60, 88, 500, 1000);
     //std::cout << blm.initSprite(renderer, 60, 88, 800, 250);
-
+    npcs.push_back(blm);
     srand(time(NULL));
 
     //Declare and Initialize Variables
@@ -233,8 +236,8 @@ int main(int argc, char *argv[]) {
         player.render();
 
         //Render NPC (not ready yet)
-        //blm.renderToScreen(renderer, time_change, 50, 60);
-
+        //blm.renderToScreen(renderer, time_change, cam);
+        npcs[0].renderToScreen(renderer, time_change, cam);
         player.collision();
         
         //Update Screen
