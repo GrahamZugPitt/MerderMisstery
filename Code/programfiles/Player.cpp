@@ -121,7 +121,6 @@ void Player::render(SDL_Renderer *rendererPointer, SDL_Rect *cam) {
     screenPos.y = positionPNG.y - (*cam).y;
     screenPos.w = cropPNG.w;
     screenPos.h = cropPNG.h;
-
     SDL_RenderCopy(rendererPointer, playerTexture, &cropPNG, &screenPos);
 }
 
