@@ -33,7 +33,6 @@ BMPMod::BMPMod(std::string ifilename, std::string ofilename) {
 		outfile = new std::fstream(ofilename.c_str(), std::ios::binary | std::ios::out | std::ios::in);	
 	}
 	if(infile->is_open()){
-		std::cout << "Infile open" << std::endl;
 		if(validateBMP(infile) != 0){
 			// throw exception if file is not a valid format
 			throw "Invalid File format";
