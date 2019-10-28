@@ -96,8 +96,8 @@ int main(int argc, char *argv[])
     SDL_Texture *wellObject = SDL_CreateTextureFromSurface(renderer, well);
 
     //Chat Coming Soon
-    SDL_Surface *chatSoon = IMG_Load("Art/chat_soon.png");
-    SDL_Texture *chatSoonObject = SDL_CreateTextureFromSurface(renderer, chatSoon);
+    SDL_Surface *chatExample = IMG_Load("Art/chat_example.png");
+    SDL_Texture *chatExampleObject = SDL_CreateTextureFromSurface(renderer, chatExample);
 
     //Set player configuration and send to Player class
     Player player1(renderer, "Art/Player/PlayerSpriteSheet.png", initial_x, initial_y);
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
               bool inChat = true;
 
               //Render chat coming soon page
-              SDL_RenderCopy(renderer, chatSoonObject, NULL, NULL);
+              SDL_RenderCopy(renderer, chatExampleObject, NULL, NULL);
               SDL_RenderPresent(renderer);
 
               //Wait for user to exit chat
@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
                   bool inChat = true;
 
                   //Render chat coming soon page
-                  SDL_RenderCopy(renderer, chatSoonObject, NULL, NULL);
+                  SDL_RenderCopy(renderer, chatExampleObject, NULL, NULL);
                   SDL_RenderPresent(renderer);
 
                   //Wait for user to exit chat
