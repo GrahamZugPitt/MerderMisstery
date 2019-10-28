@@ -19,8 +19,17 @@
 #include "npc.hpp"
 
 
-
 //Constructor
+/* Creates an Instance of an NPC
+	Args:
+		name: the NPCs name
+		spriteFileName: the name of the bitmap file to use for the npc
+		dLust: the color to usefor the lust section if the npc is not lustful
+		dLoyal: the color to usefor the disloyalty section if the npc is not disloyal
+		dWrath: the color to usefor the wrath section if the npc is not wrathful
+		NOTE: For Linux these values should be 0xAARRGGBB where AA is alpha RR is red BB is blue and GG is green
+		This may not work properly on mac since mac forces bitmaps into its own masks for the color channels
+*/
 NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsigned int dLoyal, unsigned int dWrath) :mood{0}, murderiness{0},
 													name{name}, spriteFileName{spriteFileName} {
 	
@@ -43,7 +52,6 @@ NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsig
 	BMPMod img(spriteFileName, oname);
 	
 	unsigned int fleshtone = fleshtones[rand() % 5];
-	std::cout << std::hex << fleshtone << std::endl;
 	img.swapColor((unsigned int)0x80FFFFFF, fleshtone);
 
 	if (personality[traits[0]] >= 25){
@@ -70,6 +78,7 @@ NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsig
 		std::cout << "Dishonesty sprite used" << std::endl;
 		spriteRow += 2;
 	}
+	spriteRow = 1;
 	spriteFileName = oname;
 	#ifdef LOGGING
 	std::string str = "--Constructor Called--\n";
@@ -81,16 +90,32 @@ NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsig
 	#endif
 	printf("exiting\n");
 }
-// Initializes the sprite size and position on the map	
+
+// Constructor with no arguments
+NPC::NPC() :NPC("", "", 0xFF888888,0xFF111111,0xFFEEEEEE){}
+/* Initializes the sprite size and position on the map
+	Args:
+		renderer: a pointer to the renderer
+		sizeX: the width of the sprite (60)
+		sizeY: the height of the sprite (88)
+		posX: the initial display x postion
+		posY: the initial display y position
+	Returns:
+		1 on successful creation, 0 if the texture was unable to be made
+*/
 int NPC::initSprite(SDL_Renderer *renderer, int sizeX, int sizeY, int posX, int posY){
 	crop.x = 7 + rand() % 3; //TODO: fix this offset in the sprite sheet
 	crop.y = spriteRow * sizeY;
 	crop.w = sizeX;
 	crop.h = sizeY;
-	position.x = posX;
-	position.y = posY;
-	position.w = sizeX;
-	position.h = sizeY;
+	mapPos.x = posX;
+	mapPos.y = posY;
+	mapPos.w = sizeX;
+	mapPos.h = sizeY;
+	screenPos.x = -100;
+	screenPos.y = -100;
+	screenPos.w = sizeX;
+	screenPos.h = sizeY;
 	std::string oname = spriteFileName.substr(0,spriteFileName.length()-4) + "m.bmp";
     SDL_Surface *surface = IMG_Load(oname.c_str());
     
@@ -140,7 +165,14 @@ std::string NPC::toString(){
 	return str;
 }
 
-void NPC::renderToScreen(SDL_Renderer *renderer, float timechange){
+/*Renders the npc sprite to the window
+	Args:
+		renderer: the renderer
+		timechange: the time since the last frame was rendered
+		posX: the absolute x position relative to the window to display the sprite
+		posY: the absolute y position relative to the window to display the sprite
+*/
+void NPC::renderToScreen(SDL_Renderer *renderer, float timechange, SDL_Rect camPos){
 	prevTime += timechange;
 	if(prevTime >= 0.5f){
 		prevTime = 0.0;
@@ -171,7 +203,11 @@ void NPC::renderToScreen(SDL_Renderer *renderer, float timechange){
 		}
 	}
 	if(renderer != NULL && texture != NULL){
-		SDL_RenderCopy(renderer, texture, &crop, &position);
+		screenPos.x = mapPos.x - camPos.x;
+		screenPos.y = mapPos.y - camPos.y;
+		if (screenPos.x >= -NPC_WIDTH && screenPos.x <= 1280 + NPC_WIDTH &&
+			screenPos.y >= - NPC_HEIGHT && screenPos.y <= 720 + NPC_HEIGHT)
+			SDL_RenderCopy(renderer, texture, &crop, &screenPos);
 	}
 }
 

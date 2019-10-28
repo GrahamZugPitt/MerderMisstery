@@ -13,7 +13,7 @@ NPC_HEADERS = Code/NPC_Gen/bmp_edit.hpp Code/NPC_Gen/npc.hpp
 OBJ_FILES = $(patsubst %,%.o, $(SOURCE_FILES))
 
 #COMPILER
-CC = g++
+CC = clang++
 
 #COMPILER FLAGS
 COMPILER_FLAGS = -Wall -I/usr/include/SDL2
@@ -37,7 +37,7 @@ murder.o: $(OBJ_FILES)#bmp_edit.o npc.o main.o Player.o#$(START_FILES)
 	$(CC) -o $@ $^ $(LINKER_FLAGS) -std=c++14
 
 clean:
-	rm *.o
+	rm *.o ./Art/NPCs/*m.bmp
 
 farnan:
 	make

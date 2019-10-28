@@ -2,7 +2,7 @@
 #include "main_helper.hpp"
 #include "Player.hpp"
 #include "chat.hpp"
-
+#include "../NPC_Gen/npc.hpp"
 // Add some vars to be used below
 std::string mapImgPath = "Art/Tiles/Map.png";
 std::string playerImgPath = "Art/Player/PlayerSpriteSheet.png";
@@ -15,6 +15,36 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     SDL_Texture* bg = loadFiles(mapImgPath, renderer);
     Player *player = new Player(playerImgPath, renderer);
     SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+
+    //display npcs
+    NPC npcs[12];
+    // lust, loyal, wrath => green, blue, red
+    npcs[0].initSprite("Benedict", "Art/NPCs/Blacksmith.bmp", BROWN, GRAY, BLACK,
+                        renderer, 60, 88, 1400, 1000);
+    npcs[1].initSprite("Charles", "Art/NPCs/Vicar.bmp", WHITE, WHITE, PURPLE,
+                        renderer, 60, 88, 1600, 1000);
+    npcs[2].initSprite("David", "Art/NPCs/Worker1.bmp", ORANGE, DARK_BLUE, WHITE,
+                        renderer, 60, 88, 1800, 1000);
+    npcs[3].initSprite("Erick", "Art/NPCs/Worker2.bmp", ORANGE, LIGHT_BLUE, WHITE,
+                        renderer, 60, 88, 1400, 1200);
+    npcs[4].initSprite("Frank", "Art/NPCs/Worker3.bmp", ORANGE, BLACK, WHITE,
+                        renderer, 60, 88, 1600, 1200);
+    npcs[5].initSprite("Gail", "Art/NPCs/Worker4.bmp", ORANGE, LIGHT_BLUE, WHITE,
+                        renderer, 60, 88, 1800, 1200);
+    npcs[6].initSprite("Henry", "Art/NPCs/Mayor.bmp", WHITE, GRAY, DARK_GREEN,
+                        renderer, 60, 88, 1400, 1400);
+    npcs[7].initSprite("Isaac", "Art/NPCs/Fuzz.bmp", WHITE, DARK_BLUE, ORANGE,
+                        renderer, 60, 88, 1600, 1400);
+    npcs[8].initSprite("Jake", "Art/NPCs/Barkeep.bmp", LIGHT_RED, GRAY, WHITE,
+                        renderer, 60, 88, 1800, 1400);
+    npcs[9].initSprite("Kyle", "Art/NPCs/Farmer.bmp", LIGHT_GREEN, BLUE, ORANGE,
+                        renderer, 60, 88, 1400, 1600);
+    npcs[10].initSprite("Liam", "Art/NPCs/Jeweler.bmp", WHITE, GRAY, BLACK,
+                        renderer, 60, 88, 1600, 1600);
+    npcs[11].initSprite("Michael", "Art/NPCs/FishMonger.bmp", GREEN, DARK_BLUE, WHITE,
+                        renderer, 60, 88, 1400, 1800);
+    
+    
 
     //Enter Game Loop
     while(!(*quit)) {
@@ -57,6 +87,18 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
         // Render Player
         player->render(renderer, &cam);
+
+        //render npc
+        int i=0;
+        SDL_Rect collide;
+        for(i = 0; i < 12; i++){
+            npcs[i].renderToScreen(renderer, time_change, cam);
+            if( SDL_IntersectRect(&npcs[i].mapPos, &(player->positionPNG), &collide)){
+                std::cout << "Player collision with " << npcs[i].getName() << std::endl;
+            }
+        }
+
+        
 
         // Check Collisions
         player->collision(renderer, keyState);
