@@ -78,6 +78,7 @@ NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsig
 		std::cout << "Dishonesty sprite used" << std::endl;
 		spriteRow += 2;
 	}
+	spriteRow = 1;
 	spriteFileName = oname;
 	#ifdef LOGGING
 	std::string str = "--Constructor Called--\n";
