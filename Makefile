@@ -37,7 +37,7 @@ murder.o: $(OBJ_FILES)#bmp_edit.o npc.o main.o Player.o#$(START_FILES)
 	$(CC) -o $@ $^ $(LINKER_FLAGS) -std=c++14
 
 clean:
-	rm *.o
+	rm *.o ./Art/NPCs/*m.bmp
 
 farnan:
 	make
