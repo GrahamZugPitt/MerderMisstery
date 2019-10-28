@@ -30,8 +30,7 @@
 		NOTE: For Linux these values should be 0xAARRGGBB where AA is alpha RR is red BB is blue and GG is green
 		This may not work properly on mac since mac forces bitmaps into its own masks for the color channels
 */
-NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsigned int dLoyal, unsigned int dWrath) :mood{0}, murderiness{0},
-													name{name}, spriteFileName{spriteFileName} {
+NPC::NPC() :mood{0}, murderiness{0} {
 	
 
 	spriteRow = 0;
@@ -47,6 +46,45 @@ NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsig
 		personality.insert({trait, rand() % 201 - 100});
 	}
 	
+	
+	#ifdef LOGGING
+	std::string str = "--Constructor Called--\n";
+	str += toString();
+	log(lfName, str);
+	#endif
+	#ifdef VERBOSE
+	std::cout << str << std::endl;
+	#endif
+}
+
+/* Initializes the sprite size and position on the map
+	Args:
+		renderer: a pointer to the renderer
+		sizeX: the width of the sprite (60)
+		sizeY: the height of the sprite (88)
+		posX: the initial display x postion
+		posY: the initial display y position
+	Returns:
+		1 on successful creation, 0 if the texture was unable to be made
+*/
+int NPC::initSprite(std::string charName, std::string spriteFileName, unsigned int dLust, unsigned int dLoyal, unsigned int dWrath,
+					SDL_Renderer *renderer, int sizeX, int sizeY, int posX, int posY){
+	name = charName;
+	crop.x = 7 + rand() % 3; //TODO: fix this offset in the sprite sheet
+	crop.y = spriteRow * sizeY;
+	crop.w = sizeX;
+	crop.h = sizeY;
+	mapPos.x = posX;
+	mapPos.y = posY;
+	mapPos.w = sizeX;
+	mapPos.h = sizeY;
+	screenPos.x = -100;
+	screenPos.y = -100;
+	screenPos.w = sizeX;
+	screenPos.h = sizeY;
+
+	std::size_t found = spriteFileName.find_last_of("/");
+	std::cout << spriteFileName.substr(found, spriteFileName.length()-4) << std::endl;
 	std::string oname = spriteFileName.substr(0,spriteFileName.length()-4) + "m.bmp";
 	
 	BMPMod img(spriteFileName, oname);
@@ -62,13 +100,13 @@ NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsig
 	}
 	if (personality[traits[1]] >= 25){
 		std::cout << "disloyalty colors swapped" << std::endl;
-		img.swapColor((unsigned int) 0xFF0000FF, (unsigned int)0xFF000000);
+		img.swapColor((unsigned int) 0xFF0000FF, DISLOYAL);
 	} else {
 		img.swapColor((unsigned int)0xFF0000FF, dLoyal);
 	}
 	if (personality[traits[3]] >= 25){
 		std::cout << "wrath colors swapped" << std::endl;
-		img.swapColor((unsigned int) 0xFFFF0000, (unsigned int)0xFFEE1111);
+		img.swapColor((unsigned int) 0xFFFF0000, WRATH);
 	} else {
 		img.swapColor((unsigned int) 0xFFFF0000, dWrath);
 	} if (personality[traits[2]] >= 25){
@@ -78,50 +116,13 @@ NPC::NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsig
 		std::cout << "Dishonesty sprite used" << std::endl;
 		spriteRow += 2;
 	}
-	spriteRow = 1;
-	spriteFileName = oname;
-	#ifdef LOGGING
-	std::string str = "--Constructor Called--\n";
-	str += toString();
-	log(lfName, str);
-	#endif
-	#ifdef VERBOSE
-	std::cout << str << std::endl;
-	#endif
-	printf("exiting\n");
-}
-
-// Constructor with no arguments
-NPC::NPC() :NPC("", "", 0xFF888888,0xFF111111,0xFFEEEEEE){}
-/* Initializes the sprite size and position on the map
-	Args:
-		renderer: a pointer to the renderer
-		sizeX: the width of the sprite (60)
-		sizeY: the height of the sprite (88)
-		posX: the initial display x postion
-		posY: the initial display y position
-	Returns:
-		1 on successful creation, 0 if the texture was unable to be made
-*/
-int NPC::initSprite(SDL_Renderer *renderer, int sizeX, int sizeY, int posX, int posY){
-	crop.x = 7 + rand() % 3; //TODO: fix this offset in the sprite sheet
 	crop.y = spriteRow * sizeY;
-	crop.w = sizeX;
-	crop.h = sizeY;
-	mapPos.x = posX;
-	mapPos.y = posY;
-	mapPos.w = sizeX;
-	mapPos.h = sizeY;
-	screenPos.x = -100;
-	screenPos.y = -100;
-	screenPos.w = sizeX;
-	screenPos.h = sizeY;
-	std::string oname = spriteFileName.substr(0,spriteFileName.length()-4) + "m.bmp";
-    SDL_Surface *surface = IMG_Load(oname.c_str());
+	spriteFileName = oname;
+	SDL_Surface *surface = IMG_Load(oname.c_str());
     
-    //Check if we can pull PlayerSpriteSheet.png
+    //Check if the sprite sheet is loaded
     if (surface == NULL)
-        printf("Error loading Player Sprite Sheet!");
+        printf("Error loading NPC Sprite Sheet!");
     else
     {
         //Create texture from player sprite surface we just created
