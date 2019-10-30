@@ -1,5 +1,4 @@
 #include "event.cpp"
-#include "EventList.cpp"
 #include <vector>
 #include "bmp_edit.hpp"
 #include "npc.hpp"
