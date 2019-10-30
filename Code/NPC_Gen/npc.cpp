@@ -82,6 +82,9 @@ int NPC::initSprite(std::string charName, std::string spriteFileName, unsigned i
 	screenPos.y = -100;
 	screenPos.w = sizeX;
 	screenPos.h = sizeY;
+
+	std::size_t found = spriteFileName.find_last_of("/");
+	std::cout << spriteFileName.substr(found, spriteFileName.length()-4) << std::endl;
 	std::string oname = spriteFileName.substr(0,spriteFileName.length()-4) + "m.bmp";
 	
 	BMPMod img(spriteFileName, oname);
@@ -113,11 +116,13 @@ int NPC::initSprite(std::string charName, std::string spriteFileName, unsigned i
 		std::cout << "Dishonesty sprite used" << std::endl;
 		spriteRow += 2;
 	}
-	spriteFileName = oname;SDL_Surface *surface = IMG_Load(oname.c_str());
+	crop.y = spriteRow * sizeY;
+	spriteFileName = oname;
+	SDL_Surface *surface = IMG_Load(oname.c_str());
     
-    //Check if we can pull PlayerSpriteSheet.png
+    //Check if the sprite sheet is loaded
     if (surface == NULL)
-        printf("Error loading Player Sprite Sheet!");
+        printf("Error loading NPC Sprite Sheet!");
     else
     {
         //Create texture from player sprite surface we just created
