@@ -6,14 +6,7 @@
 #include <string>
 #include <map>
 // This is just a dummy event until we can include an actual event
-class Event{
-	public:
-		std::string event;
-		Event(std::string str) :event{str}{};
-		Event(){
-			event = "NONE";
-		}
-};
+
 const int NPC_WIDTH = 60;
 const int NPC_HEIGHT = 88;
 
@@ -35,13 +28,12 @@ class NPC {
 		int mood;
 		int murderiness;
 		int relationships[NUM_NPCS];
-		Event goal;
-		SDL_Rect mapPos;
-		SDL_Rect screenPos;
+		int goal;
+		SDL_Rect position;
 		SDL_Texture *texture;
 		//Constructor
 		NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsigned int dLoyal, unsigned int dWrath);
-		NPC();
+		
 		int initSprite(SDL_Renderer *renderer, int sizeX, int sizeY, int posX, int posY);
 		void print();
 		std::string toString();
@@ -49,9 +41,7 @@ class NPC {
 		~NPC();
 		std::string getName();
 		std::string getSpriteName();
-		void setName(std::string name);
-		void setSpriteName(std::string filename);
-		void renderToScreen(SDL_Renderer *renderer, float timechange, SDL_Rect camPos);
+		void renderToScreen(SDL_Renderer *renderer, float timechange, float posX, float posY);
 	private:
 		int spriteRow;
 		std::string name;

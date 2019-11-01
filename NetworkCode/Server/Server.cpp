@@ -8,6 +8,8 @@
 #include <string>
 #include <cstring>
 #include <sstream>
+#include <fstream>
+#include <streambuf>
 #include <unistd.h>
 
 using namespace std;
@@ -116,7 +118,7 @@ int main()
 	                }
 
 	                // Send a welcome message to the connected client
-	                string welcomeMsg = "Welcome to the Forum!\r\n";
+	                string welcomeMsg = "\nWelcome to Merder Misstery chat!\r\n";
 	                send(client, welcomeMsg.c_str(), welcomeMsg.size() + 1, 0);
 	            }
 	            else // It's an inbound message
@@ -134,20 +136,66 @@ int main()
 	                }
 	                else
 	                {
-	                    // Send message to other clients, and not listening socket
+	                    //Client is looking for specific data
+						string buffer(buf);
+						if(buffer == "uDN0oyTNjaAENW9KLocdjXP85ou3bAtBAhBAOPXLU8P0Iip8AcaELgAvewFNTpzM") {
+							ifstream file;
+							file.open("forum_data.txt");
+							string data;
+							file.seekg(0, ios::end);
+							data.reserve(file.tellg());
+							file.seekg(0, ios::beg);
+							data.assign((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+							file.close();
+							
+							//Send back to listener
+							for(int i = 0; i <= fdmax; i++) {
+								int outSock = i;
+								if(outSock == listener || outSock == temp) {
+									ostringstream ss;
+									ss << data;
+									string strOut = ss.str();
+									
+									send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+								}
+							}
+						}
+						//Client wants to send the updated data
+						else if(buffer.substr(buffer.size()-64).compare("uDN0oyTNjaAENW9KLocdjXP85ou3bAtBAhBAOPXLU8P0Iip8AcaELgAvewFNTpzM") == 0) {
+							ofstream file;
+							file.open("forum_data.txt", ios::out | ios::trunc);
+							file << buffer.substr(0, buffer.size()-64);
+							file.close();
+							
+							//Send back to listener
+							for(int i = 0; i <= fdmax; i++) {
+								int outSock = i;
+								if(outSock == listener || outSock == temp) {
+									string strOut = "Data updated successfully";
+									
+									send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+								}
+							}
+						}
+						else {
+							
+							if(buffer != "exit") {
+								
+								// Send message to other clients, and not listening socket, unless message is exit
+								for (int i = 0; i <= fdmax; i++)
+								{
+									int outSock = i;
+									if (outSock != listener && outSock != temp)
+									{
+										ostringstream ss;
+										ss << "SOCKET #" << temp << ": " << buf;
+										string strOut = ss.str();
 
-	                    for (int i = 0; i <= fdmax; i++)
-	                    {
-	                        int outSock = i;
-	                        if (outSock != listener && outSock != temp)
-	                        {
-	                            ostringstream ss;
-	                            ss << "SOCKET #" << temp << ": " << buf;
-	                            string strOut = ss.str();
-
-	                            send(outSock, strOut.c_str(), strOut.size() + 1, 0);
-	                        }
-	                    }
+										send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+									}
+								}
+							}
+						}
 	                }
 	            }
 	        }
