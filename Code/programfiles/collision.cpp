@@ -13,37 +13,63 @@ Collidable::Collidable(SDL_Rect bounds){
 	rect.w = bounds.w;
 	rect.h = bounds.h;
 }
+Collidable::Collidable(int x, int y, int w, int h){
+	rect.x = x;
+	rect.y = y;
+	rect.w = w;
+	rect.h = h;
+}
 Collidable::~Collidable(){
 	if(!children.empty())
 		children.clear();
 }
+
 void Collidable::addChild(Collidable child){
 	children.push_back(child);
 }
 
 bool Collidable::checkCollision(SDL_Rect *playerRect, SDL_Rect *overlap){
-	bool hasIntersect = false;
+	bool found = false;
 	if(SDL_IntersectRect(&rect, playerRect, overlap)){
-		hasIntersect = true;
+		found = true;
 		for(auto child: children){
-			hasIntersect = child.checkCollision(playerRect, overlap);
-			if (hasIntersect){
+			if ( child.checkCollision(playerRect, overlap) ){break;}
+		}
+	}
+	return found;
+}
+
+int Collidable::checkCollisionLevel(SDL_Rect *playerRect, SDL_Rect *overlap, int *level, int  searchDepth){
+	if(SDL_HasIntersection(&rect, playerRect)){
+		*level += 1;
+		//printf("found match level: %d", *level);
+		if (*level ==  searchDepth){
+			SDL_IntersectRect(&rect, playerRect, overlap);
+			//return *level;
+		} else {
+			for (auto child: children){
+				child.checkCollisionLevel(playerRect, overlap, level,  searchDepth);
 				break;
 			}
 		}
 	}
-	return hasIntersect;
+	return *level;
 }
 
 std::string Collidable::toString(){
 	std::string s;
 	s += "Collidable: Rect (" + std::to_string(rect.x) + ", " + std::to_string(rect.y) + ", " + std::to_string(rect.w)+ ", " + std::to_string(rect.h)+")";
-	for(auto child: children){
-		s+= child.toString();
+	if(!children.empty()){
+		s += "\n  Children:\n";
+		for(auto child: children){
+			s+= child.toString();
+		}
+		s += "\n End Children\n";
 	}
 	return s;
 }
 // Used for testing
+/*
 #ifdef TESTING
 int main(int argc, char** argv){
 	printf("Main running\n");
@@ -53,23 +79,37 @@ int main(int argc, char** argv){
 	rect.w = 100;
 	rect.h = 100;
 	Collidable c(rect);
-	rect.x = 10;
-	rect.y = 10;
-	rect.w = 80;
-	rect.h = 80;
+	rect.x = 0;
+	rect.y = 0;
+	rect.w = 50;
+	rect.h = 100;
 	Collidable c2(rect);
+	rect.x = 0;
+	rect.y = 0;
+	rect.w = 50;
+	rect.h = 50;
+	Collidable c3(rect);
+	c2.addChild(c3);
 	c.addChild(c2);
-
+	//c.addChild(c3);
 	SDL_Rect player;
 	SDL_Rect intersect;
-	player.x = 70;
-	player.y = 70;
+	player.x = 0;
+	player.y = 60;
 	player.w = 100;
 	player.h = 100;
 	std::cout << c.toString() << std::endl;
-	std::cout << c.children[0].toString() << std::endl;
+	//std::cout << c.children[0].toString() << std::endl;
+	int level = 0;
 	std::cout << c.checkCollision(&player, &intersect) << std::endl;
 
+
+	//std::cout << intersect.x << ", " << intersect.y << ", " << intersect.w << ", " << intersect.h << std::endl;
+	level = 0;
+	int  searchDepth = 3;	
+	std::cout << (searchDepth == c.checkCollisionLevel(&player, &intersect, &level,  searchDepth)) << std::endl;
 	std::cout << intersect.x << ", " << intersect.y << ", " << intersect.w << ", " << intersect.h << std::endl;
+	
 }
 #endif
+*/

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "common.hpp"
+#include "collision.hpp"
 
 // No parameters as yet, that'll probably change
 SDL_Rect getCastle();
@@ -8,7 +9,7 @@ SDL_Rect getCastle();
 #ifndef WORLD_OBJECT_H__
 #define WORLD_OBJECT_H__
 
-class WorldObject
+class WorldObject: public Collidable
 {
 public:
 

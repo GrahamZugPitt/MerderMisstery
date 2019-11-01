@@ -29,7 +29,8 @@ WorldObject::WorldObject() :texture{NULL} {
 	crop.h = 0;
 };
 
-WorldObject::WorldObject(std::string spriteFile, SDL_Renderer *renderer, int mapX, int mapY, int mapW, int mapH,int colX, int colY, int colW, int colH){
+WorldObject::WorldObject(std::string spriteFile, SDL_Renderer *renderer, int mapX, int mapY, int mapW, int mapH,int colX, int colY, int colW, int colH)
+:Collidable(colX, colY, colW, colH) {
 	int code = 0;
 	if ((code = initObject(spriteFile, renderer, mapX, mapY, mapW, mapH, colX, colY, colW, colH)) != 0)
 		std::cout << "Object not created Error: "<< code <<std::endl;
@@ -42,6 +43,8 @@ WorldObject::WorldObject(std::string spriteFile, SDL_Renderer *renderer, int map
 	std::cout << "crop " << crop.x << ", " << crop.y << ", " << crop.w << ", " << crop.h << std::endl;
 
 	std::cout << "screen " << screenPos.x << ", " << screenPos.y << ", " << screenPos.w << ", " << screenPos.h << std::endl;
+
+	std::cout << Collidable::toString() << std::endl;
 }
 
 int WorldObject::initObject(std::string spriteFile, SDL_Renderer *renderer, int mapX, int mapY, int mapW, int mapH,int colX, int colY, int colW, int colH){
