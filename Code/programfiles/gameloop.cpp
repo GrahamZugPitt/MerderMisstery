@@ -2,6 +2,7 @@
 #include "main_helper.hpp"
 #include "Player.hpp"
 #include "chat.hpp"
+#include "worldObjects.hpp"
 #include "../NPC_Gen/npc.hpp"
 // Add some vars to be used below
 std::string mapImgPath = "Art/Tiles/Map.png";
@@ -15,6 +16,8 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     SDL_Texture* bg = loadFiles(mapImgPath, renderer);
     Player *player = new Player(playerImgPath, renderer);
     SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+
+    WorldObject horse("Art/Decor/Horse.png", renderer, 2000, 1000, 200,100, 2020, 1010, 160, 80);
 
     //display npcs
     NPC npcs[12];
@@ -94,6 +97,10 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
             }
         }
         
+        horse.renderToScreen(renderer, cam);
+        if( SDL_IntersectRect(&horse.collisionBox, &(player->positionPNG), &collide)){
+            player->alterPosition(&collide);
+        }
         setCameraPosition(&cam, player->positionPNG);
         
         // Render Player

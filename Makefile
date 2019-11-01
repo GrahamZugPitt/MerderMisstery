@@ -50,3 +50,6 @@ rebuild:
 run:
 	make
 	./murder.o
+
+collide.o: $(OBJDIR)/collision.cpp
+	$(CC) -o collide.o $< $(COMPILER_FLAGS) $(LINKER_FLAGS) -std=c++14 
