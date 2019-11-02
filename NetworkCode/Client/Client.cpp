@@ -11,6 +11,7 @@
 #include <cstring>
 #include <sstream>
 #include <unistd.h>
+#include "list.h"
 
 #include <arpa/inet.h>
 
@@ -18,59 +19,6 @@
 #define STDIN 0
 
 using namespace std;
-
-struct Post {
-	string seed;
-	string user;
-	string text;
-};
-
-struct Node {
-	Post data;
-	Node *next;
-};
-
-class List {
-	private:
-		Node *head, *tail;
-	public:
-		List() :head{nullptr}, tail{nullptr} {}
-		void createNode(Post d) {
-			Node *temp = new Node;
-			temp->data = d;
-			temp->next = nullptr;
-			if(head == nullptr) {
-				head = temp;
-				tail = temp;
-				temp = nullptr;
-			}
-			else {
-				tail->next = temp;
-				tail = temp;
-			}
-		}
-		void printList() {
-			Node *temp = new Node;
-			temp = head;
-			int counter = 1;
-			while(temp != nullptr) {
-				cout << "Seed #" << counter << ": " << temp->data.seed << "\nUser: " << temp->data.user << "\nMessage: " 
-				<< temp->data.text << "\n\n" << endl;
-				temp = temp->next;
-				counter++;
-			}
-		}
-		string toString() {
-			Node *temp = new Node;
-			temp = head;
-			stringstream ss;
-			while(temp != nullptr) {
-				ss << temp->data.seed << "\n" << temp->data.user << "\n" << temp->data.text << "\n";
-				temp = temp->next;
-			}
-			return ss.str();
-		}
-};
 
 int main(int argc, char *argv[])
 {
