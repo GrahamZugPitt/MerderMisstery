@@ -11,6 +11,7 @@
 #include <cstring>
 #include <sstream>
 #include <unistd.h>
+#include "list.h"
 
 #include <arpa/inet.h>
 
@@ -72,50 +73,142 @@ int main(int argc, char *argv[])
     }
 
     freeaddrinfo(servinfo);
+	int choice = -1;
+	cout << "Enter 0 for chat and 1 for game seed sharing: ";
+	cin >> choice;
+	
+	if(choice == 0) {
+	
+		// Do-while loop to send and receive data
+		char buf[4096];
+		string userInput;
+		FD_SET(sockfd, &master);
 
-    // Do-while loop to send and receive data
-    char buf[4096];
-    string userInput;
-    FD_SET(sockfd, &master);
-    bool firstTime = true;
+		do
+		{
+			temp = master;
 
-    do
-    {
-    	temp = master;
+			select(sockfd+1, &temp, nullptr, nullptr, &tv);
 
-    	select(sockfd+1, &temp, nullptr, nullptr, &tv);
+			if (FD_ISSET(STDIN, &temp))
+			{
+				getline(cin, userInput);
 
-    	if (FD_ISSET(STDIN, &temp))
-    	{
-	        getline(cin, userInput);
-
-	        if (userInput.size() > 0) // Make sure the user has typed in something
-	        {
-	            // Send the text
-	            int sendResult = send(sockfd, userInput.c_str(), userInput.size() + 1, 0);
-	            if (sendResult <= 0)
-	            {
-	            	break;
-	            }
-	        }
-	    }
-	    else
-	    {
-    		// Get response
-        	memset(&buf, 0, sizeof buf);
-            int bytesReceived = recv(sockfd, buf, 4096, 0);
-       	    if (bytesReceived > 0)
-            {
-                cout << string(buf, 0, bytesReceived) << endl;
-                firstTime = false;
-            }
-            else
-            {
-            	break;
-            }
-	    }
-    
-    } while (userInput != "exit");
+				if (userInput.size() > 0) // Make sure the user has typed in something
+				{
+					// Send the text
+					int sendResult = send(sockfd, userInput.c_str(), userInput.size() + 1, 0);
+					if (sendResult <= 0)
+					{
+						break;
+					}
+				}
+			}
+			else
+			{
+				// Get response
+				memset(&buf, 0, sizeof buf);
+				int bytesReceived = recv(sockfd, buf, 4096, 0);
+				if (bytesReceived > 0)
+				{
+					cout << string(buf, 0, bytesReceived) << endl;
+				}
+				else
+				{
+					break;
+				}
+			}
+		
+		} while (userInput != "exit");
+	}
+	else {
+		char buf[4096];
+		cout << "\n";
+		
+		//Receive data from server (to get past initial message)
+		memset(&buf, 0, sizeof buf);
+		int bytesReceived = recv(sockfd, buf, 4096, 0);
+		
+		//Randomly generated string, if server sees this then knows to send specific data
+		string input = "uDN0oyTNjaAENW9KLocdjXP85ou3bAtBAhBAOPXLU8P0Iip8AcaELgAvewFNTpzM";
+		int sendResult = send(sockfd, input.c_str(), input.size() + 1, 0);
+		
+		List posts;
+		Post p;
+		
+		//Receive data from server
+		memset(&buf, 0, sizeof buf);
+		bytesReceived = recv(sockfd, buf, 4096, 0);
+		
+		//Put data into linked list and print
+		if(bytesReceived > 1) {
+			int i = 0;
+			int counter = 0;
+			string add = "";
+			
+			while(buf[i] != '\0') {
+				if(buf[i] == '\n') {
+					counter++;
+					if(counter % 3 == 1) {
+						p.seed = add;
+						add = "";
+					}
+					else if(counter % 3 == 2) {
+						p.user = add;
+						add = "";
+					}
+					else {
+						p.text = add;
+						posts.createNode(p);
+						add = "";
+					}
+				}
+				else {
+					add += buf[i];
+				}
+				i++;
+			}
+			posts.printList();
+		}
+		else {
+			cout << "No seeds shared yet\n" << endl;
+		}
+		
+		choice = 0;
+		while(choice == 0) {
+			cout << "Enter 0 to share a game seed or 1 to exit: ";
+			cin >> choice;
+			
+			if(choice != 0) {
+				break;
+			}
+			
+			cout << "\nEnter Game Seed: ";
+			cin >> p.seed;
+			cout << "\nEnter User: ";
+			cin >> p.user;
+			cout << "\nEnter Message: ";
+			if(cin.peek() == '\n') {
+				cin.ignore();
+			}
+			getline(cin, p.text);
+			posts.createNode(p);
+			
+			input = posts.toString();
+			input += "uDN0oyTNjaAENW9KLocdjXP85ou3bAtBAhBAOPXLU8P0Iip8AcaELgAvewFNTpzM";
+			
+			sendResult = send(sockfd, input.c_str(), input.size() + 1, 0);
+			
+			memset(&buf, 0, sizeof buf);
+			bytesReceived = recv(sockfd, buf, 4096, 0);
+			
+			if(bytesReceived > 0) {
+				cout << "\n\n" << buf << endl;
+				cout << "Updated List\n" << endl;
+				posts.printList();
+			}
+		}
+	}
 
     //Shut her down
     close(sockfd);
