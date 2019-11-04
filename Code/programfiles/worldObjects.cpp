@@ -1,3 +1,13 @@
+/*	A C++ class representing an object in the world for the MurderMistery game
+*		by: Erick Brindock
+*
+*	This class holds a sprite to draw as well as the position information needed to 
+* 	display it.
+*	
+*	It extends the Collidable class to enable simple or "striped" collision detection.
+*
+*/
+
 #include "worldObjects.hpp"
 
 
@@ -24,7 +34,19 @@ WorldObject::WorldObject() :Collidable(0,0,0,0), texture{NULL} {
 	crop.w = 0;
 	crop.h = 0;
 };
-
+/* Creates a WorldObject and initializes it.
+	Args:
+		spriteFile: the path and name of the sprite to use
+		*renderer: the SDL_Renderer being used
+		mapX: the x position on the map
+		mapY: the y position on the map
+		mapW: the width of the sprite
+		mapH: the height of the sprite
+		colX: the x position of the collision box (usually same as mapX)
+		colY: the y position of the collision box (usually same as mapY)
+		colW: the width of the collision box (usually the same as mapW)
+		colH: the height of the collision box (usually the same as mapH)
+*/
 WorldObject::WorldObject(std::string spriteFile, SDL_Renderer *renderer, int mapX, int mapY, int mapW, int mapH,int colX, int colY, int colW, int colH)
 :Collidable(colX, colY, colW, colH) {
 	int code = 0;
@@ -41,6 +63,20 @@ WorldObject::WorldObject(std::string spriteFile, SDL_Renderer *renderer, int map
 	std::cout << Collidable::toString() << std::endl;
 }
 
+/* Initializes a world object. This load an image and converts it to a texture to render.
+	It also sets up the renderign and collision information for the object.
+	Args:
+		spriteFile: the path and name of the sprite to use
+		*renderer: the SDL_Renderer being used
+		mapX: the x position on the map
+		mapY: the y position on the map
+		mapW: the width of the sprite
+		mapH: the height of the sprite
+		colX: the x position of the collision box (usually same as mapX)
+		colY: the y position of the collision box (usually same as mapY)
+		colW: the width of the collision box (usually the same as mapW)
+		colH: the height of the collision box (usually the same as mapH)
+*/
 int WorldObject::initObject(std::string spriteFile, SDL_Renderer *renderer, int mapX, int mapY, int mapW, int mapH,int colX, int colY, int colW, int colH){
 	SDL_Surface *surface = IMG_Load(spriteFile.c_str());
     //Check if the sprite sheet is loaded
@@ -81,6 +117,11 @@ int WorldObject::initObject(std::string spriteFile, SDL_Renderer *renderer, int 
     return 0;
 }
 
+/* Renders the object to the screen.
+	Args:
+		renderer: the renderer being used
+		camPos: the rect of the camera
+*/
 void WorldObject::renderToScreen(SDL_Renderer *renderer, SDL_Rect camPos ){
 	if(renderer != NULL && texture != NULL){
 		screenPos.x = mapPos.x - camPos.x;

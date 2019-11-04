@@ -3,6 +3,7 @@
 #include "Player.hpp"
 #include "chat.hpp"
 #include "worldObjects.hpp"
+#include "Building.hpp"
 #include "../NPC_Gen/npc.hpp"
 // Add some vars to be used below
 std::string mapImgPath = "Art/Tiles/Map.png";
@@ -27,6 +28,9 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     objs[0] = horse;
     objs[1].initObject("Art/Decor/Bed.png", renderer, 2000, 1500, 100, 100, 2000, 1500, 100, 100);
 
+    Building b("Art/Buildings/generic.png", renderer, 2500, 1200, 500, 500, 2500, 1200, 500, 500);
+    SDL_Rect door = {200,121, 150, 179};
+    b.addWalls(20, door, WEST);
     //display npcs
     NPC npcs[12];
     // lust, loyal, wrath => green, blue, red
@@ -47,7 +51,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     npcs[7].initSprite("Isaac", "Art/NPCs/Fuzz.bmp", WHITE, DARK_BLUE, ORANGE,
                         renderer, 60, 88, 1600, 1400);
     npcs[8].initSprite("Jake", "Art/NPCs/Barkeep.bmp", LIGHT_RED, GRAY, WHITE,
-                        renderer, 60, 88, 1800, 1400);
+                        renderer, 60, 88, 2600, 1550);
     npcs[9].initSprite("Kyle", "Art/NPCs/Farmer.bmp", LIGHT_GREEN, BLUE, ORANGE,
                         renderer, 60, 88, 1400, 1600);
     npcs[10].initSprite("Liam", "Art/NPCs/Jeweler.bmp", WHITE, GRAY, BLACK,
@@ -94,9 +98,14 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         bgRect.h = cam.h;
         SDL_RenderCopy(renderer, bg, &cam, &bgRect);
 
+        SDL_Rect collide;
+        // render buildings
+        b.renderToScreen(renderer, cam);
+        if (b.checkCollision(&(player->positionPNG), &collide)){
+                player->alterPosition(&collide);
+        }
         //render npc
         int i=0;
-        SDL_Rect collide;
         for(i = 0; i < 12; i++){
             npcs[i].renderToScreen(renderer, time_change, cam);
             if( SDL_IntersectRect(&npcs[i].mapPos, &(player->positionPNG), &collide)){
@@ -111,6 +120,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
                 player->alterPosition(&collide);
             }
         }
+        
         
         setCameraPosition(&cam, player->positionPNG);
         
