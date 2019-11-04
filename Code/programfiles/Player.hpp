@@ -13,7 +13,7 @@ class Player {
         void alterPosition(SDL_Rect *collider);
 
 		// playerSpeed measured in px / s
-		float playerSpeed = 200.f;
+		float playerSpeed = 500.f;
 		int colorKeyed = 0;
 		int textureWidth;
 		bool isRunning;
