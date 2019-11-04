@@ -9,16 +9,12 @@ SDL_Rect getCastle(){
 }
 // Deafult constructor 
 // set everything to null or zero
-WorldObject::WorldObject() :texture{NULL} {
+WorldObject::WorldObject() :Collidable(0,0,0,0), texture{NULL} {
 	mapPos.x = 0;
 	mapPos.y = 0;
 	mapPos.w = 0;
 	mapPos.h = 0;
 
-	collisionBox.x = 0;
-	collisionBox.y = 0;
-	collisionBox.w = 0;
-	collisionBox.h = 0;
 	screenPos.x = 0;
 	screenPos.y = 0;
 	screenPos.w = 0;
@@ -37,8 +33,6 @@ WorldObject::WorldObject(std::string spriteFile, SDL_Renderer *renderer, int map
 		
 	std::cout << "World Object Created" <<std::endl;
 	std::cout << "map " << mapPos.x << ", " << mapPos.y << ", " << mapPos.w << ", " << mapPos.h << std::endl;
-
-	std::cout << "col " << collisionBox.x << ", " << collisionBox.y << ", " << collisionBox.w << ", " << collisionBox.h << std::endl;
 
 	std::cout << "crop " << crop.x << ", " << crop.y << ", " << crop.w << ", " << crop.h << std::endl;
 
@@ -69,10 +63,10 @@ int WorldObject::initObject(std::string spriteFile, SDL_Renderer *renderer, int 
 	mapPos.w = mapW;
 	mapPos.h = mapH;
 
-	collisionBox.x = colX;
-	collisionBox.y = colY;
-	collisionBox.w = colW;
-	collisionBox.h = colH;
+	Collidable::rect.x = colX;
+	Collidable::rect.y = colY;
+	Collidable::rect.w = colW;
+	Collidable::rect.h = colH;
 
 
 	screenPos.x = 0;

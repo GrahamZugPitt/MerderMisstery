@@ -141,6 +141,13 @@ int main()
 						if(buffer == "uDN0oyTNjaAENW9KLocdjXP85ou3bAtBAhBAOPXLU8P0Iip8AcaELgAvewFNTpzM") {
 							ifstream file;
 							file.open("forum_data.txt");
+							
+							if(file.fail()) {
+								ofstream create;
+								create.open("forum_data.txt");
+								cout << "File did not exist, file created" << endl;
+							}
+						
 							string data;
 							file.seekg(0, ios::end);
 							data.reserve(file.tellg());
@@ -161,7 +168,7 @@ int main()
 							}
 						}
 						//Client wants to send the updated data
-						else if(buffer.substr(buffer.size()-64).compare("uDN0oyTNjaAENW9KLocdjXP85ou3bAtBAhBAOPXLU8P0Iip8AcaELgAvewFNTpzM") == 0) {
+						else if(buffer.size() > 64 && buffer.substr(buffer.size()-64).compare("uDN0oyTNjaAENW9KLocdjXP85ou3bAtBAhBAOPXLU8P0Iip8AcaELgAvewFNTpzM") == 0) {
 							ofstream file;
 							file.open("forum_data.txt", ios::out | ios::trunc);
 							file << buffer.substr(0, buffer.size()-64);
@@ -178,21 +185,25 @@ int main()
 							}
 						}
 						else {
-							
-							if(buffer != "exit") {
-								
-								// Send message to other clients, and not listening socket, unless message is exit
-								for (int i = 0; i <= fdmax; i++)
+							// Send message to other clients, and not listening socket, unless message is exit
+							for (int i = 0; i <= fdmax; i++)
+							{
+								int outSock = i;
+								if (outSock != listener && outSock != temp)
 								{
-									int outSock = i;
-									if (outSock != listener && outSock != temp)
-									{
+									string strOut;
+									if(buffer != "exit") {	
 										ostringstream ss;
 										ss << "SOCKET #" << temp << ": " << buf;
-										string strOut = ss.str();
-
-										send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+										strOut = ss.str();
 									}
+									else {
+										ostringstream ss;
+										ss << "SOCKET #" << temp << " has left the chat room";
+										strOut = ss.str();
+									}
+
+									send(outSock, strOut.c_str(), strOut.size() + 1, 0);
 								}
 							}
 						}

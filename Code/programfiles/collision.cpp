@@ -25,20 +25,33 @@ Collidable::~Collidable(){
 }
 
 void Collidable::addChild(Collidable child){
+	if(child.rect.x < rect.x || child.rect.y < rect.y ||
+		child.rect.x + child.rect.w > rect.x + rect.w ||
+		child.rect.y + child.rect.h > rect.y + rect.h ){
+		std::cerr << "WARNING child bounds exceed parent's\n" << std::endl;
+	}
 	children.push_back(child);
 }
 
 bool Collidable::checkCollision(SDL_Rect *playerRect, SDL_Rect *overlap){
 	bool found = false;
-	if(SDL_IntersectRect(&rect, playerRect, overlap)){
-		found = true;
-		for(auto child: children){
-			if ( child.checkCollision(playerRect, overlap) ){break;}
+	if(SDL_HasIntersection(&rect, playerRect)){
+		if(children.empty()){
+			found = true;
+			SDL_IntersectRect(&rect, playerRect, overlap);
+		} else {
+			for(auto child: children){
+				if ( SDL_HasIntersection(&(child.rect), playerRect) ){
+					SDL_IntersectRect(&(child.rect), playerRect, overlap);
+					found = true;
+					break;
+				}
+			}
 		}
 	}
 	return found;
 }
-
+/* Not working properly
 int Collidable::checkCollisionLevel(SDL_Rect *playerRect, SDL_Rect *overlap, int *level, int  searchDepth){
 	if(SDL_HasIntersection(&rect, playerRect)){
 		*level += 1;
@@ -55,7 +68,7 @@ int Collidable::checkCollisionLevel(SDL_Rect *playerRect, SDL_Rect *overlap, int
 	}
 	return *level;
 }
-
+*/
 std::string Collidable::toString(){
 	std::string s;
 	s += "Collidable: Rect (" + std::to_string(rect.x) + ", " + std::to_string(rect.y) + ", " + std::to_string(rect.w)+ ", " + std::to_string(rect.h)+")";

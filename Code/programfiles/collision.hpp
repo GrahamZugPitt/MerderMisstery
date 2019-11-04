@@ -14,17 +14,14 @@ public:
 	
 	std::string toString();
 
-	//int checkCollision(SDL_Rect *playerRect, SDL_Rect *Overlap);
 	bool checkCollision(SDL_Rect *playerRect, SDL_Rect *overlap);
 
-	int checkCollisionLevel(SDL_Rect *playerRect, SDL_Rect *overlap, int *level, int  searchDepth);
+	//int checkCollisionLevel(SDL_Rect *playerRect, SDL_Rect *overlap, int *level, int  searchDepth);
 	SDL_Rect rect;
 	std::vector<Collidable> children;
 
 	void addChild(Collidable child);
 
-private:
-	int maxDepth;
 };
 
 #endif

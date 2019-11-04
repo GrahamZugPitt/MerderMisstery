@@ -17,7 +17,15 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     Player *player = new Player(playerImgPath, renderer);
     SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
+
+    WorldObject objs[2];
     WorldObject horse("Art/Decor/Horse.png", renderer, 2000, 1000, 200,100, 2020, 1010, 160, 80);
+    Collidable c(2100, 1010, 35, 40);
+    horse.addChild(c);
+    Collidable c1(2020, 1050, 160, 40);
+    horse.addChild(c1);
+    objs[0] = horse;
+    objs[1].initObject("Art/Decor/Bed.png", renderer, 2000, 1500, 100, 100, 2000, 1500, 100, 100);
 
     //display npcs
     NPC npcs[12];
@@ -96,11 +104,14 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
                     player->alterPosition(&collide);
             }
         }
-        
-        horse.renderToScreen(renderer, cam);
-        if( SDL_IntersectRect(&horse.collisionBox, &(player->positionPNG), &collide)){
-            player->alterPosition(&collide);
+        //printf("Object size: %d\n", objs.size());
+        for (int i = 0; i < 2; i++){
+            objs[i].renderToScreen(renderer, cam);
+            if (objs[i].checkCollision(&(player->positionPNG), &collide)){
+                player->alterPosition(&collide);
+            }
         }
+        
         setCameraPosition(&cam, player->positionPNG);
         
         // Render Player

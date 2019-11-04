@@ -16,7 +16,6 @@ public:
 	SDL_Texture *texture;
 	SDL_Rect mapPos;
 	SDL_Rect screenPos;
-	SDL_Rect collisionBox;
 	SDL_Rect crop;
 	WorldObject();
 	WorldObject(std::string spriteFile, SDL_Renderer *renderer, int mapX, int mapY, int mapW, int mapH,int colX, int colY, int colW, int colH);
