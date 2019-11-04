@@ -71,8 +71,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         //Move Player
         player->move(time_change, keyState, farnan);
 
-        setCameraPosition(&cam, player->positionPNG);
-
         //Clear screen
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(renderer);
@@ -85,20 +83,21 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         bgRect.h = cam.h;
         SDL_RenderCopy(renderer, bg, &cam, &bgRect);
 
-        // Render Player
-        player->render(renderer, &cam);
-
         //render npc
         int i=0;
         SDL_Rect collide;
         for(i = 0; i < 12; i++){
             npcs[i].renderToScreen(renderer, time_change, cam);
             if( SDL_IntersectRect(&npcs[i].mapPos, &(player->positionPNG), &collide)){
-                std::cout << "Player collision with " << npcs[i].getName() << std::endl;
+                //std::cout << "Player collision with " << npcs[i].getName() << std::endl;
+                    player->alterPosition(&collide);
             }
         }
-
         
+        setCameraPosition(&cam, player->positionPNG);
+        
+        // Render Player
+        player->render(renderer, &cam);
 
         // Check Collisions
         player->collision(renderer, keyState);
