@@ -41,37 +41,26 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
     //True by default, animation is stopped if not running
     // Should probably revisit this code
     isRunning = true;
+
     if(!farnan){
         //Determine which directional keypad arrow is clicked and apply appropriate movement / image
-        if ((keyState[SDL_SCANCODE_UP] && keyState[SDL_SCANCODE_RIGHT]) || (keyState[SDL_SCANCODE_W] && keyState[SDL_SCANCODE_D])) {
-            positionPNG.y -= playerSpeed * change;
-            positionPNG.x += playerSpeed * change;
-            cropPNG.y = frameHeight * 2;
-        } else if ((keyState[SDL_SCANCODE_UP] && keyState[SDL_SCANCODE_LEFT]) || (keyState[SDL_SCANCODE_W] && keyState[SDL_SCANCODE_A])) {
-            positionPNG.y -= playerSpeed * change;
-            positionPNG.x -= playerSpeed * change;
-            cropPNG.y = frameHeight;
-        } else if ((keyState[SDL_SCANCODE_DOWN] && keyState[SDL_SCANCODE_RIGHT]) || (keyState[SDL_SCANCODE_S] && keyState[SDL_SCANCODE_D])) {
-            positionPNG.y += playerSpeed * change;
-            positionPNG.x += playerSpeed * change;
-            cropPNG.y = frameHeight * 2;
-        } else if ((keyState[SDL_SCANCODE_DOWN] && keyState[SDL_SCANCODE_LEFT]) || (keyState[SDL_SCANCODE_S] && keyState[SDL_SCANCODE_A])) {
-            positionPNG.y += playerSpeed * change;
-            positionPNG.x -= playerSpeed * change;
-            cropPNG.y = frameHeight;
-        } else if(keyState[SDL_SCANCODE_UP] || keyState[SDL_SCANCODE_W]) {
+        if(keyState[SDL_SCANCODE_UP] || keyState[SDL_SCANCODE_W]) {
             positionPNG.y -= playerSpeed * change;
             cropPNG.y = frameHeight * 3;
-        } else if(keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_S]) {
+        }
+        else if(keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_S]) {
             positionPNG.y += playerSpeed * change;
             cropPNG.y = 0;
-        } else if(keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_A]) {
+        }
+        else if(keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_A]) {
             positionPNG.x -= playerSpeed * change;
             cropPNG.y = frameHeight;
-        } else if(keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_D]) {
+        }
+        else if(keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_D]) {
             positionPNG.x += playerSpeed * change;
             cropPNG.y = frameHeight * 2;
-        } else {
+        }
+            else {
             isRunning = false;
         }
     } else {
@@ -91,7 +80,8 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
         else if(keyState[SDL_SCANCODE_RIGHT] && keyState[SDL_SCANCODE_D] && keyState[SDL_SCANCODE_M]) {
             positionPNG.x += playerSpeed * change;
             cropPNG.y = frameHeight * 2;
-        } else {
+        }
+            else {
             isRunning = false;
         }
     }
@@ -126,20 +116,9 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
         positionPNG.y -= playerSpeed * change;
     }
     
-    if (lastY > positionPNG.y && lastX < positionPNG.x) {
-        //Up and Right
-        direction = '@';
-    } else if (lastY > positionPNG.y && lastX > positionPNG.x) {
-        //Up and Left
-        direction = '#';
-    } else if (lastY < positionPNG.y && lastX < positionPNG.x) {
-        //Down and Right
-        direction = '$';
-    } else if (lastY < positionPNG.y && lastX > positionPNG.x) {
-        //Down and Left
-        direction = '%';
-    } else if (lastY > positionPNG.y) {
+    if (lastY > positionPNG.y) {
         direction = 'U';
+        overWriteY = positionPNG.y;
     } else if (lastY < positionPNG.y) {
         direction = 'D';
     } else if (lastX < positionPNG.x) {
@@ -208,22 +187,6 @@ bool Player::collision(SDL_Renderer *rendererPointer, const Uint8 *keyState){
 }
 
 void Player::alterPosition(SDL_Rect *collide) {
-    if (direction == '@') {
-        positionPNG.y += (*collide).h;
-        positionPNG.x -= (*collide).w;
-    }
-    if (direction == '#') {
-        positionPNG.y += (*collide).h;
-        positionPNG.x += (*collide).w;
-    }
-    if (direction == '$') {
-        positionPNG.y -= (*collide).h;
-        positionPNG.x -= (*collide).w;
-    }
-    if (direction == '%') {
-        positionPNG.y -= (*collide).h;
-        positionPNG.x += (*collide).w;
-    }
     if (direction == 'U') {
         positionPNG.y += (*collide).h;
     }
