@@ -5,6 +5,7 @@
 #include <SDL2/SDL_image.h>
 #include <string>
 #include <map>
+#include "../programfiles/worldObjects.hpp"
 // This is just a dummy event until we can include an actual event
 class Event{
 	public:
@@ -14,19 +15,19 @@ class Event{
 			event = "NONE";
 		}
 };
-const int NPC_WIDTH = 60;
-const int NPC_HEIGHT = 88;
+
+const int NPC_SPRITE_WIDTH = 60;
+const int NPC_SPRITE_HEIGHT = 88;
 
 const std::string lfName = "NPC.log";
 const int NUM_NPCS = 10;
 //
-const std::string traits[5] = {"Lust", "Disloyalty", "Greed", "Wrath", "Dishonesty"}; 
+const std::string traits[5] = {"Lust", "Disloyalty", "Greed", "Wrath", "Dishonesty"};
 
 const std::string names[NUM_NPCS] = {"alpha", "bravo", "charlie", "delta", "echo", "foxtrot",
 									"golf", "hotel", "india", "juliett"};
 
 constexpr unsigned int fleshtones[5] = {0xffffdbac, 0xfff1c27d, 0xffe0ac69, 0xffc68642, 0xff8d5524};
-
 
 const unsigned int BLACK = 0xFF000000;
 const unsigned int GRAY = 0xFF888888;
@@ -57,6 +58,7 @@ class NPC {
 		SDL_Rect mapPos;
 		SDL_Rect screenPos;
 		SDL_Texture *texture;
+		Collidable NPCCollider;
 		//Constructor
 		//NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsigned int dLoyal, unsigned int dWrath);
 		NPC();
@@ -71,12 +73,12 @@ class NPC {
 		void setName(std::string name);
 		void setSpriteName(std::string filename);
 		void renderToScreen(SDL_Renderer *renderer, float timechange, SDL_Rect camPos);
+		void ghostThisNPC();
 	private:
 		int spriteRow;
 		std::string name;
 		std::string spriteFileName;
 		std::map <std::string, int> personality;
-		//SDL_Renderer *renderer;
 		SDL_Rect crop;
 		float prevTime;
 		bool goingRight;

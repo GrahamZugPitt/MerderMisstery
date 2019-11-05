@@ -2,7 +2,7 @@
 #include "main_helper.hpp"
 
 // The Chat example template
-std::string chatExamplePath = "Art/chat_example.png";
+std::string chatExamplePath = "Art/Chat/chat_template.png";
 
 void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
   std::cout << "Entering Chat\n";
