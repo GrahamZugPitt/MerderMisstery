@@ -3,9 +3,6 @@
 #include "common.hpp"
 #include "collision.hpp"
 
-// No parameters as yet, that'll probably change
-SDL_Rect getCastle();
-
 #ifndef WORLD_OBJECT_H__
 #define WORLD_OBJECT_H__
 

@@ -13,7 +13,7 @@ NPC_HEADERS = Code/NPC_Gen/bmp_edit.hpp Code/NPC_Gen/npc.hpp
 OBJ_FILES = $(patsubst %,%.o, $(SOURCE_FILES))
 
 #COMPILER
-CC = clang++
+CC = g++
 
 #COMPILER FLAGS
 COMPILER_FLAGS = -Wall -I/usr/include/SDL2
