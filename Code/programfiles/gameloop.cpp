@@ -119,7 +119,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         SDL_RenderCopy(renderer, bg, &cam, &bgRect);
 
         SDL_Rect collide;
-
         //render npcs
         int i=0;
         for(i = 0; i < NPC_NUM; i++){
@@ -128,6 +127,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
                     player->alterPosition(&collide);
             }
         }
+
         for (int i = 0; i < WORLD_OBJECT_NUM; i++){
             objs[i].renderToScreen(renderer, cam);
             if (objs[i].checkCollision(&(player->positionPNG), &collide)){
