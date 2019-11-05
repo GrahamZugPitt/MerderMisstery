@@ -3,7 +3,7 @@
 
 #FILES TO COMPILE
 START_FILES = murder.o
-SOURCE_FILES = bmp_edit worldObjects chat npc gameloop menuloop main_helper Player main
+SOURCE_FILES = bmp_edit chat npc gameloop menuloop main_helper Player main collision worldObjects building
 #OUTPUT
 OUT_NAMES = $(patsubst %.cpp,%.o,$(START_FILES))
 OBJDIR := Code/programfiles/
@@ -33,7 +33,7 @@ start: $(START_FILES)
 %.o: $(NPC_DIR)/%.cpp $(NPC_HEADERS)
 	$(CC) -c -o $@ $< $(COMPILER_FLAGS) -std=c++14
 
-murder.o: $(OBJ_FILES)#bmp_edit.o npc.o main.o Player.o#$(START_FILES)
+murder.o: $(OBJ_FILES) #wo.o
 	$(CC) -o $@ $^ $(LINKER_FLAGS) -std=c++14
 
 clean:
