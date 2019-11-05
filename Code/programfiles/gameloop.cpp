@@ -55,7 +55,7 @@ void init(NPC *npcs, SDL_Renderer *renderer){
 
   // Make one of them a ghost
   // TODO: During integration, remove this bit and replace with call to sim
-  // Also don't forget to get rid of time.h
+  // Also don't forget to get rid of the time.h import
   srand(time(NULL));
   int random = rand() % 12;
   npcs[random].ghostThisNPC();
@@ -69,8 +69,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
     // Create a building, a bed, and a horse
     WorldObject objs[WORLD_OBJECT_NUM];
-    objs[0].initObject("Art/Decor/Bed.png", renderer, 2000, 1500, 100, 100, 0, 0, 100, 100);
-    objs[1].initObject("Art/Decor/Horse.png", renderer, 2000, 1000, 200, 100, 10, 10, 180, 80);
+    objs[0].initObject("Art/Decor/Horse.png", renderer, 2000, 1000, 200, 100, 10, 10, 180, 80);
 
     // Create the NPCs (offloaded for brevity)
     NPC npcs[NPC_NUM];
