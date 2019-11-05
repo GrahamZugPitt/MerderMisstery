@@ -15,6 +15,8 @@
 
 #include <arpa/inet.h>
 
+#include "Users.h"
+
 #define PORT "9034" 
 #define STDIN 0
 
@@ -35,6 +37,8 @@ int main(int argc, char *argv[])
     FD_ZERO(&master);
     FD_ZERO(&temp);
     FD_SET(STDIN, &master);
+
+    User this_user;
 
     if (argc != 2) {
         fprintf(stderr,"usage: client hostname\n");
@@ -73,8 +77,38 @@ int main(int argc, char *argv[])
     }
 
     freeaddrinfo(servinfo);
+
+
+    //Username and Password input
+    while(true){
+	    string username;
+	    cout << "\nEnter your username: ";
+	    cin >> username; 
+
+	    string password;
+	    cout << "\nEnter your password: ";
+	    cin >> password;
+
+	    //find the username in the database and make sure it's valid
+	    this_user = this_user.find_user(username);
+	    if(this_user.get_username().compare(username) != 0){
+	    	cout << "\nSorry, this username does not exist\n";
+	    	continue;
+	    }
+
+	    //if it's valid, then let's make sure the password is valid
+	    if(this_user.check_password(username, password) == false){
+	    	cout << "\nSorry, your password is incorrect\n";
+	    	continue;
+	    }
+	    else{
+	    	break;
+	    }
+	}
+
+	//Setup for Chat vs. Seed sharing
 	int choice = -1;
-	cout << "Enter 0 for chat and 1 for game seed sharing: ";
+	cout << "\nEnter 0 for chat and 1 for game seed sharing: ";
 	cin >> choice;
 	
 	if(choice == 0) {
@@ -96,7 +130,8 @@ int main(int argc, char *argv[])
 
 				if (userInput.size() > 0) // Make sure the user has typed in something
 				{
-					// Send the text
+					userInput = this_user.get_username() + ": " + userInput;
+
 					int sendResult = send(sockfd, userInput.c_str(), userInput.size() + 1, 0);
 					if (sendResult <= 0)
 					{
