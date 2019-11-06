@@ -29,7 +29,6 @@ start: $(START_FILES)
 %.o: $(OBJDIR)/%.cpp
 	$(CC) -c -o $@ $< $(COMPILER_FLAGS) -std=c++14
 
-
 %.o: $(NPC_DIR)/%.cpp $(NPC_HEADERS)
 	$(CC) -c -o $@ $< $(COMPILER_FLAGS) -std=c++14
 
