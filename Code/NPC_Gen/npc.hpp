@@ -47,9 +47,9 @@ const unsigned int PURPLE = 0xFFA606C8;
 const unsigned int DISLOYAL = 0xFFDCF31A;
 
 const int NPCColliderXOffset = 5;
-const int NPCColliderYOffset = 15;
-const int NPCColliderWidth = 50;
-const int NPCColliderHeight = 25;
+const int NPCColliderYOffset = 10;
+const int NPCColliderWidth = 45;
+const int NPCColliderHeight = 30;
 
 const int ConvoColliderXOffset = 0;
 const int ConvoColliderYOffset = NPCColliderYOffset + NPCColliderHeight;

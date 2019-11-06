@@ -254,8 +254,8 @@ void NPC::ghostThisNPC(){
 	mapPos.x = 2050;
 	mapPos.y = 200;
 	SDL_SetTextureAlphaMod(texture, 100);
-	Collidable temp(mapPos.x + NPCColliderXOffset, mapPos.y + NPCColliderYOffset, NPCColliderWidth, NPCColliderHeight);
-	NPCCollider = temp;
+	NPCCollider = *(new Collidable(mapPos.x + NPCColliderXOffset, mapPos.y + NPCColliderYOffset, NPCColliderWidth, NPCColliderHeight));
+	NPCConversationCollider = *(new Collidable(mapPos.x + ConvoColliderXOffset, mapPos.y + ConvoColliderYOffset, ConvoColliderWidth, ConvoColliderHeight));
 }
 
 /*

@@ -2,6 +2,7 @@
 #include "main_helper.hpp"
 #include "Player.hpp"
 #include "chat.hpp"
+#include "discussion.hpp"
 #include "worldObjects.hpp"
 #include "Building.hpp"
 #include "../NPC_Gen/npc.hpp"
@@ -17,6 +18,9 @@ const int WORLD_OBJECT_NUM = 2;
 
 const int NPC_WIDTH = 60;
 const int NPC_HEIGHT = 88;
+
+int npcdiscuss = 0;
+bool discussbool = false;
 
 void init(NPC *npcs, SDL_Renderer *renderer){
   // lust, loyal, wrath => green, blue, red
@@ -62,20 +66,6 @@ void init(NPC *npcs, SDL_Renderer *renderer){
   npcs[random].ghostThisNPC();
 }
 
-void renderTexture(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect cam, int x, int y, int w, int h, bool useCam){
-  // Render the 'Press whatever to talk' button
-  SDL_Rect screenPos;
-  screenPos.x = x;
-  screenPos.y = y;
-  screenPos.w = w;
-  screenPos.h = h;
-
-  if(useCam)
-    SDL_RenderCopy(renderer, texture, &cam, &screenPos);
-  else
-    SDL_RenderCopy(renderer, texture, NULL, &screenPos);
-}
-
 void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan){
     // Initialize world texture, player texture, and camera
     SDL_Texture *bg = loadFiles(mapImgPath, renderer);
@@ -118,6 +108,10 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         if (keyState[SDL_SCANCODE_C])
             enter_chat(e, &(*quit), keyState, renderer);
 
+        //Open Chat room
+        if (keyState[SDL_SCANCODE_X] && discussbool)
+            enter_discussion(e, &(*quit), keyState, renderer);
+
         //Move Player
         player->move(time_change, keyState, farnan);
 
@@ -132,6 +126,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         //render npcs and check for NPC collisions
         //  also check if you're within the conversation fields
         int i=0;
+        bool indiscusscollider = false;
         for(i = 0; i < NPC_NUM; i++){
             npcs[i].renderToScreen(renderer, time_change, cam);
             if (npcs[i].NPCCollider.checkCollision(&(player->positionPNG), &collide)){
@@ -139,13 +134,16 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
             }
 
             if (npcs[i].NPCConversationCollider.checkCollision(&(player->positionPNG), &collide)){
-                printf("Load her up, boys!\n");
                 int w, h;
                 SDL_QueryTexture(interactPromptingTex, NULL, NULL, &w, &h);
-                SDL_Rect notreally;
-                renderTexture(renderer, interactPromptingTex, notreally, 10, 10, w, h, false);
+                // Just pass in collide as a dummy arg, we don't use it
+                renderTexture(renderer, interactPromptingTex, collide, 10, 10, w, h, false);
+                npcdiscuss = i;
+                indiscusscollider = true;
             }
         }
+        // Only can discuss if we're within range
+        discussbool = indiscusscollider;
 
         // render world objects and check for collisions
         for (int i = 0; i < WORLD_OBJECT_NUM; i++){
