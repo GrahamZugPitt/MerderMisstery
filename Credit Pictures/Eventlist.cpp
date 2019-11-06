@@ -1,22 +1,15 @@
-#ifndef _EVENT_LIST_H
-#define _EVENT_LIST_H
-
-#include <stdio.h>
-#include <iostream>
-
-#include "event.hpp"
-
 class EventNode {
 private:
 	Event* data;
 public:
-	EventNode(Event *e);
+	EventNode(Event e);
 	EventNode* prev;
 	EventNode* next;
-	Event* getEvent();
+	Event getEvent();
 	std::string toString();
 	~EventNode();
-};
+}
+EventNode:
 
 class EventList {
 private:
@@ -24,14 +17,18 @@ private:
 	EventNode* tail;
 	int size;
 public:
-	EventList();
+	EventList(){
+		size = 0;
+		head = nullptr;
+		tail = nullptr;
+	}
 	int getSize();
-	void add(Event *e);
+	void add();
 	void insert();
 	EventNode get();
 	Event getEvent();
-	~EventList();
-};
+}
 
+int main() {
 
-#endif
+}
