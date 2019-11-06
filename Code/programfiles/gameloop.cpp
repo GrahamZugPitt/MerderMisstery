@@ -76,6 +76,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     // Create a horse
     WorldObject objs[WORLD_OBJECT_NUM];
     objs[0].initObject("Art/Decor/Horse.png", renderer, 2000, 1000, 200, 100, 25, 10, 160, 45);
+    objs[1].initObject("Art/Merder Objects/Blood_Puddle_1.png", renderer, 1400, 200, 300, 150, 0, 0, 0, 0);
 
     // Create the NPCs (offloaded for brevity)
     NPC npcs[NPC_NUM];
