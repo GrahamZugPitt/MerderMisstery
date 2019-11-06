@@ -46,6 +46,16 @@ const unsigned int ORANGE = 0xFFF69D1D;
 const unsigned int PURPLE = 0xFFA606C8;
 const unsigned int DISLOYAL = 0xFFDCF31A;
 
+const int NPCColliderXOffset = 5;
+const int NPCColliderYOffset = 10;
+const int NPCColliderWidth = 45;
+const int NPCColliderHeight = 30;
+
+const int ConvoColliderXOffset = 0;
+const int ConvoColliderYOffset = NPCColliderYOffset + NPCColliderHeight;
+const int ConvoColliderWidth = 60;
+const int ConvoColliderHeight = 25;
+
 class NPC {
 	public:
 		// public fields
@@ -59,6 +69,7 @@ class NPC {
 		SDL_Rect screenPos;
 		SDL_Texture *texture;
 		Collidable NPCCollider;
+		Collidable NPCConversationCollider;
 		//Constructor
 		//NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsigned int dLoyal, unsigned int dWrath);
 		NPC();
