@@ -14,7 +14,7 @@ std::string mapImgPath = "Art/Tiles/TownMap.png";
 std::string playerImgPath = "Art/Player/PlayerSpriteSheet.png";
 std::string interactImgPath = "Art/Messages/interact.png";
 const int NPC_NUM = 12;
-const int WORLD_OBJECT_NUM = 6;
+const int WORLD_OBJECT_NUM = 7;
 
 const int NPC_WIDTH = 60;
 const int NPC_HEIGHT = 88;
@@ -76,17 +76,17 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     // Create a horse, some walls, and a blood puddle
     WorldObject objs[WORLD_OBJECT_NUM];
     objs[0].initObject("Art/Decor/Horse.png", renderer, 2000, 1000, 200, 100, 25, 10, 160, 45);
-    
+
     objs[1].initObject("Art/Decor/TealBlock.png", renderer, 1297, 540, 485, 55, 15, 15, 440, 45);
-    
+
     objs[2].initObject("Art/Decor/TealBlock.png", renderer, 1297, 35, 59, 585, 10, 10, 40, 540);
-    
+
     objs[3].initObject("Art/Decor/TealBlock.png", renderer, 1294, 35, 1070, 58, 15, 15, 1000, 35);
-    
+
     objs[4].initObject("Art/Decor/TealBlock.png", renderer, 2265, 35, 59, 585, 10, 10, 40, 540);
-    
+
     objs[5].initObject("Art/Decor/TealBlock.png", renderer, 1855, 540, 485, 55, 40, 15, 410, 45);
-  
+
     objs[6].initObject("Art/Merder Objects/Blood_Puddle_1.png", renderer, 1400, 200, 300, 150, 0, 0, 0, 0);
 
 
@@ -140,6 +140,15 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         //  also check if you're within the conversation fields
         int i=0;
         bool indiscusscollider = false;
+
+        // render world objects and check for collisions
+        for (int i = 0; i < WORLD_OBJECT_NUM; i++){
+            objs[i].renderToScreen(renderer, cam);
+            if (objs[i].checkCollision(&(player->positionPNG), &collide)){
+                player->alterPosition(&collide);
+            }
+        }
+
         for(i = 0; i < NPC_NUM; i++){
             npcs[i].renderToScreen(renderer, time_change, cam);
             if (npcs[i].NPCCollider.checkCollision(&(player->positionPNG), &collide)){
@@ -157,14 +166,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         }
         // Only can discuss if we're within range
         discussbool = indiscusscollider;
-
-        // render world objects and check for collisions
-        for (int i = 0; i < WORLD_OBJECT_NUM; i++){
-            objs[i].renderToScreen(renderer, cam);
-            if (objs[i].checkCollision(&(player->positionPNG), &collide)){
-                player->alterPosition(&collide);
-            }
-        }
 
         setCameraPosition(&cam, player->positionPNG);
 
