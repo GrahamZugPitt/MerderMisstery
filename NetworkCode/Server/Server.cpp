@@ -192,16 +192,10 @@ int main()
 								if (outSock != listener && outSock != temp)
 								{
 									string strOut;
-									if(buffer != "exit") {	
-										ostringstream ss;
-										ss << "SOCKET #" << temp << ": " << buf;
-										strOut = ss.str();
-									}
-									else {
-										ostringstream ss;
-										ss << "SOCKET #" << temp << " has left the chat room";
-										strOut = ss.str();
-									}
+	
+									ostringstream ss;
+									ss << buf;
+									strOut = ss.str();		
 
 									send(outSock, strOut.c_str(), strOut.size() + 1, 0);
 								}
