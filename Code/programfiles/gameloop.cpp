@@ -14,6 +14,7 @@ std::string playerImgPath = "Art/Player/PlayerSpriteSheet.png";
 const int NPC_NUM = 12;
 const int WORLD_OBJECT_NUM = 6;
 
+//NPC Constants
 const int NPC_WIDTH = 60;
 const int NPC_HEIGHT = 88;
 
