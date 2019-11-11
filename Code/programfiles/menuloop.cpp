@@ -17,12 +17,28 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
             (*quit) = true;
           }
         }
+
+        //All Buttons top Y value: 540
+        //All Buttons bottom Y value: 626
+
+
+        //Enter Seed Left-X value: 96
+        //Enter Seed Right-X value: 386
+
+
+        //Start Game Left-X value: 485
+        //Start Game Right-X value: 774
+
+        //Roll Credits Left-X value: 875
+        //Roll Credits Right-X value: 1163
+
+
         // Get the Keyboard State
         keyState = SDL_GetKeyboardState(NULL);
 
-        // Start the game
-        if (keyState[SDL_SCANCODE_SPACE])
-          next = true;
+        // // Start the game
+        // if (keyState[SDL_SCANCODE_SPACE])
+        //   next = true;
 
         // Open Chat room
         if (keyState[SDL_SCANCODE_C])
