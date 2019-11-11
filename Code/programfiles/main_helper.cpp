@@ -8,6 +8,21 @@
 //Include Statements
 #include "main_helper.hpp"
 
+// Allows you to render an image
+void renderTexture(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect cam, int x, int y, int w, int h, bool useCam){
+  // Render the 'Press whatever to talk' button
+  SDL_Rect screenPos;
+  screenPos.x = x;
+  screenPos.y = y;
+  screenPos.w = w;
+  screenPos.h = h;
+
+  if(useCam)
+    SDL_RenderCopy(renderer, texture, &cam, &screenPos);
+  else
+    SDL_RenderCopy(renderer, texture, NULL, &screenPos);
+}
+
 //Functions as declared
 bool initialize(SDL_Window **window, SDL_Renderer **renderer) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {

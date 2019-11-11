@@ -102,7 +102,7 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
         counter = 0;
         cropPNG.x = frameWidth;
     }
-    
+
     if (positionPNG.x < 0) {
         positionPNG.x += playerSpeed * change;
     }
@@ -115,7 +115,7 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
     if (positionPNG.y + PLAYER_HEIGHT > MAP_HEIGHT) {
         positionPNG.y -= playerSpeed * change;
     }
-    
+
     if (lastY > positionPNG.y) {
         direction = 'U';
         overWriteY = positionPNG.y;
@@ -141,49 +141,9 @@ void Player::render(SDL_Renderer *rendererPointer, SDL_Rect *cam) {
     SDL_RenderCopy(rendererPointer, playerTexture, &cropPNG, &screenPos);
 }
 
+// I'll come back to this later
 bool Player::collision(SDL_Renderer *rendererPointer, const Uint8 *keyState){
-    SDL_Rect castlePosition = getCastle();
-    SDL_Rect messageDestination;
-
-    // If we're not colliding, return false;
-    if(positionPNG.x + positionPNG.w <= castlePosition.x || positionPNG.x >= castlePosition.x + castlePosition.w ||
-        positionPNG.y + positionPNG.h <= castlePosition.y || positionPNG.y >= castlePosition.y + castlePosition.h)
-    {
-        colorKeyed = 0;
-        SDL_SetTextureColorMod(playerTexture, 255, 255, 255);
-        return false;
-    }
-
-    SDL_SetTextureColorMod(playerTexture, 255, 0, 0);
-
-    if (keyState[SDL_SCANCODE_X] || colorKeyed == 1){
-        colorKeyed = 1;
-
-        //Display messages
-        messageDestination.x = (SCREEN_WIDTH / 2) - 450;
-        messageDestination.y = 600;
-        messageDestination.w = 900;
-        messageDestination.h = 100;
-        SDL_RenderCopy(rendererPointer, churchMessageTexture, NULL, &messageDestination);
-        messageDestination.x = 0;
-        messageDestination.y = 0;
-        messageDestination.w = 300;
-        messageDestination.h = 100;
-        SDL_RenderCopy(rendererPointer, exitMessageTexture, NULL, &messageDestination);
-        SDL_SetTextureColorMod(playerTexture, 255, 0, 0);
-    }
-
-    if(keyState[SDL_SCANCODE_Z] || colorKeyed == 0) {
-        colorKeyed = 0;
-        //Display interaction message and highlight character red when collision occurs
-        messageDestination.x = 0;
-        messageDestination.y = 0;
-        messageDestination.w = 300;
-        messageDestination.h = 100;
-        SDL_RenderCopy(rendererPointer, interactTexture, NULL, &messageDestination);
-    }
-
-    return true;
+    return false;
 }
 
 void Player::alterPosition(SDL_Rect *collide) {
