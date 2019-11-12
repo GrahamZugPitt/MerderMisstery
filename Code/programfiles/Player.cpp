@@ -139,6 +139,11 @@ void Player::render(SDL_Renderer *rendererPointer, SDL_Rect *cam) {
     screenPos.w = cropPNG.w;
     screenPos.h = cropPNG.h;
     SDL_RenderCopy(rendererPointer, playerTexture, &cropPNG, &screenPos);
+    SDL_SetRenderDrawColor(rendererPointer, 0, 255, 255, SDL_ALPHA_OPAQUE);
+    SDL_RenderDrawLine(rendererPointer, screenPos.x, screenPos.y, screenPos.x + screenPos.w, screenPos.y);
+    SDL_RenderDrawLine(rendererPointer, screenPos.x, screenPos.y+screenPos.h, screenPos.x + screenPos.w, screenPos.y + screenPos.h);
+    SDL_RenderDrawLine(rendererPointer, screenPos.x, screenPos.y, screenPos.x, screenPos.y + screenPos.h);
+    SDL_RenderDrawLine(rendererPointer, screenPos.x + screenPos.w, screenPos.y, screenPos.x + screenPos.w, screenPos.y + screenPos.h);
 }
 
 // I'll come back to this later

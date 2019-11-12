@@ -7,6 +7,8 @@
 #include "Building.hpp"
 #include "../NPC_Gen/npc.hpp"
 
+#include "CyanBuilding.hpp"
+
 #include <time.h>
 
 // Add some vars to be used below
@@ -99,14 +101,32 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     int curr_time = 0;
     int last_time = 0;
     float time_change;
+    int frames_rendered = 0;
+    int fr_timer = 0;
+    // int col_i = 0;
+    // Collidable cols[1];
 
+    // Chair c(1114, 712);
+    // std::cout << c.toString() << std::endl;
+
+    // cols[0] = c;
+
+    // std::cout << cols[0].toString() << std::endl;
+
+    CyanBuilding cBuilding;
     //Enter Game Loop
     while(!(*quit)) {
         //SDL time and delta value
         last_time = curr_time;
         curr_time = SDL_GetTicks();
         time_change = (curr_time - last_time) / 500.0f;
-
+        frames_rendered++;
+        fr_timer += (curr_time - last_time);
+        if(fr_timer >= 1000){
+          std::cout << "fps: " << frames_rendered << std::endl;
+          fr_timer = 0;
+          frames_rendered = 0;
+        }
         //Really would rather export this to an event handling file
         while(SDL_PollEvent(&e) != 0)
         {
@@ -165,6 +185,12 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
                 indiscusscollider = true;
             }
         }
+        //std::cout << "checking collision" << std::endl;
+        if (cBuilding.checkCollision(&(player->positionPNG), &collide)){
+            std::cout << "Collision" << std::endl;
+                player->alterPosition(&collide);
+            }
+        
         // Only can discuss if we're within range
         discussbool = indiscusscollider;
 
