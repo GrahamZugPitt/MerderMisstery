@@ -29,3 +29,5 @@ Player: Our player class, slightly different from what we've been working with.
 
 WorldObjects: Something I'm guessing will be obseleted or filled in as the NPC
   file. Not much in here as yet.
+
+seed: allows the user to enter a generation seed to replay a game
