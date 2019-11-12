@@ -2,6 +2,7 @@
 #include "main_helper.hpp"
 #include "chat.hpp"
 #include "seed.hpp"
+#include "credits.hpp"
 
 std::string logoImgPath = "Art/Logo/Start_Screen.png";
 std::string loadImgPath = "Art/Logo/Loading.png";
@@ -59,6 +60,7 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
           //Roll Credits Right-X value: 1164
           case 876 ... 1164:
             std::cout << "End Scene\n";
+            roll_credits(e, &(*quit), keyState, renderer);
             break;
         }
       }
