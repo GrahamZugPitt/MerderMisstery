@@ -1,6 +1,7 @@
 #include "gameloop.hpp"
 #include "main_helper.hpp"
 #include "chat.hpp"
+#include "seed.hpp"
 
 std::string logoImgPath = "Art/Logo/Start_Screen.png";
 std::string loadImgPath = "Art/Logo/Loading.png";
@@ -44,20 +45,20 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
           //Enter Seed Left-X value: 107
           //Enter Seed Right-X value: 393
           case 107 ... 393:
-            std::cout << "Enter Seed";
+            enter_seed(e, &(*quit), keyState, renderer);
             break;
 
           //Start Game Left-X value: 492
           //Start Game Right-X value: 779
           case 492 ... 779:
-            std::cout << "Start Game";
+            std::cout << "Start Game\n";
             next = true; // Start the game
             break;
 
           //Roll Credits Left-X value: 876
           //Roll Credits Right-X value: 1164
           case 876 ... 1164:
-            std::cout << "End Scene";
+            std::cout << "End Scene\n";
             break;
         }
       }
@@ -68,11 +69,11 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
     // Open Chat room
     if (keyState[SDL_SCANCODE_C])
-        enter_chat(e, &(*quit), keyState, renderer);
+      enter_chat(e, &(*quit), keyState, renderer);
 
     // Quit the game
     if (keyState[SDL_SCANCODE_Q])
-        (*quit) = true;
+      (*quit) = true;
 
     //Logo Screen Render
     SDL_RenderCopy(renderer, logoScreen, NULL, NULL);
