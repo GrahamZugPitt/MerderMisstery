@@ -1,15 +1,19 @@
 #include "chat.hpp"
 #include "main_helper.hpp"
+#include <SDL2/SDL_ttf.h>
 
-// The Chat example template
 std::string discussionBoxPath = "Art/DiscussionImages/DiscussionBox.png";
 std::string selectedBoxPath = "Art/DiscussionImages/TextBoxSelected.png";
 std::string deselectedBoxPath = "Art/DiscussionImages/TextBoxDeselected.png";
 
 SDL_Rect useless;
 
-void draw_boxes(int selectnum, SDL_Renderer *renderer, SDL_Texture *selected, SDL_Texture *deselected, int w, int h){
-  int boxw, boxh;
+int boxw, boxh, width_offset, height_offset, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y;
+
+std::string defaultName = "Waldo";
+
+// An initial function to get everything set up
+void setup_vars(SDL_Texture *selected){
   SDL_QueryTexture(selected, NULL, NULL, &boxw, &boxh);
 
   int width_offset = (SCREEN_WIDTH - 2 * boxw) / 3;
@@ -26,11 +30,17 @@ void draw_boxes(int selectnum, SDL_Renderer *renderer, SDL_Texture *selected, SD
 
   int br_x = tr_x;
   int br_y = bl_y;
+}
 
-  renderTexture(renderer, deselected, useless, tl_x, tl_y, boxw, boxh, false);
-  renderTexture(renderer, deselected, useless, tr_x, tr_y, boxw, boxh, false);
-  renderTexture(renderer, deselected, useless, bl_x, bl_y, boxw, boxh, false);
-  renderTexture(renderer, deselected, useless, br_x, br_y, boxw, boxh, false);
+void draw_boxes(int selectnum, SDL_Renderer *renderer, SDL_Texture *selected, SDL_Texture *deselected, int w, int h){
+  if(selectnum != 1)
+    renderTexture(renderer, deselected, useless, tl_x, tl_y, boxw, boxh, false);
+  if(selectnum != 2)
+    renderTexture(renderer, deselected, useless, tr_x, tr_y, boxw, boxh, false);
+  if(selectnum != 3)
+    renderTexture(renderer, deselected, useless, bl_x, bl_y, boxw, boxh, false);
+  if(selectnum != 4)
+    renderTexture(renderer, deselected, useless, br_x, br_y, boxw, boxh, false);
 
   int selected_x, selected_y;
 
@@ -56,10 +66,27 @@ void draw_boxes(int selectnum, SDL_Renderer *renderer, SDL_Texture *selected, SD
   renderTexture(renderer, selected, useless, selected_x, selected_y, boxw, boxh, false);
 }
 
+// The function to actually draw the text on the screen
+void draw_text(renderer){
+  
+}
+
 void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
   SDL_Texture* discussionBoxTex = loadFiles(discussionBoxPath, renderer);
   SDL_Texture* selectedBoxTex = loadFiles(selectedBoxPath, renderer);
   SDL_Texture* deselectedBoxTex = loadFiles(deselectedBoxPath, renderer);
+
+  setup_vars(selectedBoxTex);
+
+  TTF_Font *TNR = TTF_OpenFont("Art/Font/times-new-roman.ttf", 24); // Opens the font and sets the size
+
+  SDL_Color White = {255, 255, 255};
+
+  SDL_Surface *surfaceMessage = TTF_Render_Text_Solid(TNR, "Hello world", White);
+
+  SDL_Texture *TLBox = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+  SDL_Rect TLBoxRect;
+  TLBoxRect.x =
 
   int selected = 1;
 
@@ -82,7 +109,6 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
     // Get the Keyboard State
     keyState = SDL_GetKeyboardState(NULL);
 
-    //Open Chat room
     if (keyState[SDL_SCANCODE_Q])
         return;
 
@@ -112,6 +138,7 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
     renderTexture(renderer, discussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
 
     draw_boxes(selected, renderer, selectedBoxTex, deselectedBoxTex, w, h);
+    draw_text(renderer);
 
     //Update Screen
     SDL_RenderPresent(renderer);

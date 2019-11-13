@@ -31,9 +31,6 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
       // Get mouse position
       cursor_x = e.motion.x;
       cursor_y = e.motion.y;
-      // std::cout << "motion.x:" << cursor_x << "\n";
-      // std::cout << "motion.y:" << cursor_y << "\n";
-      // std::cout << "mouse clicked\n";
 
       // ALL_BUTTON_TOP Y value: 532
       // ALL_BUTTON_BOTTOM Y value: 618
@@ -73,16 +70,15 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     if (keyState[SDL_SCANCODE_C])
       enter_chat(e, &(*quit), keyState, renderer);
 
-    // Quit the game
-    if (keyState[SDL_SCANCODE_Q])
-      (*quit) = true;
-
     //Logo Screen Render
     SDL_RenderCopy(renderer, logoScreen, NULL, NULL);
     SDL_RenderPresent(renderer);
   }
 
-  SDL_Texture* loadScreen = loadFiles(loadImgPath, renderer);
-  SDL_RenderCopy(renderer, loadScreen, NULL, NULL);
-  SDL_RenderPresent(renderer);
+  // Obviously don't want to do any work if we're quitting
+  if(!*quit){
+    SDL_Texture* loadScreen = loadFiles(loadImgPath, renderer);
+    SDL_RenderCopy(renderer, loadScreen, NULL, NULL);
+    SDL_RenderPresent(renderer);
+  }
 }
