@@ -11,6 +11,9 @@
 #include <iostream>
 #include <vector>
 
+#include <SDL2/SDL_ttf.h>
+#include <cmath>
+
 //Declaring Global Variables
 const int MAP_WIDTH = 3840;
 const int MAP_HEIGHT = 2160;
