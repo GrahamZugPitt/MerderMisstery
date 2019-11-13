@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <streambuf>
+#include <queue>
 
 using namespace std;
 
@@ -11,6 +12,13 @@ struct LinkedNode {
 	string data;
 	LinkedNode *next;
 };
+
+void printQueue(queue<string> q){
+	while(!q.empty()){
+		cout << q.front() << endl;
+		q.pop();
+	}
+}
 
 class Linkedlist {
 	private:
@@ -124,5 +132,39 @@ class User{
 		return user;
 	}
 
+};
+
+class ChatBank{
+	private:
+		queue <string> comments;
+
+	public:
+
+		//blank constructor
+		ChatBank(){}
+
+		//updates queue for incoming comments
+		bool addChat(string comment){
+			//don't do anything if comment length is too long
+			if(comment.length() >= 255){
+				return false;
+			}
+			//max comments to fit on screen is 10
+			if(comments.size() == 10){
+				comments.pop();
+			}
+			comments.push(comment);
+			return true;
+		}
+
+		//prints out the entire chat bank
+		void printComments(){
+			printQueue(comments);
+		}
+
+		//to delete: testing method
+		bool isEmpty(){
+			return comments.empty();
+		}
 };
 

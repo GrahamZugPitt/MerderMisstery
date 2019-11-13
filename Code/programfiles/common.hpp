@@ -10,6 +10,10 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <SDL2/SDL_ttf.h>
+
+#include <SDL2/SDL_ttf.h>
+#include <cmath>
 
 //Declaring Global Variables
 const int MAP_WIDTH = 3840;
