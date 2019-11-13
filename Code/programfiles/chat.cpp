@@ -64,8 +64,6 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
       if (keyState[SDL_SCANCODE_E])
       {
         inChat = false;
-<<<<<<< HEAD
-=======
         TTF_CloseFont(Text);
         TTF_Quit();
         SDL_DestroyTexture(Message);
@@ -75,7 +73,6 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
         // Quit SDL TTF subsystem
         TTF_Quit();
->>>>>>> upstream/master
         //make sure to end things to close client and clear stuff that needs cleared
       }
     }
