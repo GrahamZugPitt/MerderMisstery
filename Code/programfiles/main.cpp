@@ -3,7 +3,6 @@
 //  Main File for the MerderMisstery Game
 //  Team Alpha Game Collective
 //
-
 #include "main_helper.hpp"
 #include "gameloop.hpp"
 #include "Player.hpp"
@@ -29,14 +28,15 @@ int main(int argc, char *argv[]) {
     SDL_Event e;
     bool quit = false;
     const Uint8 *keyState;
+    if (TTF_Init() < 0) printf("Failed to initialize TTF!\n");
 
     // Set the keystate just to suppress an error
     keyState = SDL_GetKeyboardState(NULL);
 
     menuloop(e, &quit, keyState, renderer);
 
-    if (!quit)
-      gameloop(e, &quit, keyState, renderer, farnan);
+    if(!quit)
+     gameloop(e, &quit, keyState, renderer, farnan);
 
     clean(window, renderer);
 
