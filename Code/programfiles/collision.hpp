@@ -11,6 +11,8 @@ public:
 	Collidable(SDL_Rect bounds);
 	Collidable(int x, int y, int w, int h);
 	~Collidable();
+
+	Collidable& operator=( const Collidable& other);
 	
 	std::string toString();
 
@@ -21,6 +23,9 @@ public:
 	std::vector<Collidable> children;
 
 	void addChild(Collidable child);
+	void addChild(int x, int y, int w, int h);
+
+	void setRectValues(int xPos, int yPos, int width, int height);
 
 };
 
