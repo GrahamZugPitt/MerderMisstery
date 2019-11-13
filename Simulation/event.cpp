@@ -21,14 +21,14 @@ class Event{
 		std::string npcName1;
 		std::string npcName2;
 		int event;
-		Event(NPC npc1, NPC npc2, int eventType, int t, int place, int observer) {
-			npcName1 = npc1.getName();
-			npcName2 = npc2.getName();
-			event = eventType;
-			time = t;
-			location = place;
-			isObserver = observer;
-		}
+// 		Event(NPC npc1, NPC npc2, int eventType, int t, int place, int observer) {
+// 			npcName1 = npc1.getName();
+// 			npcName2 = npc2.getName();
+// 			event = eventType;
+// 			time = t;
+// 			location = place;
+// 			isObserver = observer;
+// 		}
 		Event(std::string firstNPC, std::string secondNPC, int eventType, int t, int place, int observer) {
 			npcName1 = firstNPC;
 			npcName2 = secondNPC;
