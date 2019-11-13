@@ -1,6 +1,6 @@
 #include "event.cpp"
 #include "bmp_edit.hpp"
-#include "npc.hpp"
+//#include "npc.hpp"
 #include "EventArray.cpp"
 #include <cstdlib>
 #include <ctime>
