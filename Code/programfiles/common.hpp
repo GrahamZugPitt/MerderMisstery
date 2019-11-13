@@ -10,6 +10,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <SDL2/SDL_ttf.h>
 
 #include <SDL2/SDL_ttf.h>
 #include <cmath>

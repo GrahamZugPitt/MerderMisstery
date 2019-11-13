@@ -17,7 +17,6 @@ class Building: public WorldObject
 
 
 public:
-
 	SDL_Texture *texture;
 	SDL_Rect mapPos;
 	#ifdef OBJ_IMPLEMENTED
