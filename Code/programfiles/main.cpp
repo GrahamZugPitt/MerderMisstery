@@ -35,7 +35,8 @@ int main(int argc, char *argv[]) {
 
     menuloop(e, &quit, keyState, renderer);
 
-    gameloop(e, &quit, keyState, renderer, farnan);
+    if (!quit)
+      gameloop(e, &quit, keyState, renderer, farnan);
 
     clean(window, renderer);
 
