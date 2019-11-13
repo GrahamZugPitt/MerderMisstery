@@ -3,7 +3,7 @@
 
 #FILES TO COMPILE
 START_FILES = murder.o
-SOURCE_FILES = bmp_edit chat discussion npc gameloop menuloop main_helper Player main collision worldObjects building seed credits
+SOURCE_FILES = bmp_edit chat discussion npc gameloop menuloop main_helper Player main collision worldObjects building seed credits objects CyanBuilding BlueBuilding GreenBuilding YellowBuilding RedBuilding
 #OUTPUT
 OUT_NAMES = $(patsubst %.cpp,%.o,$(START_FILES))
 OBJDIR := Code/programfiles/
