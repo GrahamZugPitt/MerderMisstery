@@ -24,7 +24,35 @@ Collidable::~Collidable(){
 		children.clear();
 }
 
+void Collidable::setRectValues(int xPos, int yPos, int width, int height){
+	rect.x = xPos;
+	rect.y = yPos;
+	rect.w = width;
+	rect.h = height;
+}
+
+Collidable& Collidable::operator=( const Collidable& other){
+	rect.x = other.rect.x;
+	rect.y = other.rect.y;
+	rect.w = other.rect.w;
+	rect.h = other.rect.h;
+	for (auto child: other.children){
+		children.push_back(child);
+	}
+	return *this;
+}
+
 void Collidable::addChild(Collidable child){
+	if(child.rect.x < rect.x || child.rect.y < rect.y ||
+		child.rect.x + child.rect.w > rect.x + rect.w ||
+		child.rect.y + child.rect.h > rect.y + rect.h ){
+		std::cerr << "WARNING child bounds exceed parent's\n" << std::endl;
+	}
+	children.push_back(child);
+}
+
+void Collidable::addChild(int x, int y, int w, int h){
+	Collidable child(x, y, w, h);
 	if(child.rect.x < rect.x || child.rect.y < rect.y ||
 		child.rect.x + child.rect.w > rect.x + rect.w ||
 		child.rect.y + child.rect.h > rect.y + rect.h ){

@@ -2,21 +2,32 @@
 #include "main_helper.hpp"
 #include "Player.hpp"
 #include "chat.hpp"
+#include "discussion.hpp"
 #include "worldObjects.hpp"
 #include "Building.hpp"
 #include "../NPC_Gen/npc.hpp"
 
+#include "CyanBuilding.hpp"
+#include "BlueBuilding.hpp"
+#include "GreenBuilding.hpp"
+#include "YellowBuilding.hpp"
+#include "RedBuilding.hpp"
+
 #include <time.h>
 
 // Add some vars to be used below
-std::string mapImgPath = "Art/Tiles/TownMap.png";
+std::string mapImgPath = "Art/MapSamples/SampleMap.png";
 std::string playerImgPath = "Art/Player/PlayerSpriteSheet.png";
+std::string interactImgPath = "Art/Messages/interact.png";
 const int NPC_NUM = 12;
-const int WORLD_OBJECT_NUM = 6;
+const int WORLD_OBJECT_NUM = 2;
 
 //NPC Constants
 const int NPC_WIDTH = 60;
 const int NPC_HEIGHT = 88;
+
+int npcdiscuss = 0;
+bool discussbool = false;
 
 void init(NPC *npcs, SDL_Renderer *renderer){
   // lust, loyal, wrath => green, blue, red
@@ -65,22 +76,16 @@ void init(NPC *npcs, SDL_Renderer *renderer){
 void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan){
     // Initialize world texture, player texture, and camera
     SDL_Texture *bg = loadFiles(mapImgPath, renderer);
+    SDL_Texture *interactPromptingTex = loadFiles(interactImgPath, renderer);
     Player *player = new Player(playerImgPath, renderer);
     SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
-    // Create a building, a bed, and a horse
+    // Create a horse, some walls, and a blood puddle
     WorldObject objs[WORLD_OBJECT_NUM];
-    objs[0].initObject("Art/Decor/Horse.png", renderer, 2000, 1000, 200, 100, 10, 10, 180, 80);
-    
-    objs[1].initObject("Art/Decor/TealBlock.png", renderer, 1297, 540, 485, 55, 15, 15, 440, 45);
-    
-    objs[2].initObject("Art/Decor/TealBlock.png", renderer, 1297, 35, 59, 585, 10, 10, 40, 540);
-    
-    objs[3].initObject("Art/Decor/TealBlock.png", renderer, 1294, 35, 1070, 58, 15, 15, 1000, 35);
-    
-    objs[4].initObject("Art/Decor/TealBlock.png", renderer, 2265, 35, 59, 585, 10, 10, 40, 540);
-    
-    objs[5].initObject("Art/Decor/TealBlock.png", renderer, 1855, 540, 485, 55, 40, 15, 410, 45);
+    objs[0].initObject("Art/Decor/Horse.png", renderer, 2000, 1000, 200, 100, 25, 10, 160, 45);
+
+    objs[1].initObject("Art/Merder Objects/Blood_Puddle_1.png", renderer, 1400, 200, 300, 150, 0, 0, 0, 0);
+
 
     // Create the NPCs (offloaded for brevity)
     NPC npcs[NPC_NUM];
@@ -91,6 +96,11 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     int last_time = 0;
     float time_change;
 
+    CyanBuilding cBuilding;
+    BlueBuilding bBuilding;
+    GreenBuilding gBuilding;
+    YellowBuilding yBuilding;
+    RedBuilding rBuilding;
     //Enter Game Loop
     while(!(*quit)) {
         //SDL time and delta value
@@ -113,6 +123,10 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         if (keyState[SDL_SCANCODE_C])
             enter_chat(e, &(*quit), keyState, renderer);
 
+        //Open Chat room
+        if (keyState[SDL_SCANCODE_X] && discussbool)
+            enter_discussion(e, &(*quit), keyState, renderer);
+
         //Move Player
         player->move(time_change, keyState, farnan);
 
@@ -121,29 +135,65 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         SDL_RenderClear(renderer);
 
         // Renders the background
-        SDL_Rect bgRect;
-        bgRect.x = 0;
-        bgRect.y = 0;
-        bgRect.w = cam.w;
-        bgRect.h = cam.h;
-        SDL_RenderCopy(renderer, bg, &cam, &bgRect);
+        renderTexture(renderer, bg, cam, 0, 0, cam.w, cam.h, true);
 
         SDL_Rect collide;
-        //render npcs
+        //render npcs and check for NPC collisions
+        //  also check if you're within the conversation fields
         int i=0;
-        for(i = 0; i < NPC_NUM; i++){
-            npcs[i].renderToScreen(renderer, time_change, cam);
-            if( SDL_IntersectRect(&npcs[i].mapPos, &(player->positionPNG), &collide)){
-                    player->alterPosition(&collide);
-            }
-        }
+        bool indiscusscollider = false;
 
+        // render world objects and check for collisions
         for (int i = 0; i < WORLD_OBJECT_NUM; i++){
             objs[i].renderToScreen(renderer, cam);
             if (objs[i].checkCollision(&(player->positionPNG), &collide)){
                 player->alterPosition(&collide);
             }
         }
+
+        for(i = 0; i < NPC_NUM; i++){
+            npcs[i].renderToScreen(renderer, time_change, cam);
+            if (npcs[i].NPCCollider.checkCollision(&(player->positionPNG), &collide)){
+                player->alterPosition(&collide);
+            }
+
+            if (npcs[i].NPCConversationCollider.checkCollision(&(player->positionPNG), &collide)){
+                int w, h;
+                SDL_QueryTexture(interactPromptingTex, NULL, NULL, &w, &h);
+                // Just pass in collide as a dummy arg, we don't use it
+                renderTexture(renderer, interactPromptingTex, collide, 10, 10, w, h, false);
+                npcdiscuss = i;
+                indiscusscollider = true;
+            }
+        }
+        
+        if (cBuilding.checkCollision(&(player->positionPNG), &collide)) {
+        std::cout << "Collision" << std::endl;
+            player->alterPosition(&collide);
+        }
+        
+        if (bBuilding.checkCollision(&(player->positionPNG), &collide)) {
+        std::cout << "Collision" << std::endl;
+            player->alterPosition(&collide);
+        }
+        
+        if (gBuilding.checkCollision(&(player->positionPNG), &collide)) {
+        std::cout << "Collision" << std::endl;
+            player->alterPosition(&collide);
+        }
+        
+        if (yBuilding.checkCollision(&(player->positionPNG), &collide)) {
+        std::cout << "Collision" << std::endl;
+            player->alterPosition(&collide);
+        }
+        
+        if (rBuilding.checkCollision(&(player->positionPNG), &collide)) {
+        std::cout << "Collision" << std::endl;
+            player->alterPosition(&collide);
+        }
+        
+        // Only can discuss if we're within range
+        discussbool = indiscusscollider;
 
         setCameraPosition(&cam, player->positionPNG);
 

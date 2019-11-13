@@ -81,6 +81,10 @@ int NPC::initSprite(std::string charName, std::string spriteFileName, unsigned i
 	screenPos.w = sizeX;
 	screenPos.h = sizeY;
 
+	// Why on earth does 'new' return a pointer, what the f*ck
+	NPCCollider = *(new Collidable(posX + NPCColliderXOffset, posY + NPCColliderYOffset, NPCColliderWidth, NPCColliderHeight));
+	NPCConversationCollider = *(new Collidable(posX + ConvoColliderXOffset, posY + ConvoColliderYOffset, ConvoColliderWidth, ConvoColliderHeight));
+
 	std::size_t found = spriteFileName.find_last_of("/");
 	std::cout << spriteFileName.substr(found, spriteFileName.length()-4) << std::endl;
 	std::string oname = spriteFileName.substr(0,spriteFileName.length()-4) + "m.bmp";
@@ -250,6 +254,8 @@ void NPC::ghostThisNPC(){
 	mapPos.x = 2050;
 	mapPos.y = 200;
 	SDL_SetTextureAlphaMod(texture, 100);
+	NPCCollider = *(new Collidable(mapPos.x + NPCColliderXOffset, mapPos.y + NPCColliderYOffset, NPCColliderWidth, NPCColliderHeight));
+	NPCConversationCollider = *(new Collidable(mapPos.x + ConvoColliderXOffset, mapPos.y + ConvoColliderYOffset, ConvoColliderWidth, ConvoColliderHeight));
 }
 
 /*
