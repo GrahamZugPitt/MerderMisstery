@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
     SDL_Event e;
     bool quit = false;
     const Uint8 *keyState;
+    if (TTF_Init() < 0) printf("Failed to initialize TTF!\n");
 
     // Set the keystate just to suppress an error
     keyState = SDL_GetKeyboardState(NULL);

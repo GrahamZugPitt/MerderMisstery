@@ -1,6 +1,5 @@
 #include "chat.hpp"
 #include "main_helper.hpp"
-#include <SDL2/SDL_ttf.h>
 
 std::string discussionBoxPath = "Art/DiscussionImages/DiscussionBox.png";
 std::string selectedBoxPath = "Art/DiscussionImages/TextBoxSelected.png";
@@ -8,28 +7,32 @@ std::string deselectedBoxPath = "Art/DiscussionImages/TextBoxDeselected.png";
 
 SDL_Rect useless;
 
-int boxw, boxh, width_offset, height_offset, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y;
+int boxw, boxh, width_offset, height_offset, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, w, h, selected_x, selected_y;
 
-std::string defaultName = "Waldo";
+char *TLString = "Who do you think killed Butler?";
+char *TRString = "What is your last memory of the victim?";
+char *BLString = "How does Tom feel about Jerry?";
+char *BRString = "Where were you last evening?";
 
 // An initial function to get everything set up
-void setup_vars(SDL_Texture *selected){
+void setup_vars(SDL_Texture *selected, SDL_Texture *discussionBoxTex){
   SDL_QueryTexture(selected, NULL, NULL, &boxw, &boxh);
+  SDL_QueryTexture(discussionBoxTex, NULL, NULL, &w, &h);
 
-  int width_offset = (SCREEN_WIDTH - 2 * boxw) / 3;
-  int height_offset = (SCREEN_HEIGHT - h - 2 * boxh) / 3;
+  width_offset = (SCREEN_WIDTH - 2 * boxw) / 3;
+  height_offset = (SCREEN_HEIGHT - h - 2 * boxh) / 3;
 
-  int tl_x = width_offset;
-  int tl_y = SCREEN_HEIGHT - h + height_offset;
+  tl_x = width_offset;
+  tl_y = SCREEN_HEIGHT - h + height_offset;
 
-  int tr_x = tl_x + boxw + width_offset;
-  int tr_y = tl_y;
+  tr_x = tl_x + boxw + width_offset;
+  tr_y = tl_y;
 
-  int bl_x = tl_x;
-  int bl_y = tl_y + boxh + height_offset - 25;
+  bl_x = tl_x;
+  bl_y = tl_y + boxh + height_offset - 25;
 
-  int br_x = tr_x;
-  int br_y = bl_y;
+  br_x = tr_x;
+  br_y = bl_y;
 }
 
 void draw_boxes(int selectnum, SDL_Renderer *renderer, SDL_Texture *selected, SDL_Texture *deselected, int w, int h){
@@ -41,8 +44,6 @@ void draw_boxes(int selectnum, SDL_Renderer *renderer, SDL_Texture *selected, SD
     renderTexture(renderer, deselected, useless, bl_x, bl_y, boxw, boxh, false);
   if(selectnum != 4)
     renderTexture(renderer, deselected, useless, br_x, br_y, boxw, boxh, false);
-
-  int selected_x, selected_y;
 
   switch(selectnum){
     case 1:
@@ -67,8 +68,11 @@ void draw_boxes(int selectnum, SDL_Renderer *renderer, SDL_Texture *selected, SD
 }
 
 // The function to actually draw the text on the screen
-void draw_text(renderer){
-  
+void draw_text(SDL_Renderer *renderer, SDL_Texture *TLBox, SDL_Rect TLBoxRect, SDL_Texture *TRBox, SDL_Rect TRBoxRect, SDL_Texture *BLBox, SDL_Rect BLBoxRect, SDL_Texture *BRBox, SDL_Rect BRBoxRect){
+  SDL_RenderCopy(renderer, TLBox, NULL, &TLBoxRect);
+  SDL_RenderCopy(renderer, TRBox, NULL, &TRBoxRect);
+  SDL_RenderCopy(renderer, BLBox, NULL, &BLBoxRect);
+  SDL_RenderCopy(renderer, BRBox, NULL, &BRBoxRect);
 }
 
 void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
@@ -76,17 +80,28 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
   SDL_Texture* selectedBoxTex = loadFiles(selectedBoxPath, renderer);
   SDL_Texture* deselectedBoxTex = loadFiles(deselectedBoxPath, renderer);
 
-  setup_vars(selectedBoxTex);
+  setup_vars(selectedBoxTex, discussionBoxTex);
 
   TTF_Font *TNR = TTF_OpenFont("Art/Font/times-new-roman.ttf", 24); // Opens the font and sets the size
-
+  if(!TNR)
+    printf("TTF_OpenFont: %s\n", TTF_GetError());
   SDL_Color White = {255, 255, 255};
+  // Load the phrases
+  SDL_Surface *TLsurfaceMessage = TTF_RenderText_Solid(TNR, TLString, White);
+  SDL_Surface *TRsurfaceMessage = TTF_RenderText_Solid(TNR, TRString, White);
+  SDL_Surface *BLsurfaceMessage = TTF_RenderText_Solid(TNR, BLString, White);
+  SDL_Surface *BRsurfaceMessage = TTF_RenderText_Solid(TNR, BRString, White);
+  // Turn them into textures
+  SDL_Texture *TLBox = SDL_CreateTextureFromSurface(renderer, TLsurfaceMessage);
+  SDL_Texture *TRBox = SDL_CreateTextureFromSurface(renderer, TRsurfaceMessage);
+  SDL_Texture *BLBox = SDL_CreateTextureFromSurface(renderer, BLsurfaceMessage);
+  SDL_Texture *BRBox = SDL_CreateTextureFromSurface(renderer, BRsurfaceMessage);
+  // Create the position rectangles
+  SDL_Rect TLBoxRect = {tl_x + 10, tl_y, boxw - 20, boxh};
+  SDL_Rect TRBoxRect = {tr_x + 10, tr_y, boxw - 20, boxh};
+  SDL_Rect BLBoxRect = {bl_x + 10, bl_y, boxw - 20, boxh};
+  SDL_Rect BRBoxRect = {br_x + 10, br_y, boxw - 20, boxh};
 
-  SDL_Surface *surfaceMessage = TTF_Render_Text_Solid(TNR, "Hello world", White);
-
-  SDL_Texture *TLBox = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
-  SDL_Rect TLBoxRect;
-  TLBoxRect.x =
 
   int selected = 1;
 
@@ -132,13 +147,10 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
       if(selected == 3) selected = 4;
     }
 
-    // Draw Handler
-    int w, h;
-    SDL_QueryTexture(discussionBoxTex, NULL, NULL, &w, &h);
     renderTexture(renderer, discussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
 
     draw_boxes(selected, renderer, selectedBoxTex, deselectedBoxTex, w, h);
-    draw_text(renderer);
+    draw_text(renderer, TLBox, TLBoxRect, TRBox, TRBoxRect, BLBox, BLBoxRect, BRBox, BRBoxRect);
 
     //Update Screen
     SDL_RenderPresent(renderer);
