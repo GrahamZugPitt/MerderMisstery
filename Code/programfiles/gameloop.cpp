@@ -20,11 +20,7 @@ std::string mapImgPath = "Art/MapSamples/SampleMap.png";
 std::string playerImgPath = "Art/Player/PlayerSpriteSheet.png";
 std::string interactImgPath = "Art/Messages/interact.png";
 const int NPC_NUM = 12;
-<<<<<<< HEAD
 const int WORLD_OBJECT_NUM = 2;
-=======
-const int WORLD_OBJECT_NUM = 7;
->>>>>>> upstream/master
 
 //NPC Constants
 const int NPC_WIDTH = 60;
