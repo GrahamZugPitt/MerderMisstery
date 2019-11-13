@@ -29,7 +29,10 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
     if (keyState[SDL_SCANCODE_LCTRL] || keyState[SDL_SCANCODE_RCTRL])
     {
       if (keyState[SDL_SCANCODE_E])
-          inChat = false;
+      {
+        inChat = false;
+        //make sure to end things to close client and clear stuff that needs cleared
+      }
     }
   }
 }
