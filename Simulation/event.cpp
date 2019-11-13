@@ -10,7 +10,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "npc.hpp"
+//#include "npc.hpp"
 
 
 class Event{
