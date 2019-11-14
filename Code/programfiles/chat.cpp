@@ -38,10 +38,19 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
   SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
 
   SDL_Rect input_rect; //create a rect
-  input_rect.x = 32;  //controls the rect's x coordinate
+
+  int textW = 0;
+  int textH = 0;
+  //returns inherent width and height of font determed by size set in Text variable
+  //stores these values in textH and textW variables
+  SDL_QueryTexture(Message, NULL, NULL, &textW, &textH);
+
+  input_rect.x = 36;  //controls the rect's x coordinate
   input_rect.y = 597; // controls the rect's y coordinte
-  input_rect.w = 1215; // controls the width of the rect
-  input_rect.h = 113; // controls the height of the rect
+  input_rect.w = textW; //1215; // controls the width of the rect
+  input_rect.h = textH; //113; // controls the height of the rect
+  //text will most likely still go outside the input box, need to clean up with
+  //example from https://gamedev.stackexchange.com/questions/140294/what-is-the-most-efficient-way-to-render-a-textbox-in-c-sdl2
 
   SDL_RenderCopy(renderer, Message, NULL, &input_rect);
   SDL_RenderSetClipRect(renderer, NULL);
@@ -64,12 +73,11 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
       if (keyState[SDL_SCANCODE_E])
       {
         inChat = false;
+
+        //free memory for all text related items that were intialized
         TTF_CloseFont(Text);
         TTF_Quit();
         SDL_DestroyTexture(Message);
-        // gWindow = NULL;
-        // gRenderer = NULL;
-        // gFont = NULL;
 
         // Quit SDL TTF subsystem
         TTF_Quit();
