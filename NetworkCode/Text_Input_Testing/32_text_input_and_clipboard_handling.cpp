@@ -296,10 +296,10 @@ bool loadMedia()
 	bool success = true;
 
 	//Open the font
-	gFont = TTF_OpenFont( "lazy.ttf", 28 );
+	gFont = TTF_OpenFont( "Times New Roman.ttf", 28 );
 	if( gFont == NULL )
 	{
-		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
+		printf( "Failed to load TNR font! SDL_ttf Error: %s\n", TTF_GetError() );
 		success = false;
 	}
 	else

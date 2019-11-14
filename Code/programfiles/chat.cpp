@@ -21,48 +21,114 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
   //Initialize SDL_ttf library
   TTF_Init();
+  std::string inputText = "Input Text";
 
   //Open a font style and sets size
-  TTF_Font* Text = TTF_OpenFont("Fonts/Arial.ttf", 25);
-  if(!Text) {
+  TTF_Font* fontStyle = TTF_OpenFont("Fonts/Arial.ttf", 25);
+  if(!fontStyle) {
       printf("TTF_OpenFont: %s\n", TTF_GetError());
   }
 
   //Set White variable in rgb format
-  SDL_Color White = {255, 255, 255};
+  SDL_Color textWhite = {255, 255, 255};
 
   //TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
-  SDL_Surface* surfaceMessage = TTF_RenderText_Solid(Text, "please show on the screen", White);
+  SDL_Surface* surfaceInputText = TTF_RenderText_Solid(fontStyle, inputText.c_str(), textWhite);
 
   //now you can convert it into a texture
-  SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+  SDL_Texture* textureInputText = SDL_CreateTextureFromSurface(renderer, surfaceInputText);
 
-  SDL_Rect input_rect; //create a rect
+  SDL_Rect inputRect; //create a rect
 
   int textW = 0;
   int textH = 0;
-  //returns inherent width and height of font determed by size set in Text variable
+  //returns inherent width and height of font determed by size set in fontStyle variable
   //stores these values in textH and textW variables
-  SDL_QueryTexture(Message, NULL, NULL, &textW, &textH);
+  SDL_QueryTexture(textureInputText, NULL, NULL, &textW, &textH);
 
-  input_rect.x = 36;  //controls the rect's x coordinate
-  input_rect.y = 597; // controls the rect's y coordinte
-  input_rect.w = textW; //1215; // controls the width of the rect
-  input_rect.h = textH; //113; // controls the height of the rect
+  inputRect.x = 36;  //controls the rect's x coordinate
+  inputRect.y = 597; // controls the rect's y coordinte
+  inputRect.w = textW; //1215; // controls the width of the rect
+  inputRect.h = textH; //113; // controls the height of the rect
   //text will most likely still go outside the input box, need to clean up with
   //example from https://gamedev.stackexchange.com/questions/140294/what-is-the-most-efficient-way-to-render-a-textbox-in-c-sdl2
 
-  SDL_RenderCopy(renderer, Message, NULL, &input_rect);
+  SDL_RenderCopy(renderer, textureInputText, NULL, &inputRect);
   SDL_RenderSetClipRect(renderer, NULL);
   SDL_RenderPresent(renderer);
 
+  //Enable text input
+  SDL_StartTextInput();
 
   //Wait for user to exit chat
-  while (SDL_PollEvent(&e) != 0 || (inChat == true && !(*quit)))
-  {
-    //Quit application
-    if(e.type == SDL_QUIT)
+  while (inChat == true && !(*quit)) {
+
+    //The rerender text flag
+    bool renderText = false;
+
+    while (SDL_PollEvent(&e) != 0) {
+
+      //Quit application
+      if(e.type == SDL_QUIT) {
         *quit = true;
+      }
+      else if (e.type == SDL_KEYDOWN) {
+        //Handle backspace
+        if(e.key.keysym.sym == SDLK_BACKSPACE && inputText.length() > 0) {
+          //lop off character
+          inputText.pop_back();
+          renderText = true;
+        }
+        //Handle copy
+        else if(e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL) {
+          SDL_SetClipboardText( inputText.c_str() );
+        }
+        //Handle paste
+        else if(e.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL) {
+          inputText = SDL_GetClipboardText();
+          renderText = true;
+        }
+        //Handle ctrl e to exit
+        else if(e.key.keysym.sym == SDLK_e && SDL_GetModState() & KMOD_CTRL) {
+
+        }
+      }
+      //Special text input event
+      else if(e.type == SDL_TEXTINPUT) {
+        //Not copy or pasting
+        if(!( SDL_GetModState() & KMOD_CTRL && ( e.text.text[ 0 ] == 'c' || e.text.text[ 0 ] == 'C' || e.text.text[ 0 ] == 'v' || e.text.text[ 0 ] == 'V'))) {
+          //Append character
+          inputText += e.text.text;
+          renderText = true;
+        }
+      }
+    }
+
+    //Rerender text if needed
+    if(renderText) {
+
+      //Text is not empty
+      if(inputText != "") {
+        //Render new text. Create surface first and then texture
+        surfaceInputText = TTF_RenderText_Solid(fontStyle, inputText.c_str(), textWhite);
+        textureInputText = SDL_CreateTextureFromSurface(renderer, surfaceInputText);
+      }
+      //Text is empty
+      else {
+        surfaceInputText = TTF_RenderText_Solid(fontStyle, " ", textWhite);
+        textureInputText = SDL_CreateTextureFromSurface(renderer, surfaceInputText);
+      }
+
+      // here is where i need to clear the previously rendered text, but I am not sure how to do it
+
+      inputRect.w = textW; 
+      inputRect.h = textH;
+      SDL_QueryTexture(textureInputText, NULL, NULL, &textW, &textH);
+      //render the textures and update screen
+      SDL_RenderCopy(renderer, textureInputText, NULL, &inputRect);
+      SDL_RenderSetClipRect(renderer, NULL);
+      SDL_RenderPresent(renderer);
+    }
 
     // Get the Keyboard State
     keyState = SDL_GetKeyboardState(NULL);
@@ -75,9 +141,11 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
         inChat = false;
 
         //free memory for all text related items that were intialized
-        TTF_CloseFont(Text);
+        TTF_CloseFont(fontStyle);
         TTF_Quit();
-        SDL_DestroyTexture(Message);
+        SDL_DestroyTexture(textureInputText);
+        //Disable text input
+        SDL_StopTextInput();
 
         // Quit SDL TTF subsystem
         TTF_Quit();
@@ -85,4 +153,6 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
       }
     }
   }
+
+  
 }
