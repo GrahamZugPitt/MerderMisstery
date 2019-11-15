@@ -57,6 +57,17 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
   SDL_RenderSetClipRect(renderer, NULL);
   SDL_RenderPresent(renderer);
 
+  SDL_SetRenderDrawColor(renderer, 143, 171, 221, 0);
+
+  SDL_Rect blankRect; // create a rect to be used to display a blank box
+  blankRect.x = 36;  //controls the rect's x coordinate
+  blankRect.y = 597; // controls the rect's y coordinte
+  blankRect.w = textW; // controls the width of the rect
+  blankRect.h = textH; // controls the height of the rect
+  SDL_RenderDrawRect(renderer, &blankRect);
+  SDL_RenderFillRect(renderer, &blankRect);
+  SDL_RenderPresent(renderer);
+
   //Enable text input
   SDL_StartTextInput();
 
@@ -79,6 +90,12 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
           inputText.pop_back();
           renderText = true;
         }
+        //Handle 'sending' text, right now it is set to tab, can't find sdl keycode for enter
+        else if(e.key.keysym.sym == SDLK_TAB) {
+          // here is where the 'sending' to the file will happen
+          inputText=" ";
+          renderText = true;
+        }
         //Handle copy
         else if(e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL) {
           SDL_SetClipboardText( inputText.c_str() );
@@ -87,10 +104,6 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
         else if(e.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL) {
           inputText = SDL_GetClipboardText();
           renderText = true;
-        }
-        //Handle ctrl e to exit
-        else if(e.key.keysym.sym == SDLK_e && SDL_GetModState() & KMOD_CTRL) {
-
         }
       }
       //Special text input event
@@ -105,7 +118,9 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
     }
 
     //Rerender text if needed
-    if(renderText) {
+    if(renderText) { 
+
+      // here is where the previous texture needs to be freed/removed/overwritten
 
       //Text is not empty
       if(inputText != "") {
@@ -118,12 +133,15 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
         surfaceInputText = TTF_RenderText_Solid(fontStyle, " ", textWhite);
         textureInputText = SDL_CreateTextureFromSurface(renderer, surfaceInputText);
       }
-
-      // here is where i need to clear the previously rendered text, but I am not sure how to do it
-
+      SDL_QueryTexture(textureInputText, NULL, NULL, &textW, &textH);
       inputRect.w = textW; 
       inputRect.h = textH;
-      SDL_QueryTexture(textureInputText, NULL, NULL, &textW, &textH);
+      if(textW>blankRect.w)
+        blankRect.w = textW; // controls the width of the rect
+      
+      SDL_RenderDrawRect(renderer, &blankRect);
+      SDL_RenderFillRect(renderer, &blankRect);
+      SDL_RenderPresent(renderer);
       //render the textures and update screen
       SDL_RenderCopy(renderer, textureInputText, NULL, &inputRect);
       SDL_RenderSetClipRect(renderer, NULL);
@@ -142,7 +160,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
         //free memory for all text related items that were intialized
         TTF_CloseFont(fontStyle);
-        TTF_Quit();
+        SDL_FreeSurface(surfaceInputText);
         SDL_DestroyTexture(textureInputText);
         //Disable text input
         SDL_StopTextInput();
