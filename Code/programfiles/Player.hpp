@@ -20,6 +20,8 @@ class Player {
 		int frameWidth;
 		int frameHeight;
 		float counter;
+		float xvel;
+		float yvel;
     char direction = 'a';
     int lastX = 0;
     int lastY = 0;

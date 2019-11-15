@@ -15,6 +15,7 @@ Player::Player(std::string playerTexturePath, SDL_Renderer *renderer){
     positionPNG.x = (MAP_WIDTH / 2) - (PLAYER_WIDTH / 2);
     positionPNG.y = (MAP_HEIGHT / 2) - (PLAYER_HEIGHT / 2);
 
+    xvel = yvel = 0.0;
     //Setting last positions for use in collisions
     lastX = positionPNG.x;
     lastY = positionPNG.y;
@@ -41,28 +42,42 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
     //True by default, animation is stopped if not running
     // Should probably revisit this code
     isRunning = true;
-
+    xvel = yvel = 0;
     if(!farnan){
+        isRunning = false;
         //Determine which directional keypad arrow is clicked and apply appropriate movement / image
         if(keyState[SDL_SCANCODE_UP] || keyState[SDL_SCANCODE_W]) {
-            positionPNG.y -= playerSpeed * change;
+            yvel -= static_cast<int>(playerSpeed * change);
+            //positionPNG.y -= static_cast<int>(playerSpeed * change);
             cropPNG.y = frameHeight * 3;
+            isRunning = true;
         }
-        else if(keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_S]) {
-            positionPNG.y += playerSpeed * change;
+        if(keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_S]) {
+            yvel += static_cast<int>(playerSpeed * change);
+            //positionPNG.y += static_cast<int>(playerSpeed * change);            //yvel += playerSpeed * change;
             cropPNG.y = 0;
+            isRunning = true;
         }
-        else if(keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_A]) {
-            positionPNG.x -= playerSpeed * change;
+        if(keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_A]) {
+            xvel -= static_cast<int>(playerSpeed * change);
+            //positionPNG.x -= static_cast<int>(playerSpeed * change);
             cropPNG.y = frameHeight;
+            isRunning = true;
         }
-        else if(keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_D]) {
-            positionPNG.x += playerSpeed * change;
+        if(keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_D]) {
+            xvel += static_cast<int>(playerSpeed * change);
+            //positionPNG.x += static_cast<int>(playerSpeed * change);
             cropPNG.y = frameHeight * 2;
+            isRunning = true;
         }
-            else {
-            isRunning = false;
+        // try collision detection here
+        if (xvel != 0 && yvel != 0){
+            xvel = static_cast<int>(xvel * 0.707);
+            yvel = static_cast<int>(yvel * 0.707);
         }
+        positionPNG.x += xvel;
+        positionPNG.y += yvel;
+        std::cout << "running " << positionPNG.x << " " << positionPNG.y <<std::endl;
     } else {
         //Determine which directional keypad arrow is clicked and apply appropriate movement / image
         if(keyState[SDL_SCANCODE_UP] && keyState[SDL_SCANCODE_W] && keyState[SDL_SCANCODE_M]) {
@@ -138,12 +153,8 @@ void Player::render(SDL_Renderer *rendererPointer, SDL_Rect *cam) {
     screenPos.y = positionPNG.y - (*cam).y;
     screenPos.w = cropPNG.w;
     screenPos.h = cropPNG.h;
+    //std::cout << screenPos.x << " " << screenPos.y <<std::endl;
     SDL_RenderCopy(rendererPointer, playerTexture, &cropPNG, &screenPos);
-    SDL_SetRenderDrawColor(rendererPointer, 0, 255, 255, SDL_ALPHA_OPAQUE);
-    SDL_RenderDrawLine(rendererPointer, screenPos.x, screenPos.y, screenPos.x + screenPos.w, screenPos.y);
-    SDL_RenderDrawLine(rendererPointer, screenPos.x, screenPos.y+screenPos.h, screenPos.x + screenPos.w, screenPos.y + screenPos.h);
-    SDL_RenderDrawLine(rendererPointer, screenPos.x, screenPos.y, screenPos.x, screenPos.y + screenPos.h);
-    SDL_RenderDrawLine(rendererPointer, screenPos.x + screenPos.w, screenPos.y, screenPos.x + screenPos.w, screenPos.y + screenPos.h);
 }
 
 // I'll come back to this later
