@@ -107,7 +107,6 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
 
   //Clear screen
   SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
-  SDL_RenderClear(renderer);
 
   bool inDiscussion = true;
 
@@ -149,6 +148,7 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
 
     renderTexture(renderer, discussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
 
+    SDL_RenderClear(renderer);
     draw_boxes(selected, renderer, selectedBoxTex, deselectedBoxTex, w, h);
     draw_text(renderer, TLBox, TLBoxRect, TRBox, TRBoxRect, BLBox, BLBoxRect, BRBox, BRBoxRect);
 
