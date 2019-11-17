@@ -7,6 +7,12 @@
 #include "Building.hpp"
 #include "../NPC_Gen/npc.hpp"
 
+#include "CyanBuilding.hpp"
+#include "BlueBuilding.hpp"
+#include "GreenBuilding.hpp"
+#include "YellowBuilding.hpp"
+#include "RedBuilding.hpp"
+
 #include <time.h>
 
 // Add some vars to be used below
@@ -14,7 +20,7 @@ std::string mapImgPath = "Art/MapSamples/SampleMap.png";
 std::string playerImgPath = "Art/Player/PlayerSpriteSheet.png";
 std::string interactImgPath = "Art/Messages/interact.png";
 const int NPC_NUM = 12;
-const int WORLD_OBJECT_NUM = 7;
+const int WORLD_OBJECT_NUM = 2;
 
 //NPC Constants
 const int NPC_WIDTH = 60;
@@ -77,18 +83,8 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     // Create a horse, some walls, and a blood puddle
     WorldObject objs[WORLD_OBJECT_NUM];
     objs[0].initObject("Art/Decor/Horse.png", renderer, 2000, 1000, 200, 100, 25, 10, 160, 45);
-
-    objs[1].initObject("Art/Decor/TealBlock.png", renderer, 1297, 540, 485, 55, 15, 15, 440, 45);
-
-    objs[2].initObject("Art/Decor/TealBlock.png", renderer, 1297, 35, 59, 585, 10, 10, 40, 540);
-
-    objs[3].initObject("Art/Decor/TealBlock.png", renderer, 1294, 35, 1070, 58, 15, 15, 1000, 35);
-
-    objs[4].initObject("Art/Decor/TealBlock.png", renderer, 2265, 35, 59, 585, 10, 10, 40, 540);
-
-    objs[5].initObject("Art/Decor/TealBlock.png", renderer, 1855, 540, 485, 55, 40, 15, 410, 45);
-
-    objs[6].initObject("Art/Merder Objects/Blood_Puddle_1.png", renderer, 1400, 200, 300, 150, 0, 0, 0, 0);
+    
+    objs[1].initObject("Art/Merder Objects/Blood_Puddle_1.png", renderer, 1400, 200, 300, 150, 0, 0, 0, 0);
 
 
     // Create the NPCs (offloaded for brevity)
@@ -100,6 +96,11 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     int last_time = 0;
     float time_change;
 
+    CyanBuilding cBuilding;
+    BlueBuilding bBuilding;
+    GreenBuilding gBuilding;
+    YellowBuilding yBuilding;
+    RedBuilding rBuilding;
     //Enter Game Loop
     while(!(*quit)) {
         //SDL time and delta value
@@ -165,6 +166,32 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
                 indiscusscollider = true;
             }
         }
+        
+        if (cBuilding.checkCollision(&(player->positionPNG), &collide)) {
+        std::cout << "Collision" << std::endl;
+            player->alterPosition(&collide);
+        }
+        
+        if (bBuilding.checkCollision(&(player->positionPNG), &collide)) {
+        std::cout << "Collision" << std::endl;
+            player->alterPosition(&collide);
+        }
+        
+        if (gBuilding.checkCollision(&(player->positionPNG), &collide)) {
+        std::cout << "Collision" << std::endl;
+            player->alterPosition(&collide);
+        }
+        
+        if (yBuilding.checkCollision(&(player->positionPNG), &collide)) {
+        std::cout << "Collision" << std::endl;
+            player->alterPosition(&collide);
+        }
+        
+        if (rBuilding.checkCollision(&(player->positionPNG), &collide)) {
+        std::cout << "Collision" << std::endl;
+            player->alterPosition(&collide);
+        }
+        
         // Only can discuss if we're within range
         discussbool = indiscusscollider;
 
