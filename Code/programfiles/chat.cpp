@@ -91,7 +91,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
           renderText = true;
         }
         //Handle 'sending' text, right now it is set to tab, can't find sdl keycode for enter
-        else if(e.key.keysym.sym == SDLK_TAB) {
+        else if(e.key.keysym.sym == SDLK_RETURN) {
           // here is where the 'sending' to the file will happen
           inputText=" ";
           renderText = true;
