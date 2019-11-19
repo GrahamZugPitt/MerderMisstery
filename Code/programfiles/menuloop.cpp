@@ -20,6 +20,7 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
   //Logo Screen Loop
   while(!next && !(*quit)) {
+
     while(SDL_PollEvent(&e) != 0) {
       if(e.type == SDL_QUIT) {
         (*quit) = true;
@@ -43,7 +44,10 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
           //Enter Seed Left-X value: 107
           //Enter Seed Right-X value: 393
           case 107 ... 393:
+            SDL_Delay(300);
             enter_seed(e, &(*quit), keyState, renderer);
+            SDL_Delay(300);
+            std::cout << "Exited Seed Loop\n";
             break;
 
           //Start Game Left-X value: 492
@@ -67,8 +71,12 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     keyState = SDL_GetKeyboardState(NULL);
 
     // Open Chat room
-    if (keyState[SDL_SCANCODE_C])
+    if (keyState[SDL_SCANCODE_C]) {
+      SDL_Delay(300);
       enter_chat(e, &(*quit), keyState, renderer);
+      SDL_Delay(300);
+      std::cout << "Exited Chat Loop\n";
+    }
 
     //Logo Screen Render
     SDL_RenderCopy(renderer, logoScreen, NULL, NULL);
