@@ -8,6 +8,7 @@
 #include "../NPC_Gen/npc.hpp"
 
 #include "CyanBuilding.hpp"
+
 #include "BlueBuilding.hpp"
 #include "GreenBuilding.hpp"
 #include "YellowBuilding.hpp"
@@ -80,12 +81,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     Player *player = new Player(playerImgPath, renderer);
     SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
-    // Create a horse, some walls, and a blood puddle
-    WorldObject objs[WORLD_OBJECT_NUM];
-    objs[0].initObject("Art/Decor/Horse.png", renderer, 2000, 1000, 200, 100, 25, 10, 160, 45);
-    
-    objs[1].initObject("Art/Merder Objects/Blood_Puddle_1.png", renderer, 1400, 200, 300, 150, 0, 0, 0, 0);
-
 
     // Create the NPCs (offloaded for brevity)
     NPC npcs[NPC_NUM];
@@ -95,19 +90,35 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     int curr_time = 0;
     int last_time = 0;
     float time_change;
+    int frames_rendered = 0;
+    int fr_timer = 0;
+    
+    // Allocate buildings
+    CyanBuilding cBuilding;   // West (Town Hall)
+    BlueBuilding bBuilding;   // East (Factory)
+    GreenBuilding gBuilding;  // South East (Church)
+    YellowBuilding yBuilding; // South West (Residences?)
+    RedBuilding rBuilding;    // North  (Murder *Ominous music playing*)
+  //PurpleBuilding pBuilding; // Central (Courtyard)
 
-    CyanBuilding cBuilding;
-    BlueBuilding bBuilding;
-    GreenBuilding gBuilding;
-    YellowBuilding yBuilding;
-    RedBuilding rBuilding;
+    // Collision dectction variables
+    SDL_Rect collide;
+    SDL_Rect convCollide;
+    int hasCollided = 0;
     //Enter Game Loop
     while(!(*quit)) {
         //SDL time and delta value
         last_time = curr_time;
         curr_time = SDL_GetTicks();
         time_change = (curr_time - last_time) / 500.0f;
-
+        frames_rendered++;
+        fr_timer += (curr_time - last_time);
+        if(fr_timer >= 1000){
+          std::cout << "fps: " << frames_rendered << std::endl;
+          fr_timer = 0;
+          frames_rendered = 0;
+        }
+        hasCollided = 0;
         //Really would rather export this to an event handling file
         while(SDL_PollEvent(&e) != 0)
         {
@@ -137,27 +148,48 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         // Renders the background
         renderTexture(renderer, bg, cam, 0, 0, cam.w, cam.h, true);
 
-        SDL_Rect collide;
-        //render npcs and check for NPC collisions
-        //  also check if you're within the conversation fields
+        
+        //render npcs
         int i=0;
-        bool indiscusscollider = false;
+        int indiscusscollider = 0;
 
-        // render world objects and check for collisions
-        for (int i = 0; i < WORLD_OBJECT_NUM; i++){
-            objs[i].renderToScreen(renderer, cam);
-            if (objs[i].checkCollision(&(player->positionPNG), &collide)){
-                player->alterPosition(&collide);
-            }
+        // check for collisions
+        // Loop through twice to accomidate corner sections where the player may collide with 2 objects
+        for (int axisI = 0; axisI < 2; axisI++){
+          // Check NPC Collisions
+          for(i = 0; i < NPC_NUM; i++){
+              if (npcs[i].NPCCollider.checkCollision(&(player->positionPNG), &collide)){
+                  hasCollided = 2;
+              }
+          }
+          //Check building collisions
+          if (cBuilding.checkCollision(&(player->positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (bBuilding.checkCollision(&(player->positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (gBuilding.checkCollision(&(player->positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (yBuilding.checkCollision(&(player->positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (rBuilding.checkCollision(&(player->positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if(hasCollided){
+            player->alterPosition(&collide);
+          } else {
+            axisI = 2;
+          }
+          hasCollided = 0;
         }
 
+        //render NPC's and check for conversation
         for(i = 0; i < NPC_NUM; i++){
             npcs[i].renderToScreen(renderer, time_change, cam);
-            if (npcs[i].NPCCollider.checkCollision(&(player->positionPNG), &collide)){
-                player->alterPosition(&collide);
-            }
-
-            if (npcs[i].NPCConversationCollider.checkCollision(&(player->positionPNG), &collide)){
+            if (npcs[i].NPCConversationCollider.checkCollision(&(player->positionPNG), &convCollide)){
                 int w, h;
                 SDL_QueryTexture(interactPromptingTex, NULL, NULL, &w, &h);
                 // Just pass in collide as a dummy arg, we don't use it
@@ -166,32 +198,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
                 indiscusscollider = true;
             }
         }
-        
-        if (cBuilding.checkCollision(&(player->positionPNG), &collide)) {
-        std::cout << "Collision" << std::endl;
-            player->alterPosition(&collide);
-        }
-        
-        if (bBuilding.checkCollision(&(player->positionPNG), &collide)) {
-        std::cout << "Collision" << std::endl;
-            player->alterPosition(&collide);
-        }
-        
-        if (gBuilding.checkCollision(&(player->positionPNG), &collide)) {
-        std::cout << "Collision" << std::endl;
-            player->alterPosition(&collide);
-        }
-        
-        if (yBuilding.checkCollision(&(player->positionPNG), &collide)) {
-        std::cout << "Collision" << std::endl;
-            player->alterPosition(&collide);
-        }
-        
-        if (rBuilding.checkCollision(&(player->positionPNG), &collide)) {
-        std::cout << "Collision" << std::endl;
-            player->alterPosition(&collide);
-        }
-        
         // Only can discuss if we're within range
         discussbool = indiscusscollider;
 
