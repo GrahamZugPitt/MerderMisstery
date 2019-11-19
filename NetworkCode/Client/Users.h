@@ -20,6 +20,15 @@ void printQueue(queue<string> q){
 	}
 }
 
+string returnQueue(queue<string> q){
+	string str;
+	while(!q.empty()){
+		str.append(q.front() + "\n");
+		q.pop();
+	}
+	return str;
+}
+
 class Linkedlist {
 	private:
 		LinkedNode *head, *tail;
@@ -160,6 +169,10 @@ class ChatBank{
 		//prints out the entire chat bank
 		void printComments(){
 			printQueue(comments);
+		}
+
+		string returnComments(){
+			return returnQueue(comments);
 		}
 
 		//to delete: testing method
