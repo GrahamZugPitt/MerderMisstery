@@ -12,6 +12,8 @@
 #include <streambuf>
 #include <unistd.h>
 
+#include "Users.h"
+
 using namespace std;
 
 #define PORT "9034"
@@ -34,6 +36,8 @@ int main()
     int i, j, rv;
 
     struct addrinfo hints, *ai, *p;
+
+    ChatBank chat;
 
     FD_ZERO(&master);    // clear the master and temp sets
     FD_ZERO(&copy);
@@ -185,19 +189,24 @@ int main()
 							}
 						}
 						else {
-							// Send message to other clients, and not listening socket, unless message is exit
+							//change the chat data structure and send out to the chat UI
+							chat.addChat(buf);
+
+							//test line displaying to the server the current state of the data structure
+							chat.printComments();
+							printf("\n");
+							string str = "hello";
+
+
+							//might need to change the case of the length of the message, in client code?
+
+							// Send message to all clients, and not listening socket
 							for (int i = 0; i <= fdmax; i++)
 							{
 								int outSock = i;
-								if (outSock != listener && outSock != temp)
+								if (outSock != listener)
 								{
-									string strOut;
-	
-									ostringstream ss;
-									ss << buf;
-									strOut = ss.str();		
-
-									send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+									send(outSock, chat.returnComments().c_str(), chat.returnComments().size(), 0);
 								}
 							}
 						}
