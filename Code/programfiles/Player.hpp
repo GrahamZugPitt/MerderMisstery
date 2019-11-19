@@ -3,6 +3,11 @@
 #include "common.hpp"
 #endif
 
+
+constexpr char UP = 0x01;
+constexpr char DOWN = 0x02;
+constexpr char LEFT = 0x04;
+constexpr char RIGHT = 0x08; 
 class Player {
 	public:
 		Player(std::string playerTexturePath, SDL_Renderer *renderer);
@@ -22,7 +27,7 @@ class Player {
 		float counter;
 		float xvel;
 		float yvel;
-    char direction = 'a';
+    int direction = 0;
     int lastX = 0;
     int lastY = 0;
     int overWriteX = 0;
