@@ -179,7 +179,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
               hasCollided = 3;
           }
           if(hasCollided){
-            player->alterHorizPosition(&collide);
+            player->alterPosition(&collide);
           } else {
             axisI = 2;
           }
