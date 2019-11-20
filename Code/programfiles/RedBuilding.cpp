@@ -1,11 +1,11 @@
 #include "RedBuilding.hpp"
 
 RedBuilding::RedBuilding(){
-    walls[0].setRectValues(1971, 526, 366, 10);
-    walls[1].setRectValues(2329, 46, 10, 489);
-    walls[2].setRectValues(1488, 46, 849, 10);
-    walls[3].setRectValues(1488, 46, 10, 489);
-    walls[4].setRectValues(1488, 528, 366, 10);
+    walls[0].setRectValues(1993, 519, 377, 15);
+    walls[1].setRectValues(2351, 38, 20, 496);
+    walls[2].setRectValues(1504, 37, 866, 16);
+    walls[3].setRectValues(1505, 39, 16, 497);
+    walls[4].setRectValues(1505, 519, 377, 15);
     walls[5].setRectValues(1488, 300, 348, 10);
     walls[6].setRectValues(1990, 300, 345, 10);
 }
