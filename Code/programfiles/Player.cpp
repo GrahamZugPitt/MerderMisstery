@@ -12,8 +12,8 @@ Player::Player(std::string playerTexturePath, SDL_Renderer *renderer){
     exitMessageTexture = loadFiles("Art/Messages/exitMessage.png", renderer);
 
     //Position of player sprite
-    positionPNG.x = (MAP_WIDTH / 2) - (PLAYER_WIDTH / 2);
-    positionPNG.y = (MAP_HEIGHT / 2) - (PLAYER_HEIGHT / 2);
+    positionPNG.x = 2275;
+    positionPNG.y = 136;
 
     xvel = yvel = 0.0;
     //Setting last positions for use in collisions
@@ -131,7 +131,7 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
         positionPNG.y -= playerSpeed * change;
     }
 
-    
+
     lastX = positionPNG.x;
     lastY = positionPNG.y;
 }
