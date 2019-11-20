@@ -33,10 +33,18 @@ int main(int argc, char *argv[]) {
     // Set the keystate just to suppress an error
     keyState = SDL_GetKeyboardState(NULL);
 
-    menuloop(e, &quit, keyState, renderer);
+    while(!quit){
+      menuloop(e, &quit, keyState, renderer);
 
-    if(!quit)
-     gameloop(e, &quit, keyState, renderer, farnan);
+      if(!quit){
+        // During the game, quit will have been set to true
+        // Please don't ask why I'm handling this so poorly
+        // You weren't there
+        // You wouldn't understand
+        gameloop(e, &quit, keyState, renderer, farnan);
+      }
+    }
+
 
     clean(window, renderer);
 

@@ -70,6 +70,7 @@ class NPC {
 		SDL_Texture *texture;
 		Collidable NPCCollider;
 		Collidable NPCConversationCollider;
+		bool isGhost = false;
 		//Constructor
 		//NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsigned int dLoyal, unsigned int dWrath);
 		NPC();
