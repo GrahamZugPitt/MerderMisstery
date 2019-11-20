@@ -1,4 +1,4 @@
-#include "chat.hpp"
+#include "inventory.hpp"
 #include "main_helper.hpp"
 
 SDL_Rect useless_other;
@@ -33,7 +33,7 @@ void open_inventory(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer
 
     SDL_RenderClear(renderer);
     renderTexture(renderer, inventoryScreenTex, useless_other, 0, 0, 1280, 720, false);
-    renderTexture(renderer, playerTex, useless_other, 960, 50, 112, 144, false);
+    renderTexture(renderer, playerTex, useless_other, 800, 100, 168, 216, false);
 
     //Update Screen
     SDL_RenderPresent(renderer);

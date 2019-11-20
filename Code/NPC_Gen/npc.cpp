@@ -128,6 +128,8 @@ int NPC::initSprite(std::string charName, std::string spriteFileName, unsigned i
     else
     {
         //Create texture from player sprite surface we just created
+				// And set The Render Scale Quality so we don't get fuzziness on zoom
+			  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
         texture = SDL_CreateTextureFromSurface(renderer, surface);
 
         //Check if texture was able to be made
@@ -202,6 +204,7 @@ void NPC::renderToScreen(SDL_Renderer *renderer, float timechange, SDL_Rect camP
 					crop.x = 7;
 					goingRight = true;
 				}
+  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 			}
 		}
 	}
@@ -251,6 +254,7 @@ std::string NPC::getSpriteName(){
 }
 
 void NPC::ghostThisNPC(){
+	isGhost = true;
 	mapPos.x = 2064;
 	mapPos.y = 80;
 	SDL_SetTextureAlphaMod(texture, 100);
