@@ -3,7 +3,6 @@
 //#include "npc.hpp"
 #include "EventArray.cpp"
 #include <cstdlib>
-#include <ctime>
 
 const int EVENT_MODE = 0;
 const int DEBUG_MODE = 1;
@@ -13,6 +12,34 @@ const int TOWN_SIZE = 12;
 const int LOCATION = 5;
 const int SELFCONTROL = 40;
 int CLOCK = 0;
+
+// Code for the custom random number generator that's platfor independent
+const int rand_depth = 10;
+const int rand_mover = 37;
+int rand_times = 0;
+int last_rand = 0;
+
+void grif_srand(int seed){
+	last_rand = seed;
+}
+
+// I can't guarantee this will produce well-distributed numbers, but I can
+//	guarantee that I don't know for sure that it won't!
+int grif_rand(){
+	int i;
+	int returner;
+
+	if(last_rand < 0) last_rand = 0;
+
+	for(i = 0; i < rand_depth; i++){
+		rand_times += rand_mover;
+	}
+	rand_times %= rand_mover;
+	for(i = 0; i < rand_times * rand_mover; i++){
+		last_rand += rand_times;
+	}
+	return returner;
+}
 
 enum relationshipDelta{
 	HATE = -50,
@@ -87,8 +114,8 @@ public:
 	int murderiness;
 	int role;
 
-	NPClite(std::string name, int role){ //constructor
-		srand(time(NULL));
+	NPClite(std::string name, int role, int seed){ //constructor
+		srand(seed);
 		this->name = name;
 		this->role = role;
 		for(int i = 0; i < TOWN_SIZE; i++)
@@ -779,6 +806,7 @@ int main() {
 	srand(seed);
 	std::cout << "Seed: " << seed << "\n";
 	//townies
+	printf("Generating characters!\n");
 	NPClite jarrett("Jarrett Billingsley", MAYOR); //0
 	NPClite kim("Kim Cardassian", POLICE); //1
 	NPClite pope("Pope Benedict IX", PRIEST); //2
@@ -792,6 +820,7 @@ int main() {
 	NPClite merge("Marge Simpzon", WORKER); //10
 	NPClite sigmund("Sigmund Frued", WORKER); //11
 	NPClite town[TOWN_SIZE] = {jarrett, kim, pope, gaben, marie, lary, luigi, albert, dennis, helen, merge, sigmund};
+	printf("NPCs, generated!\n");
 
 	bool murder = false;
 
