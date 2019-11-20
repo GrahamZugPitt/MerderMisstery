@@ -5,7 +5,7 @@
 std::string chatScreenPath = "Art/Chat/chat_template.png";
 
 void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
-  std::cout << "Entering Chat\n";
+  std::cout << "Entered Chat Loop\n";
   //inChat boolean value
   bool inChat = true;
 
@@ -21,7 +21,9 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
   //Initialize SDL_ttf library
   TTF_Init();
-  std::string inputText = "Input Text";
+
+  //Initialize string that holds the user's input
+  std::string inputText = "";
 
   //Open a font style and sets size
   TTF_Font* fontStyle = TTF_OpenFont("Fonts/Arial.ttf", 25);
@@ -57,6 +59,8 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
   SDL_RenderSetClipRect(renderer, NULL);
   SDL_RenderPresent(renderer);
 
+  // set render draw color to be the same as the input box color
+  // will be used to fill a blank rectangle to cover up old text 
   SDL_SetRenderDrawColor(renderer, 143, 171, 221, 0);
 
   SDL_Rect blankRect; // create a rect to be used to display a blank box
@@ -90,15 +94,17 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
           inputText.pop_back();
           renderText = true;
         }
-        //Handle 'sending' text, right now it is set to tab, can't find sdl keycode for enter
-        else if(e.key.keysym.sym == SDLK_TAB) {
+        //Handle 'sending' text by pressing enter or return
+        else if(e.key.keysym.sym == SDLK_RETURN) {
           // here is where the 'sending' to the file will happen
           inputText=" ";
           renderText = true;
+          std::cout << "Input was 'sent'\n";
+
         }
         //Handle copy
         else if(e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL) {
-          SDL_SetClipboardText( inputText.c_str() );
+          SDL_SetClipboardText(inputText.c_str());
         }
         //Handle paste
         else if(e.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL) {
@@ -120,8 +126,6 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
     //Rerender text if needed
     if(renderText) { 
 
-      // here is where the previous texture needs to be freed/removed/overwritten
-
       //Text is not empty
       if(inputText != "") {
         //Render new text. Create surface first and then texture
@@ -136,6 +140,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
       SDL_QueryTexture(textureInputText, NULL, NULL, &textW, &textH);
       inputRect.w = textW; 
       inputRect.h = textH;
+      blankRect.h = textH;
       if(textW>blankRect.w)
         blankRect.w = textW; // controls the width of the rect
       
@@ -168,6 +173,10 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
         // Quit SDL TTF subsystem
         TTF_Quit();
         //make sure to end things to close client and clear stuff that needs cleared
+
+        SDL_RenderClear(renderer);
+        //make sure to end things
+        return;
       }
     }
   }
