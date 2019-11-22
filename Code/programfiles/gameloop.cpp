@@ -2,6 +2,7 @@
 #include "main_helper.hpp"
 #include "Player.hpp"
 #include "chat.hpp"
+#include "inventory.hpp"
 #include "discussion.hpp"
 #include "worldObjects.hpp"
 #include "Building.hpp"
@@ -34,37 +35,37 @@ void init(NPC *npcs, SDL_Renderer *renderer){
   // lust, loyal, wrath => green, blue, red
   // MarketPeople at the Market
   npcs[0].initSprite("Benedict", "Art/NPCs/Blacksmith.bmp", BROWN, GRAY, BLACK,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 1600, 1250);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 1796, 1108);
   npcs[1].initSprite("Liam", "Art/NPCs/Jeweler.bmp", WHITE, GRAY, BLACK,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 1900, 1250);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 1866, 1108);
   npcs[2].initSprite("Michael", "Art/NPCs/FishMonger.bmp", GREEN, DARK_BLUE, WHITE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 1600, 1550);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 1936, 1108);
   npcs[3].initSprite("Kyle", "Art/NPCs/Farmer.bmp", LIGHT_GREEN, BLUE, ORANGE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 1900, 1550);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 2006, 1108);
 
   // Workers in the factory
   npcs[4].initSprite("David", "Art/NPCs/Worker1.bmp", ORANGE, DARK_BLUE, WHITE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 2900, 400);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 2420, 748);
   npcs[5].initSprite("Erick", "Art/NPCs/Worker2.bmp", ORANGE, LIGHT_BLUE, WHITE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 3400, 400);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 2490, 748);
   npcs[6].initSprite("Frank", "Art/NPCs/Worker3.bmp", ORANGE, BLACK, WHITE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 2900, 700);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 2560, 748);
   npcs[7].initSprite("Gail", "Art/NPCs/Worker4.bmp", ORANGE, LIGHT_BLUE, WHITE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 3400, 700);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 2630, 748);
 
   // Administrators in the town hall
   npcs[8].initSprite("Henry", "Art/NPCs/Mayor.bmp", WHITE, GRAY, DARK_GREEN,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 250, 500);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 990, 482);
   npcs[9].initSprite("Isaac", "Art/NPCs/Fuzz.bmp", WHITE, DARK_BLUE, ORANGE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 600, 500);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 1358, 685);
 
   // Barkeep at the bar
   npcs[10].initSprite("Jake", "Art/NPCs/Barkeep.bmp", LIGHT_RED, GRAY, WHITE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 400, 1450);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 1431, 1452);
 
   // Church Person at the Church
   npcs[11].initSprite("Charles", "Art/NPCs/Vicar.bmp", WHITE, WHITE, PURPLE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 3500, 1600);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 2248, 1670);
 
   // Make one of them a ghost
   // TODO: During integration, remove this bit and replace with call to sim
@@ -92,7 +93,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     float time_change;
     int frames_rendered = 0;
     int fr_timer = 0;
-    
+
     // Allocate buildings
     CyanBuilding cBuilding;   // West (Town Hall)
     BlueBuilding bBuilding;   // East (Factory)
@@ -130,13 +131,21 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         // Get the Keyboard State
         keyState = SDL_GetKeyboardState(NULL);
 
-        //Open Chat room
+        // Open Chat room
         if (keyState[SDL_SCANCODE_C])
             enter_chat(e, &(*quit), keyState, renderer);
 
-        //Open Chat room
+        // Open the inventory
+        if (keyState[SDL_SCANCODE_I])
+            open_inventory(e, &(*quit), keyState, renderer);
+
+        //Talk to an NPC
         if (keyState[SDL_SCANCODE_X] && discussbool)
-            enter_discussion(e, &(*quit), keyState, renderer);
+            enter_discussion(e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
+
+        // Quit may have changed during the dialogue, so it's best to check 
+        if (*quit)
+            return;
 
         //Move Player
         player->move(time_change, keyState, farnan);
@@ -148,7 +157,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         // Renders the background
         renderTexture(renderer, bg, cam, 0, 0, cam.w, cam.h, true);
 
-        
         //render npcs
         int i=0;
         int indiscusscollider = 0;

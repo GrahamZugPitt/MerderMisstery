@@ -79,6 +79,7 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     }
 
     //Logo Screen Render
+    SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, logoScreen, NULL, NULL);
     SDL_RenderPresent(renderer);
   }
