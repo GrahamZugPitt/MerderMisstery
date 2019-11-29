@@ -1,8 +1,12 @@
-#ifndef GLOBALVAR_COMMON
-#define GLOBALVAR_COMMON
+#ifndef __PLAYER__
+#define __PLAYER__
 #include "common.hpp"
-#endif
 
+
+constexpr char UP = 0x01;
+constexpr char DOWN = 0x02;
+constexpr char LEFT = 0x04;
+constexpr char RIGHT = 0x08;
 class Player {
 	public:
 		Player(std::string playerTexturePath, SDL_Renderer *renderer);
@@ -20,7 +24,9 @@ class Player {
 		int frameWidth;
 		int frameHeight;
 		float counter;
-    char direction = 'a';
+		float xvel;
+		float yvel;
+    int direction = 0;
     int lastX = 0;
     int lastY = 0;
     int overWriteX = 0;
@@ -32,3 +38,5 @@ class Player {
 		SDL_Rect cropPNG;
     SDL_Rect positionPNG;
 };
+
+#endif

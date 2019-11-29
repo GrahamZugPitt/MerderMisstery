@@ -2,12 +2,14 @@
 #include "main_helper.hpp"
 #include "Player.hpp"
 #include "chat.hpp"
+#include "inventory.hpp"
 #include "discussion.hpp"
 #include "worldObjects.hpp"
 #include "Building.hpp"
 #include "../NPC_Gen/npc.hpp"
 
 #include "CyanBuilding.hpp"
+
 #include "BlueBuilding.hpp"
 #include "GreenBuilding.hpp"
 #include "YellowBuilding.hpp"
@@ -33,37 +35,37 @@ void init(NPC *npcs, SDL_Renderer *renderer){
   // lust, loyal, wrath => green, blue, red
   // MarketPeople at the Market
   npcs[0].initSprite("Benedict", "Art/NPCs/Blacksmith.bmp", BROWN, GRAY, BLACK,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 1600, 1250);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 1796, 1108);
   npcs[1].initSprite("Liam", "Art/NPCs/Jeweler.bmp", WHITE, GRAY, BLACK,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 1900, 1250);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 1866, 1108);
   npcs[2].initSprite("Michael", "Art/NPCs/FishMonger.bmp", GREEN, DARK_BLUE, WHITE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 1600, 1550);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 1936, 1108);
   npcs[3].initSprite("Kyle", "Art/NPCs/Farmer.bmp", LIGHT_GREEN, BLUE, ORANGE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 1900, 1550);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 2006, 1108);
 
   // Workers in the factory
   npcs[4].initSprite("David", "Art/NPCs/Worker1.bmp", ORANGE, DARK_BLUE, WHITE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 2900, 400);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 2420, 748);
   npcs[5].initSprite("Erick", "Art/NPCs/Worker2.bmp", ORANGE, LIGHT_BLUE, WHITE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 3400, 400);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 2490, 748);
   npcs[6].initSprite("Frank", "Art/NPCs/Worker3.bmp", ORANGE, BLACK, WHITE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 2900, 700);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 2560, 748);
   npcs[7].initSprite("Gail", "Art/NPCs/Worker4.bmp", ORANGE, LIGHT_BLUE, WHITE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 3400, 700);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 2630, 748);
 
   // Administrators in the town hall
   npcs[8].initSprite("Henry", "Art/NPCs/Mayor.bmp", WHITE, GRAY, DARK_GREEN,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 250, 500);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 990, 482);
   npcs[9].initSprite("Isaac", "Art/NPCs/Fuzz.bmp", WHITE, DARK_BLUE, ORANGE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 600, 500);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 1358, 685);
 
   // Barkeep at the bar
   npcs[10].initSprite("Jake", "Art/NPCs/Barkeep.bmp", LIGHT_RED, GRAY, WHITE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 400, 1450);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 1431, 1452);
 
   // Church Person at the Church
   npcs[11].initSprite("Charles", "Art/NPCs/Vicar.bmp", WHITE, WHITE, PURPLE,
-                      renderer, NPC_WIDTH, NPC_HEIGHT, 3500, 1600);
+                      renderer, NPC_WIDTH, NPC_HEIGHT, 2248, 1670);
 
   // Make one of them a ghost
   // TODO: During integration, remove this bit and replace with call to sim
@@ -80,12 +82,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     Player *player = new Player(playerImgPath, renderer);
     SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
-    // Create a horse, some walls, and a blood puddle
-    WorldObject objs[WORLD_OBJECT_NUM];
-    objs[0].initObject("Art/Decor/Horse.png", renderer, 2000, 1000, 200, 100, 25, 10, 160, 45);
-    
-    objs[1].initObject("Art/Merder Objects/Blood_Puddle_1.png", renderer, 1400, 200, 300, 150, 0, 0, 0, 0);
-
 
     // Create the NPCs (offloaded for brevity)
     NPC npcs[NPC_NUM];
@@ -95,19 +91,35 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     int curr_time = 0;
     int last_time = 0;
     float time_change;
+    int frames_rendered = 0;
+    int fr_timer = 0;
 
-    CyanBuilding cBuilding;
-    BlueBuilding bBuilding;
-    GreenBuilding gBuilding;
-    YellowBuilding yBuilding;
-    RedBuilding rBuilding;
+    // Allocate buildings
+    CyanBuilding cBuilding;   // West (Town Hall)
+    BlueBuilding bBuilding;   // East (Factory)
+    GreenBuilding gBuilding;  // South East (Church)
+    YellowBuilding yBuilding; // South West (Residences?)
+    RedBuilding rBuilding;    // North  (Murder *Ominous music playing*)
+  //PurpleBuilding pBuilding; // Central (Courtyard)
+
+    // Collision dectction variables
+    SDL_Rect collide;
+    SDL_Rect convCollide;
+    int hasCollided = 0;
     //Enter Game Loop
     while(!(*quit)) {
         //SDL time and delta value
         last_time = curr_time;
         curr_time = SDL_GetTicks();
         time_change = (curr_time - last_time) / 500.0f;
-
+        frames_rendered++;
+        fr_timer += (curr_time - last_time);
+        if(fr_timer >= 1000){
+          std::cout << "fps: " << frames_rendered << std::endl;
+          fr_timer = 0;
+          frames_rendered = 0;
+        }
+        hasCollided = 0;
         //Really would rather export this to an event handling file
         while(SDL_PollEvent(&e) != 0)
         {
@@ -119,13 +131,21 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         // Get the Keyboard State
         keyState = SDL_GetKeyboardState(NULL);
 
-        //Open Chat room
+        // Open Chat room
         if (keyState[SDL_SCANCODE_C])
             enter_chat(e, &(*quit), keyState, renderer);
 
-        //Open Chat room
+        // Open the inventory
+        if (keyState[SDL_SCANCODE_I])
+            open_inventory(e, &(*quit), keyState, renderer);
+
+        //Talk to an NPC
         if (keyState[SDL_SCANCODE_X] && discussbool)
-            enter_discussion(e, &(*quit), keyState, renderer);
+            enter_discussion(e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
+
+        // Quit may have changed during the dialogue, so it's best to check 
+        if (*quit)
+            return;
 
         //Move Player
         player->move(time_change, keyState, farnan);
@@ -137,27 +157,47 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         // Renders the background
         renderTexture(renderer, bg, cam, 0, 0, cam.w, cam.h, true);
 
-        SDL_Rect collide;
-        //render npcs and check for NPC collisions
-        //  also check if you're within the conversation fields
+        //render npcs
         int i=0;
-        bool indiscusscollider = false;
+        int indiscusscollider = 0;
 
-        // render world objects and check for collisions
-        for (int i = 0; i < WORLD_OBJECT_NUM; i++){
-            objs[i].renderToScreen(renderer, cam);
-            if (objs[i].checkCollision(&(player->positionPNG), &collide)){
-                player->alterPosition(&collide);
-            }
+        // check for collisions
+        // Loop through twice to accomidate corner sections where the player may collide with 2 objects
+        for (int axisI = 0; axisI < 2; axisI++){
+          // Check NPC Collisions
+          for(i = 0; i < NPC_NUM; i++){
+              if (npcs[i].NPCCollider.checkCollision(&(player->positionPNG), &collide)){
+                  hasCollided = 2;
+              }
+          }
+          //Check building collisions
+          if (cBuilding.checkCollision(&(player->positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (bBuilding.checkCollision(&(player->positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (gBuilding.checkCollision(&(player->positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (yBuilding.checkCollision(&(player->positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (rBuilding.checkCollision(&(player->positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if(hasCollided){
+            player->alterPosition(&collide);
+          } else {
+            axisI = 2;
+          }
+          hasCollided = 0;
         }
 
+        //render NPC's and check for conversation
         for(i = 0; i < NPC_NUM; i++){
             npcs[i].renderToScreen(renderer, time_change, cam);
-            if (npcs[i].NPCCollider.checkCollision(&(player->positionPNG), &collide)){
-                player->alterPosition(&collide);
-            }
-
-            if (npcs[i].NPCConversationCollider.checkCollision(&(player->positionPNG), &collide)){
+            if (npcs[i].NPCConversationCollider.checkCollision(&(player->positionPNG), &convCollide)){
                 int w, h;
                 SDL_QueryTexture(interactPromptingTex, NULL, NULL, &w, &h);
                 // Just pass in collide as a dummy arg, we don't use it
@@ -166,32 +206,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
                 indiscusscollider = true;
             }
         }
-        
-        if (cBuilding.checkCollision(&(player->positionPNG), &collide)) {
-        std::cout << "Collision" << std::endl;
-            player->alterPosition(&collide);
-        }
-        
-        if (bBuilding.checkCollision(&(player->positionPNG), &collide)) {
-        std::cout << "Collision" << std::endl;
-            player->alterPosition(&collide);
-        }
-        
-        if (gBuilding.checkCollision(&(player->positionPNG), &collide)) {
-        std::cout << "Collision" << std::endl;
-            player->alterPosition(&collide);
-        }
-        
-        if (yBuilding.checkCollision(&(player->positionPNG), &collide)) {
-        std::cout << "Collision" << std::endl;
-            player->alterPosition(&collide);
-        }
-        
-        if (rBuilding.checkCollision(&(player->positionPNG), &collide)) {
-        std::cout << "Collision" << std::endl;
-            player->alterPosition(&collide);
-        }
-        
         // Only can discuss if we're within range
         discussbool = indiscusscollider;
 

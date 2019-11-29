@@ -1,12 +1,12 @@
 #include "YellowBuilding.hpp"
 
 YellowBuilding::YellowBuilding(){
-    walls[0].setRectValues(1337, 1825, 180, 10);
-    walls[1].setRectValues(1520, 1219, 10, 611);
-    walls[2].setRectValues(854, 1219, 676, 10);
-    walls[3].setRectValues(854, 1219, 10, 607);
-    walls[4].setRectValues(854, 1825, 369, 10);
-    walls[5].setRectValues(1197, 1220, 10, 610);
+    walls[0].setRectValues(1366, 1816, 187, 16);
+    walls[1].setRectValues(1534, 1213, 18, 617);
+    walls[2].setRectValues(879, 1210, 672, 17);
+    walls[3].setRectValues(878, 1212, 17, 618);
+    walls[4].setRectValues(877, 1816, 368, 16);
+    walls[5].setRectValues(1235, 1213, 20, 617);
 }
 
 bool YellowBuilding::checkCollision(SDL_Rect *playerRect, SDL_Rect *overlap){
