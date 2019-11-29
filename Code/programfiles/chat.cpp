@@ -137,12 +137,12 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
       //Text is not empty
       if(inputText != "") {
         //Render new text. Create surface first and then texture
-        surfaceInputText = TTF_RenderText_Solid(fontStyle, inputText.c_str(), textWhite);
+        surfaceInputText = TTF_RenderText_Blended_Wrapped(fontStyle, inputText.c_str(), textWhite, 1215);
         textureInputText = SDL_CreateTextureFromSurface(renderer, surfaceInputText);
       }
       //Text is empty
       else {
-        surfaceInputText = TTF_RenderText_Solid(fontStyle, " ", textWhite);
+        surfaceInputText = TTF_RenderText_Blended_Wrapped(fontStyle, " ", textWhite, 1215);
         textureInputText = SDL_CreateTextureFromSurface(renderer, surfaceInputText);
       }
       SDL_QueryTexture(textureInputText, NULL, NULL, &textW, &textH);
@@ -196,7 +196,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
 void initialize_input(SDL_Renderer* renderer){
   //set input text surface and convert into texture
-  surfaceInputText = TTF_RenderText_Solid(fontStyle, inputText.c_str(), textWhite);
+  surfaceInputText = TTF_RenderText_Blended_Wrapped(fontStyle, inputText.c_str(), textWhite, 1215);
   textureInputText = SDL_CreateTextureFromSurface(renderer, surfaceInputText);
 
   //returns inherent width and height of font determed by size set in fontStyle variable
