@@ -8,6 +8,9 @@ std::string singlePlayerPathDisc = "Art/Player/SinglePlayer.png";
 
 SDL_Rect useless;
 
+int nameboxw = 100;
+int nameboxh = 50;
+
 int boxw, boxh, width_offset, height_offset, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, w, h, selected_x, selected_y;
 
 std::string TLString = "Who do you think killed Butler?";
@@ -114,8 +117,9 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
   if(!TNR)
     printf("TTF_OpenFont: %s\n", TTF_GetError());
   SDL_Color White = {255, 255, 255};
+  SDL_Color Yellow = {255, 255, 0};
 
-  SDL_Surface *TLsurfaceMessage, *TRsurfaceMessage, *BLsurfaceMessage, *BRsurfaceMessage;
+  SDL_Surface *TLsurfaceMessage, *TRsurfaceMessage, *BLsurfaceMessage, *BRsurfaceMessage, *CharNameSurface;
 
   // Load the phrases
   if(!(theNPC->isGhost)){
@@ -130,16 +134,21 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
     BLsurfaceMessage = TTF_RenderText_Solid(TNR, BLStringGhost.c_str(), White);
     BRsurfaceMessage = TTF_RenderText_Solid(TNR, BRStringGhost.c_str(), White);
   }
+  // Also load the name
+  CharNameSurface = TTF_RenderText_Solid(TNR, theNPC->getName().c_str(), Yellow);
+
   // Turn them into textures
   SDL_Texture *TLBox = SDL_CreateTextureFromSurface(renderer, TLsurfaceMessage);
   SDL_Texture *TRBox = SDL_CreateTextureFromSurface(renderer, TRsurfaceMessage);
   SDL_Texture *BLBox = SDL_CreateTextureFromSurface(renderer, BLsurfaceMessage);
   SDL_Texture *BRBox = SDL_CreateTextureFromSurface(renderer, BRsurfaceMessage);
+  SDL_Texture *CharTex = SDL_CreateTextureFromSurface(renderer, CharNameSurface);
   // Create the position rectangles
   SDL_Rect TLBoxRect = {tl_x + 10, tl_y, boxw - 20, boxh};
   SDL_Rect TRBoxRect = {tr_x + 10, tr_y, boxw - 20, boxh};
   SDL_Rect BLBoxRect = {bl_x + 10, bl_y, boxw - 20, boxh};
   SDL_Rect BRBoxRect = {br_x + 10, br_y, boxw - 20, boxh};
+  SDL_Rect NameBoxRect = {880 - (nameboxw / 2), 300, nameboxw, nameboxh};
 
   int selected = 1;
 
@@ -194,6 +203,7 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
       SDL_DestroyTexture(TRBox);
       SDL_DestroyTexture(BLBox);
       SDL_DestroyTexture(BRBox);
+      SDL_DestroyTexture(CharTex);
       return;
     }
 
@@ -203,6 +213,7 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
     draw_peoples(renderer, playerTex, npcTex);
     draw_boxes(selected, renderer, selectedBoxTex, deselectedBoxTex, w, h);
     draw_text(renderer, TLBox, TLBoxRect, TRBox, TRBoxRect, BLBox, BLBoxRect, BRBox, BRBoxRect);
+    SDL_RenderCopy(renderer, CharTex, NULL, &NameBoxRect);
 
     //Update Screen
     SDL_RenderPresent(renderer);

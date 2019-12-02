@@ -10,9 +10,6 @@
 #include <time.h>
 #include <stdlib.h>
 
-//#include "npc.hpp"
-
-
 class Event{
 	public:
 		int time;
@@ -21,14 +18,6 @@ class Event{
 		std::string npcName1;
 		std::string npcName2;
 		int event;
-// 		Event(NPC npc1, NPC npc2, int eventType, int t, int place, int observer) {
-// 			npcName1 = npc1.getName();
-// 			npcName2 = npc2.getName();
-// 			event = eventType;
-// 			time = t;
-// 			location = place;
-// 			isObserver = observer;
-// 		}
 		Event(std::string firstNPC, std::string secondNPC, int eventType, int t, int place, int observer) {
 			npcName1 = firstNPC;
 			npcName2 = secondNPC;
@@ -47,7 +36,16 @@ class Event{
 			isObserver = observer;
 		}
 		
-		Event() {
+		Event(Event* e, int timeHeard, int observer) {
+			npcName1 = e->npcName1;
+			npcName2 = e->npcName2;
+			event = e->event;
+			time = timeHeard;
+			location = e->location;
+			isObserver = observer;
+		}
+		
+		Event() { //IMPORTANT: Do not name an Npc "first," or "second," as the game may break.
 			time = 0;
 			npcName1 = "first";
 			npcName2 = "second";
