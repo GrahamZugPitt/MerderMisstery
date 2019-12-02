@@ -17,24 +17,31 @@ const int NPC_HEIGHT = 88;
 int npcdiscuss = 0;
 bool discussbool = false;
 
-<<<<<<< HEAD
 // Return the seed so we can use it later if necessary
 std::string simTown(NPClite *town, std::string seed){
   int seedint = -1;
-  // Convert the seed from a string to an int
+
   if(seed.compare("") == 0){ // If you don't have one, we'll just use the time
-    seedint = time(0);
-  }
-  else{
-    const char *seedCharray = seed.c_str();
-    int i;
-    for(i = 0; i < seed.length(); i++){
-      seedint = seedCharray[i];
-    }
+    time_t rawtime;
+    struct tm * timeinfo;
+    char buffer[80];
+
+    time (&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    strftime(buffer,sizeof(buffer),"%d-%m-%Y %H:%M:%S",timeinfo);
+    std::string time_str(buffer);
+
+    seed = time_str;
   }
 
-  std::cout << "The string was: " << seed << std::endl;
-  printf("Your seedint is: %d\n", seedint);
+  const char *seedCharray = seed.c_str();
+  int i;
+  for(i = 0; i < seed.length(); i++){
+    seedint = seedCharray[i];
+  }
+
+  std::cout << "Your seed is: " << seed << std::endl;
 
   // Dunno if it has to be positive, but may as well.
   if(seedint < 1) seedint = (-1 * seedint) + 1;
@@ -68,22 +75,22 @@ std::string simTown(NPClite *town, std::string seed){
 		town[10] = merge;
 		town[11] = sigmund;
 	  simulation(town, seedint);
-    // Removing the goodMurder stufff for now, since it's causing weird issues
+    // Removing the goodMurder stuff for now, since it's causing weird issues
     //if(goodMurder(town))
       goodKill = 1;
 	}
+
+  return seed;
 }
 
 // Has to return the seed because we'll need it later
-std::string init(NPC *npcs, SDL_Renderer *renderer, std::string seed, NPClite *town){
+std::string init(NPC *npcs, SDL_Renderer *renderer, WorldObject *worldObjects, std::string seed, NPClite *town){
   // Runs the simulation. I know, it looks so innocuous. Kinda nifty, right?
   seed = simTown(town, seed);
+  std::cout << "Your seed is: " << seed << std::endl;
 
   // Set up the front end NPCs
   //   Presumably this is where the backend info will be pushed to the front end
-=======
-void init(NPC *npcs, WorldObject *worldObjects, SDL_Renderer *renderer){
->>>>>>> upstream/master
   // lust, loyal, wrath => green, blue, red
   // MarketPeople at the Market
   npcs[0].initSprite("Benedict", "Art/NPCs/Blacksmith.bmp", BROWN, GRAY, BLACK,
@@ -124,7 +131,7 @@ void init(NPC *npcs, WorldObject *worldObjects, SDL_Renderer *renderer){
   worldObjects[1].initObject("Art/Merder Objects/Hammer_1.png", renderer, 1371, 1660, 50, 80, 5, 5, 50, 80);
   worldObjects[2].initObject("Art/Merder Objects/Pickaxe_1.png", renderer, 2158, 1760, 80, 80, 5, 5, 80, 80);
   worldObjects[3].initObject("Art/Merder Objects/butcher_knife.png", renderer, 2510, 855, 80, 80, 0, 0, 70, 70);
-    
+
   // Make one of them a ghost
   int i;
   for(i = 0; i < 12; i++){
@@ -132,6 +139,8 @@ void init(NPC *npcs, WorldObject *worldObjects, SDL_Renderer *renderer){
       npcs[i].ghostThisNPC();
     }
   }
+
+  return seed;
 }
 
 void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan, std::string seed){
@@ -144,12 +153,8 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
     // Create the NPCs (offloaded for brevity)
     NPC npcs[NPC_NUM];
-<<<<<<< HEAD
-    init(npcs, renderer, seed, town);
-=======
     WorldObject worldObjects[WORLD_OBJECT_NUM];
-    init(npcs, worldObjects, renderer);
->>>>>>> upstream/master
+    init(npcs, renderer, worldObjects, seed, town);
 
     // Used for framerate independence
     int curr_time = 0;
@@ -165,7 +170,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     YellowBuilding yBuilding; // South West (Residences?)
     RedBuilding rBuilding;    // North  (Murder *Ominous music playing*)
   //PurpleBuilding pBuilding; // Central (Courtyard)
-    
+
     int itemList[] = {0, 0, 0, 0};
 
     // Collision dectction variables
@@ -272,7 +277,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
                 indiscusscollider = true;
             }
         }
-        
+
         if (itemList[0] == 0) {
             worldObjects[0].renderToScreen(renderer, cam);
         }
@@ -285,7 +290,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         if (itemList[3] == 0) {
             worldObjects[3].renderToScreen(renderer, cam);
         }
-        
+
         //Check if we need to pick up some items
         if (worldObjects[0].checkCollision((&player->positionPNG), &collide)) {
             itemList[0] = 1;
@@ -299,7 +304,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         if (worldObjects[3].checkCollision((&player->positionPNG), &collide)) {
             itemList[3] = 1;
         }
-        
+
         // Only can discuss if we're within range
         discussbool = indiscusscollider;
 
