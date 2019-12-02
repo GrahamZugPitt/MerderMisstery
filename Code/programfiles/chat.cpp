@@ -1,63 +1,89 @@
+#include <iostream>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <string>
+#include <cstring>
+#include <sstream>
+#include <unistd.h>
+#include <arpa/inet.h>
+
 #include "chat.hpp"
 #include "main_helper.hpp"
+#include "Users.h"
+
+using namespace std;
 
 // The Chat screen template
-std::string chatScreenPath = "Art/Chat/chat_template.png";
+const std::string chatScreenPath = "Art/Chat/chat_template.png";
+//initialize chatScreen texture
+SDL_Texture* chatScreen;
+
+//inChat boolean value
+bool inChat;
+
+//Set White variable in rgb format
+const SDL_Color textWhite = {255, 255, 255};
+
+//intialize TTF_Font variable to be set later
+TTF_Font* fontStyle;
+
+//initialize text width and height ints
+int textW = 0;
+int textH = 0;
+
+//Initialize string that holds the user's input and messages from server
+std::string inputText, textFromServer;
+
+//initialize surface and texture for server messages and input text
+SDL_Surface* surfaceMessage;
+SDL_Surface* surfaceInputText;
+
+SDL_Texture* textureMessage;
+SDL_Texture* textureInputText;
+
+//create a rect for the text textures to appear in
+SDL_Rect inputRect;
+SDL_Rect serverMessageRect;
+
+/*layout dimensions
+    User input box left X: 32
+    User input box right X: 1247
+    User input box top y: 597
+    User input box bottom y: 710
+*/
 
 void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
   std::cout << "Entered Chat Loop\n";
-  //inChat boolean value
-  bool inChat = true;
 
-  SDL_Texture* chatScreen = loadFiles(chatScreenPath, renderer);
+  //set inChat boolean value
+  inChat = true;
 
-  //Render chat template
-  SDL_RenderCopy(renderer, chatScreen, NULL, NULL);
-
-  //User input box left X: 32
-  //User input box right X: 1247
-  //User input box top y: 597
-  //User input box bottom y: 710
+  //set chatScreen texture
+  chatScreen = loadFiles(chatScreenPath, renderer);
 
   //Initialize SDL_ttf library
   TTF_Init();
 
-  //Initialize string that holds the user's input
-  std::string inputText = "";
-
   //Open a font style and sets size
-  TTF_Font* fontStyle = TTF_OpenFont("Fonts/Arial.ttf", 25);
+  fontStyle = TTF_OpenFont("Fonts/Arial.ttf", 35);
   if(!fontStyle) {
       printf("TTF_OpenFont: %s\n", TTF_GetError());
   }
 
-  //Set White variable in rgb format
-  SDL_Color textWhite = {255, 255, 255};
+  //initialize messages from server into serverMessageRect
+  update_messages(renderer, "");
 
-  //TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
-  SDL_Surface* surfaceInputText = TTF_RenderText_Solid(fontStyle, inputText.c_str(), textWhite);
+  //initialize user input
+  initialize_input(renderer);
 
-  //now you can convert it into a texture
-  SDL_Texture* textureInputText = SDL_CreateTextureFromSurface(renderer, surfaceInputText);
-
-  SDL_Rect inputRect; //create a rect
-
-  int textW = 0;
-  int textH = 0;
-  //returns inherent width and height of font determed by size set in fontStyle variable
-  //stores these values in textH and textW variables
-  SDL_QueryTexture(textureInputText, NULL, NULL, &textW, &textH);
-
-  inputRect.x = 36;  //controls the rect's x coordinate
-  inputRect.y = 597; // controls the rect's y coordinte
-  inputRect.w = textW; //1215; // controls the width of the rect
-  inputRect.h = textH; //113; // controls the height of the rect
-  //text will most likely still go outside the input box, need to clean up with
-  //example from https://gamedev.stackexchange.com/questions/140294/what-is-the-most-efficient-way-to-render-a-textbox-in-c-sdl2
-
-  SDL_RenderCopy(renderer, textureInputText, NULL, &inputRect);
-  SDL_RenderSetClipRect(renderer, NULL);
-  SDL_RenderPresent(renderer);
+  //initialize text from input into inputRect and begin rendering user text
+  update_render(renderer);
 
   // set render draw color to be the same as the input box color
   // will be used to fill a blank rectangle to cover up old text
@@ -75,11 +101,94 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
   //Enable text input
   SDL_StartTextInput();
 
+  //Adding Client Code Initialization
+  int sockfd;
+  struct addrinfo hints, *servinfo, *p;
+  struct timeval tv;
+  int rv;
+  //char s[INET6_ADDRSTRLEN];
+  fd_set master;
+  fd_set temp;
+
+  tv.tv_sec = 0;
+
+  FD_ZERO(&master);
+  FD_ZERO(&temp);
+  //FD_SET(sockfd, &master);
+
+  User this_user;
+
+  memset(&hints, 0, sizeof hints);
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+
+  //This will be subject to change with the username password thing hostname page
+  //First string is the host name and second is the port number
+  if ((rv = getaddrinfo("colton-VirtualBox", "9034", &hints, &servinfo)) != 0){
+    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+    return;
+  }
+
+  for(p = servinfo; p != NULL; p = p->ai_next){
+    if((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+      perror("client: socket");
+      continue;
+    }
+    if(connect(sockfd, p->ai_addr, p->ai_addrlen) == -1){
+      close(sockfd);
+      perror("client connect");
+      continue;
+    }
+    break;
+  }
+
+  if(p == NULL){
+    fprintf(stderr, "client: failed to connect\n");
+    return;
+  }
+
+  freeaddrinfo(servinfo);
+
+  //commandline username and password until front end is up
+  while(true){
+    string username;
+    cout << "\nEnter your username: ";
+    cin >> username;
+
+    string password;
+    cout << "\nEnter your password: ";
+    cin >> password;
+
+    //find the usernmae in the database and make sure it's valid
+    this_user = this_user.find_user(username);
+    if(this_user.get_username().compare(username) != 0){
+      cout << "\nSorry, this username does not exist\n";
+      continue;
+    }
+
+    if(this_user.check_password(username, password) == false){
+      cout << "\nSorry, your password is incorrect\n";
+      continue;
+    }
+    else{
+      break;
+    }
+  }
+
+  FD_SET(sockfd, &master);
+
+  //info to send and receive data
+  char buf[4096];
+  FD_SET(sockfd, &master);
+
+  string text;
+
   //Wait for user to exit chat
   while (inChat == true && !(*quit)) {
 
     //The rerender text flag
     bool renderText = false;
+    bool send_text = false;
 
     while (SDL_PollEvent(&e) != 0) {
 
@@ -97,10 +206,12 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
         //Handle 'sending' text by pressing enter or return
         else if(e.key.keysym.sym == SDLK_RETURN) {
           // here is where the 'sending' to the file will happen
-          inputText=" ";
+          //inputText=" ";
           renderText = true;
-          std::cout << "Input was 'sent'\n";
-
+          send_text = true;
+          text = inputText;
+          inputText = "";
+          //std::cout << "Input was 'sent': " << text << "\n";
         }
         //Handle copy
         else if(e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL) {
@@ -123,17 +234,48 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
       }
     }
 
+    temp = master;
+    select(sockfd+1, &temp, nullptr, nullptr, &tv);
+
+
+    if (FD_ISSET(sockfd, &temp)){ //if(text.size() > 0){
+      //cout << "also got here before the seg" << endl;
+      memset(&buf, 0, sizeof buf);
+      int bytesReceived = recv(sockfd, buf, 4096, 0);//this guy blocks until it receives from the server
+      if(bytesReceived > 0){
+        text = string(buf, 0, bytesReceived);
+        renderText = true;
+        //cout << string(buf, 0, bytesReceived);
+      }
+      else{
+        break;
+      }
+    }
+    if (send_text){ 
+      if(text.size() > 0){
+        text = this_user.get_username() + ": " + text;
+
+        int sendResult = send(sockfd, text.c_str(), text.size() + 1, 0);
+        send_text = false;
+
+        if(sendResult <= 0){
+          break;
+        }
+      }
+    }
+
     //Rerender text if needed
-    if(renderText) { 
+    if(renderText) {
+
       //Text is not empty
       if(inputText != "") {
         //Render new text. Create surface first and then texture
-        surfaceInputText = TTF_RenderText_Solid(fontStyle, inputText.c_str(), textWhite);
+        surfaceInputText = TTF_RenderText_Blended_Wrapped(fontStyle, inputText.c_str(), textWhite, 1215);
         textureInputText = SDL_CreateTextureFromSurface(renderer, surfaceInputText);
       }
       //Text is empty
       else {
-        surfaceInputText = TTF_RenderText_Solid(fontStyle, " ", textWhite);
+        surfaceInputText = TTF_RenderText_Blended_Wrapped(fontStyle, " ", textWhite, 1215);
         textureInputText = SDL_CreateTextureFromSurface(renderer, surfaceInputText);
       }
       SDL_QueryTexture(textureInputText, NULL, NULL, &textW, &textH);
@@ -143,6 +285,10 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
       if(textW>blankRect.w)
         blankRect.w = textW; // controls the width of the rect
 
+      //update messages from server
+      update_messages(renderer, text);
+      update_render(renderer);
+      
       SDL_RenderDrawRect(renderer, &blankRect);
       SDL_RenderFillRect(renderer, &blankRect);
       SDL_RenderPresent(renderer);
@@ -179,6 +325,58 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
       }
     }
   }
+} //end enter_chat
 
+void initialize_input(SDL_Renderer* renderer){
+  //set input text surface and convert into texture
+  surfaceInputText = TTF_RenderText_Blended_Wrapped(fontStyle, inputText.c_str(), textWhite, 1215);
+  textureInputText = SDL_CreateTextureFromSurface(renderer, surfaceInputText);
 
-}
+  //returns inherent width and height of font determed by size set in fontStyle variable
+  //stores these values in textH and textW variables
+  SDL_QueryTexture(textureInputText, NULL, NULL, &textW, &textH);
+
+  //rect for input text
+  inputRect.x = 36;  //controls the rect's x coordinate
+  inputRect.y = 597; // controls the rect's y coordinte
+  inputRect.w = textW; //1215; // controls the width of the rect
+  inputRect.h = textH; //113; // controls the height of the rect
+} //end initialize_input
+
+void update_messages(SDL_Renderer* renderer, string textFromServer){
+  //Read in data structure from the server, Colton ;)
+  //Need to make sure to append \n (new line) to the end of each message so that
+
+  //take past messages from server and make them a surface --> texture
+
+  //convert server text into 'message' char needed for TTF_RenderText_Blended_Wrapped
+  char message[textFromServer.size() + 1];
+	std::copy(textFromServer.begin(), textFromServer.end(), message);
+	message[textFromServer.size()] = '\0';
+
+  //set message text surface and convert into texture, 1215 sets the text to
+  //wrap to the next line at that pixel
+  surfaceMessage = TTF_RenderText_Blended_Wrapped(fontStyle, message, textWhite, 1215);
+  textureMessage = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+
+  //returns inherent width and height of font determed by size set in fontStyle variable
+  //stores these values in textH and textW variables
+  SDL_QueryTexture(textureMessage, NULL, NULL, &textW, &textH);
+
+  //rect for messages from server
+  serverMessageRect.x = 36;
+  serverMessageRect.y = 120;
+  serverMessageRect.w = textW;
+  serverMessageRect.h = textH;
+
+} //end update_messages
+
+// render chatScreen, textureMessage, and textureInputText
+void update_render(SDL_Renderer* renderer){
+  SDL_RenderClear(renderer);
+  SDL_RenderCopy(renderer, chatScreen, NULL, NULL); //Render chat template
+  SDL_RenderCopy(renderer, textureMessage, NULL, &serverMessageRect);
+  SDL_RenderCopy(renderer, textureInputText, NULL, &inputRect);
+  // SDL_RenderSetClipRect(renderer, NULL); dont think we need this
+  SDL_RenderPresent(renderer);
+} //end update_render
