@@ -3,6 +3,7 @@
 #include "chat.hpp"
 #include "seed.hpp"
 #include "credits.hpp"
+#include  <fstream>
 
 std::string logoImgPath = "Art/Logo/Start_Screen.png";
 std::string loadImgPath = "Art/Logo/Loading.png";
@@ -11,6 +12,13 @@ const int ALL_BUTTON_TOP = 618;
 const int ALL_BUTTON_BOTTOM = 532;
 
 void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
+  std::fstream save;
+  save.open("save.txt", std::fstream::in);
+  if (save) {
+    logoImgPath = "Art/Logo/Continue_Screen.png";
+    std::cout << "This is where the new path for the start screen will go\n";
+  }
+  save.close();
   // Load the title screens
   SDL_Texture* logoScreen = loadFiles(logoImgPath, renderer);
   bool next = false;
@@ -44,17 +52,28 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
           //Enter Seed Left-X value: 107
           //Enter Seed Right-X value: 393
           case 107 ... 393:
-            SDL_Delay(300);
-            enter_seed(e, &(*quit), keyState, renderer);
-            SDL_Delay(300);
-            std::cout << "Exited Seed Loop\n";
+            if (save) {  // Replace the seed call to the abort
+              remove("save.txt");
+              logoImgPath = "Art/Logo/Start_Screen.png";
+              logoScreen = loadFiles(logoImgPath, renderer);
+            } else {
+              SDL_Delay(300);
+              enter_seed(e, &(*quit), keyState, renderer);
+              SDL_Delay(300);
+              std::cout << "Exited Seed Loop\n";
+            }
             break;
 
           //Start Game Left-X value: 492
           //Start Game Right-X value: 779
           case 492 ... 779:
-            std::cout << "Start Game\n";
-            next = true; // Start the game
+            if (save) { //TODO: Replace the start call to the continue call
+              std::cout << "Start Game\n";
+              next = true; // Start the game
+            } else {
+              std::cout << "Start Game\n";
+              next = true; // Start the game
+            }
             break;
 
           //Roll Credits Left-X value: 876

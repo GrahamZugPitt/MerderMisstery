@@ -9,7 +9,7 @@ constexpr char LEFT = 0x04;
 constexpr char RIGHT = 0x08;
 class Player {
 	public:
-		Player(std::string playerTexturePath, SDL_Renderer *renderer);
+		Player(std::string playerTexturePath, SDL_Renderer *renderer, int player_x, int player_y);
 		~Player();
 		void render(SDL_Renderer *renderer, SDL_Rect *cam);
 		void move(float change, const Uint8 *keyState, bool farnan);

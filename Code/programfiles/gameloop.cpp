@@ -16,6 +16,7 @@
 #include "RedBuilding.hpp"
 
 #include <time.h>
+#include <fstream>
 
 // Add some vars to be used below
 std::string mapImgPath = "Art/MapSamples/SampleMap.png";
@@ -75,11 +76,11 @@ void init(NPC *npcs, SDL_Renderer *renderer){
   npcs[random].ghostThisNPC();
 }
 
-void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan){
+void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan, int player_x, int player_y){
     // Initialize world texture, player texture, and camera
     SDL_Texture *bg = loadFiles(mapImgPath, renderer);
     SDL_Texture *interactPromptingTex = loadFiles(interactImgPath, renderer);
-    Player *player = new Player(playerImgPath, renderer);
+    Player *player = new Player(playerImgPath, renderer, player_x, player_y);
     SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
 
@@ -144,8 +145,13 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
             enter_discussion(e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
 
         // Quit may have changed during the dialogue, so it's best to check 
-        if (*quit)
+        if (*quit) {
+            std::fstream save;
+            save.open("save.txt", std::fstream::out);
+            save << "Here will be the seed\n" << player->positionPNG.x << "\n" << player->positionPNG.y << "\n";
+            save.close();
             return;
+        }
 
         //Move Player
         player->move(time_change, keyState, farnan);
