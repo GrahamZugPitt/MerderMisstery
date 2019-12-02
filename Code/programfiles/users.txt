@@ -1,3 +1,0 @@
-User1,pass,User2,User3
-User2,pass,User1
-User3,pass,User1
