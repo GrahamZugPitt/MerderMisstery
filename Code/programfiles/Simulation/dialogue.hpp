@@ -1,10 +1,10 @@
-#ifndef __DIALOGUE__
-#define __DIALOGUE__
+#ifndef __DIALOGUE__H
+#define __DIALOGUE__H
 
-#include "simulation.cpp"
-#include "../winCode.hpp"
+#include "simulation.hpp"
 #include <cstring>
 
 int dialogue(NPClite* town);
+bool goodMurder(NPClite *town);
 
 #endif

@@ -94,7 +94,7 @@ std::string enter_seed(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rende
         //Handle 'sending' seed by pressing enter or return
         else if(e.key.keysym.sym == SDLK_RETURN) {
           // here is where the 'sending' the seed will happen
-          seedInput=" ";
+          //seedInput=" "; Not sure why this line was here
           renderText = true;
           inSeed=false;
 

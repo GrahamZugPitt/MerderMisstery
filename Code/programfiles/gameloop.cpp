@@ -1,21 +1,7 @@
+#ifndef __GAMELOOPCPP__
+#define __GAMELOOPCPP__
+
 #include "gameloop.hpp"
-#include "main_helper.hpp"
-#include "Player.hpp"
-#include "chat.hpp"
-#include "inventory.hpp"
-#include "discussion.hpp"
-#include "worldObjects.hpp"
-#include "Building.hpp"
-#include "../NPC_Gen/npc.hpp"
-#include "Simulation/simulation.hpp"
-
-#include "CyanBuilding.hpp"
-
-#include "BlueBuilding.hpp"
-#include "GreenBuilding.hpp"
-#include "YellowBuilding.hpp"
-#include "RedBuilding.hpp"
-#include <time.h>
 
 // Add some vars to be used below
 std::string mapImgPath = "Art/MapSamples/SampleMap.png";
@@ -33,15 +19,21 @@ bool discussbool = false;
 
 // Return the seed so we can use it later if necessary
 std::string simTown(NPClite *town, std::string seed){
-  int seedint;
+  int seedint = -1;
   // Convert the seed from a string to an int
-  if(seed.compare("") != 0){ // If you don't have one, we'll just use the time
+  if(seed.compare("") == 0){ // If you don't have one, we'll just use the time
     seedint = time(0);
   }
   else{
-    // TODO: Set seedint with some numeric version of the passed in string
-    //    I need to get to bed
+    const char *seedCharray = seed.c_str();
+    int i;
+    for(i = 0; i < seed.length(); i++){
+      seedint = seedCharray[i];
+    }
   }
+
+  std::cout << "The string was: " << seed << std::endl;
+  printf("Your seedint is: %d\n", seedint);
 
   // Dunno if it has to be positive, but may as well.
   if(seedint < 1) seedint = (-1 * seedint) + 1;
@@ -75,7 +67,9 @@ std::string simTown(NPClite *town, std::string seed){
 		town[10] = merge;
 		town[11] = sigmund;
 	  simulation(town, seedint);
-    if(goodMurder(town)) goodKill = 1;
+    // Removing the goodMurder stufff for now, since it's causing weird issues
+    //if(goodMurder(town))
+      goodKill = 1;
 	}
 }
 
@@ -136,12 +130,12 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     SDL_Texture *interactPromptingTex = loadFiles(interactImgPath, renderer);
     Player *player = new Player(playerImgPath, renderer);
     SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-    NPClite *town = NPClite[12];
+    NPClite town[12];
 
 
     // Create the NPCs (offloaded for brevity)
     NPC npcs[NPC_NUM];
-    init(npcs, renderer, seed);
+    init(npcs, renderer, seed, town);
 
     // Used for framerate independence
     int curr_time = 0;
@@ -277,3 +271,5 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         SDL_RenderPresent(renderer);
     }
 }
+
+#endif

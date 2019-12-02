@@ -1,3 +1,6 @@
+#ifndef __DIALOGUE__
+#define __DIALOGUE__
+
 #include "dialogue.hpp"
 
 const int DIALOGUE_OPTION_COUNT = 40;
@@ -610,3 +613,5 @@ int dialogue(NPClite* town){
 	}
 	return 0;
 }
+
+#endif

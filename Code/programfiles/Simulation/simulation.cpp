@@ -1,85 +1,17 @@
+#ifndef __SIMCPP__
+#define __SIMCPP__
+
 #include "simulation.hpp"
 
-const int SEED = 1;
-const int EVENT_MODE = 0;
-const int DEBUG_MODE = 0;
-const int OBSERVATION_MODE = 0;
-const int HEARSAY_MODE = 0;
-const int TOWN_SIZE = 12;
-const int LOCATION = 5;
-const int SELFCONTROL = 40;
-const int MURDER_MODE = 1;
-const int M = 982451653;
-const int MULTIPLIER = 373587883;
-int seed = 1;
+int rand_seed = 1;
 int CLOCK = 0;
 
-enum relationshipDelta{
-	HATE = -75,
-	SDISLIKE = -60,
-	DESPISE = -30,
-	DISLIKE = -25,
-	DISCOMFORT = -10,
-	NEUTRAL = 0,
-	HAPPY = 5,
-	LIKE = 10,
-	LOVE = 25,
-};
-
-enum observer{
-	SUBJECT,
-	FIRSTHAND,
-	SECONDHAND,
-};
-
-enum location{
-	TOWN_HALL,
-	FACTORY,
-	MARKET,
-	INN,
-	CHURCH,
-};
-enum role{
-	MAYOR,
-	PRIEST,
-	WORKER,
-	MERCHANT,
-	POLICE,
-	INNKEEPER
-};
-enum trait{
-	LUST,
-	DISLOYALTY,
-	GREED,
-	WRATH,
-	DISHONESTY,
-	DEFAULT,
-	HL,
-};
-enum event{
-	CDATE, //0
-	INTRODUCE, //1
-	SOCIALIZE, //2
-	ENVY, //3
-	LIE, //4
-	ASKFORDISTANCE, //5
-	FLIRT, //6
-	DATE, //7
-	VERBALFIGHT, //8
-	ROB, //9
-	PHYSICALFIGHT, //10
-	SEX, //11
-	BREAKUP, //12
-};
-
-
-// Code for the custom random number generator that's platfor independent
-
+// Code for the custom random number generator that's hopefully platform independent
 int z_rand(){
-	seed = (seed*MULTIPLIER + 1) % M;
-	if(seed < 0)
-		seed = seed*-1;
-	return seed;
+	rand_seed = (rand_seed*MULTIPLIER + 1) % M;
+	if(rand_seed < 0)
+		rand_seed = rand_seed*-1;
+	return rand_seed;
 }
 
 // The NPClite constructors
@@ -853,7 +785,7 @@ bool didMurder(NPClite* town){
 }
 void simulation(NPClite* town, int givenSeed) {
 	CLOCK = 0;
-	seed = givenSeed;
+	rand_seed = givenSeed;
 	if(SEED)
 		std::cout << "Seed: " << givenSeed << "\n";
 
@@ -893,3 +825,5 @@ void simulation(NPClite* town, int givenSeed) {
 		}
 	}
 }
+
+#endif
