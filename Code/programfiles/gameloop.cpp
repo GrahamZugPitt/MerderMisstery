@@ -8,7 +8,7 @@ std::string mapImgPath = "Art/MapSamples/SampleMap.png";
 std::string playerImgPath = "Art/Player/PlayerSpriteSheet.png";
 std::string interactImgPath = "Art/Messages/interact.png";
 const int NPC_NUM = 12;
-const int WORLD_OBJECT_NUM = 2;
+const int WORLD_OBJECT_NUM = 4;
 
 //NPC Constants
 const int NPC_WIDTH = 60;
@@ -17,6 +17,7 @@ const int NPC_HEIGHT = 88;
 int npcdiscuss = 0;
 bool discussbool = false;
 
+<<<<<<< HEAD
 // Return the seed so we can use it later if necessary
 std::string simTown(NPClite *town, std::string seed){
   int seedint = -1;
@@ -80,6 +81,9 @@ std::string init(NPC *npcs, SDL_Renderer *renderer, std::string seed, NPClite *t
 
   // Set up the front end NPCs
   //   Presumably this is where the backend info will be pushed to the front end
+=======
+void init(NPC *npcs, WorldObject *worldObjects, SDL_Renderer *renderer){
+>>>>>>> upstream/master
   // lust, loyal, wrath => green, blue, red
   // MarketPeople at the Market
   npcs[0].initSprite("Benedict", "Art/NPCs/Blacksmith.bmp", BROWN, GRAY, BLACK,
@@ -115,6 +119,12 @@ std::string init(NPC *npcs, SDL_Renderer *renderer, std::string seed, NPClite *t
   npcs[11].initSprite("Charles", "Art/NPCs/Vicar.bmp", WHITE, WHITE, PURPLE,
                       renderer, NPC_WIDTH, NPC_HEIGHT, 2248, 1670);
 
+  // Weapons
+  worldObjects[0].initObject("Art/Merder Objects/bat.png", renderer, 960, 855, 100, 50, 5, 5, 100, 50);
+  worldObjects[1].initObject("Art/Merder Objects/Hammer_1.png", renderer, 1371, 1660, 50, 80, 5, 5, 50, 80);
+  worldObjects[2].initObject("Art/Merder Objects/Pickaxe_1.png", renderer, 2158, 1760, 80, 80, 5, 5, 80, 80);
+  worldObjects[3].initObject("Art/Merder Objects/butcher_knife.png", renderer, 2510, 855, 80, 80, 0, 0, 70, 70);
+    
   // Make one of them a ghost
   int i;
   for(i = 0; i < 12; i++){
@@ -132,10 +142,14 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
     NPClite town[12];
 
-
     // Create the NPCs (offloaded for brevity)
     NPC npcs[NPC_NUM];
+<<<<<<< HEAD
     init(npcs, renderer, seed, town);
+=======
+    WorldObject worldObjects[WORLD_OBJECT_NUM];
+    init(npcs, worldObjects, renderer);
+>>>>>>> upstream/master
 
     // Used for framerate independence
     int curr_time = 0;
@@ -151,6 +165,8 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     YellowBuilding yBuilding; // South West (Residences?)
     RedBuilding rBuilding;    // North  (Murder *Ominous music playing*)
   //PurpleBuilding pBuilding; // Central (Courtyard)
+    
+    int itemList[] = {0, 0, 0, 0};
 
     // Collision dectction variables
     SDL_Rect collide;
@@ -187,7 +203,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
         // Open the inventory
         if (keyState[SDL_SCANCODE_I])
-            open_inventory(e, &(*quit), keyState, renderer);
+            open_inventory(e, &(*quit), keyState, renderer, itemList);
 
         //Talk to an NPC
         if (keyState[SDL_SCANCODE_X] && discussbool)
@@ -256,6 +272,34 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
                 indiscusscollider = true;
             }
         }
+        
+        if (itemList[0] == 0) {
+            worldObjects[0].renderToScreen(renderer, cam);
+        }
+        if (itemList[1] == 0) {
+            worldObjects[1].renderToScreen(renderer, cam);
+        }
+        if (itemList[2] == 0) {
+            worldObjects[2].renderToScreen(renderer, cam);
+        }
+        if (itemList[3] == 0) {
+            worldObjects[3].renderToScreen(renderer, cam);
+        }
+        
+        //Check if we need to pick up some items
+        if (worldObjects[0].checkCollision((&player->positionPNG), &collide)) {
+            itemList[0] = 1;
+        }
+        if (worldObjects[1].checkCollision((&player->positionPNG), &collide)) {
+            itemList[1] = 1;
+        }
+        if (worldObjects[2].checkCollision((&player->positionPNG), &collide)) {
+            itemList[2] = 1;
+        }
+        if (worldObjects[3].checkCollision((&player->positionPNG), &collide)) {
+            itemList[3] = 1;
+        }
+        
         // Only can discuss if we're within range
         discussbool = indiscusscollider;
 
