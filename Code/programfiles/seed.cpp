@@ -4,7 +4,7 @@
 // The Seed page template
 std::string seedPagePath = "Art/Logo/Seed_Page.png";
 
-void enter_seed(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
+std::string enter_seed(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
   std::cout << "Entered Seed Loop\n";
   //inSeed boolean value
   bool inSeed = true;
@@ -55,7 +55,7 @@ void enter_seed(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
   SDL_RenderSetClipRect(renderer, NULL);
 
   // set render draw color to be the same as the input box color
-  // will be used to fill a blank rectangle to cover up old text 
+  // will be used to fill a blank rectangle to cover up old text
   SDL_SetRenderDrawColor(renderer, 91, 71, 4, 0);
 
   SDL_Rect blankRect; // create a rect to be used to display a blank box
@@ -123,7 +123,7 @@ void enter_seed(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
 
   	//Rerender text if needed
-    if(renderText) { 
+    if(renderText) {
 
       //Text is not empty
       if(seedInput != "") {
@@ -137,13 +137,13 @@ void enter_seed(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
         textureInputText = SDL_CreateTextureFromSurface(renderer, surfaceInputText);
       }
       SDL_QueryTexture(textureInputText, NULL, NULL, &textW, &textH);
-      inputRect.w = textW; 
+      inputRect.w = textW;
       inputRect.h = textH;
       blankRect.h = textH;
       if(textW>blankRect.w) {
       	blankRect.w = textW; // controls the width of the rect
       }
-      
+
       SDL_RenderDrawRect(renderer, &blankRect);
       SDL_RenderFillRect(renderer, &blankRect);
       SDL_RenderPresent(renderer);
@@ -178,7 +178,7 @@ void enter_seed(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
       SDL_RenderClear(renderer);
       //make sure to end things and return seed
-      return;
+      return seedInput;
     }
   }
 }

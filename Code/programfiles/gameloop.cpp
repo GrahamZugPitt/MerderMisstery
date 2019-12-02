@@ -7,6 +7,7 @@
 #include "worldObjects.hpp"
 #include "Building.hpp"
 #include "../NPC_Gen/npc.hpp"
+#include "Simulation/simulation.hpp"
 
 #include "CyanBuilding.hpp"
 
@@ -14,7 +15,6 @@
 #include "GreenBuilding.hpp"
 #include "YellowBuilding.hpp"
 #include "RedBuilding.hpp"
-
 #include <time.h>
 
 // Add some vars to be used below
@@ -31,7 +31,61 @@ const int NPC_HEIGHT = 88;
 int npcdiscuss = 0;
 bool discussbool = false;
 
-void init(NPC *npcs, SDL_Renderer *renderer){
+// Return the seed so we can use it later if necessary
+std::string simTown(NPClite *town, std::string seed){
+  int seedint;
+  // Convert the seed from a string to an int
+  if(seed.compare("") != 0){ // If you don't have one, we'll just use the time
+    seedint = time(0);
+  }
+  else{
+    // TODO: Set seedint with some numeric version of the passed in string
+    //    I need to get to bed
+  }
+
+  // Dunno if it has to be positive, but may as well.
+  if(seedint < 1) seedint = (-1 * seedint) + 1;
+  // There's literally only one case where this'd be an issue, so yannow
+  if(seedint < 1) seedint = 1;
+
+  int goodKill = 0;
+	while(goodKill == 0){
+		NPClite jarrett("Benedict", MERCHANT); //0
+		NPClite kim("Liam", MERCHANT); //1
+		NPClite pope("Micheal", MERCHANT); //2
+		NPClite gaben("Kyle", MERCHANT); //3
+		NPClite marie("David", WORKER); //4
+		NPClite lary("Erick", WORKER); //5
+		NPClite luigi("Frank", WORKER); //6
+		NPClite albert("Gail", WORKER); //7
+		NPClite dennis("Henry", MAYOR); //8
+		NPClite helen("Isaac", POLICE); //9
+		NPClite merge("Jake", INNKEEPER); //10
+		NPClite sigmund("Charles", PRIEST); //11
+		town[0] = jarrett;
+		town[1] = kim;
+		town[2] = pope;
+		town[3] = gaben;
+		town[4] = marie;
+		town[5] = lary;
+		town[6] = luigi;
+		town[7] = albert;
+		town[8] = dennis;
+		town[9] = helen;
+		town[10] = merge;
+		town[11] = sigmund;
+	  simulation(town, seedint);
+    if(goodMurder(town)) goodKill = 1;
+	}
+}
+
+// Has to return the seed because we'll need it later
+std::string init(NPC *npcs, SDL_Renderer *renderer, std::string seed, NPClite *town){
+  // Runs the simulation. I know, it looks so innocuous. Kinda nifty, right?
+  seed = simTown(town, seed);
+
+  // Set up the front end NPCs
+  //   Presumably this is where the backend info will be pushed to the front end
   // lust, loyal, wrath => green, blue, red
   // MarketPeople at the Market
   npcs[0].initSprite("Benedict", "Art/NPCs/Blacksmith.bmp", BROWN, GRAY, BLACK,
@@ -68,24 +122,26 @@ void init(NPC *npcs, SDL_Renderer *renderer){
                       renderer, NPC_WIDTH, NPC_HEIGHT, 2248, 1670);
 
   // Make one of them a ghost
-  // TODO: During integration, remove this bit and replace with call to sim
-  // Also don't forget to get rid of the time.h import
-  srand(time(NULL));
-  int random = rand() % 12;
-  npcs[random].ghostThisNPC();
+  int i;
+  for(i = 0; i < 12; i++){
+    if(town[i].isDead){
+      npcs[i].ghostThisNPC();
+    }
+  }
 }
 
-void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan){
+void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan, std::string seed){
     // Initialize world texture, player texture, and camera
     SDL_Texture *bg = loadFiles(mapImgPath, renderer);
     SDL_Texture *interactPromptingTex = loadFiles(interactImgPath, renderer);
     Player *player = new Player(playerImgPath, renderer);
     SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+    NPClite *town = NPClite[12];
 
 
     // Create the NPCs (offloaded for brevity)
     NPC npcs[NPC_NUM];
-    init(npcs, renderer);
+    init(npcs, renderer, seed);
 
     // Used for framerate independence
     int curr_time = 0;
@@ -143,7 +199,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         if (keyState[SDL_SCANCODE_X] && discussbool)
             enter_discussion(e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
 
-        // Quit may have changed during the dialogue, so it's best to check 
+        // Quit may have changed during the dialogue, so it's best to check
         if (*quit)
             return;
 

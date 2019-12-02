@@ -3,6 +3,7 @@
 
 #include "common.hpp"
 #include "../NPC_Gen/npc.hpp"
+#include "Simulation/dialogue.hpp"
 #include "winCode.hpp"
 #include <cstring>
 
