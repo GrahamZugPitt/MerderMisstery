@@ -103,7 +103,7 @@ void draw_text(SDL_Renderer *renderer, SDL_Texture *TLBox, SDL_Rect TLBoxRect, S
   SDL_RenderCopy(renderer, BRBox, NULL, &BRBoxRect);
 }
 
-void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, NPC *theNPC){
+int enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, NPC *theNPC){
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
   SDL_Texture* discussionBoxTex = loadFiles(discussionBoxPath, renderer);
   SDL_Texture* selectedBoxTex = loadFiles(selectedBoxPath, renderer);
@@ -160,10 +160,11 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
   //Wait for user to exit chat
   while (SDL_PollEvent(&e) != 0 || inDiscussion)
   {
+    int hasSolved = 0;
     //Quit application
     if(e.type == SDL_QUIT){
         *quit = true;
-        return;
+        return 0;
     }
 
     // Input Handler
@@ -192,6 +193,7 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
 
     if (keyState[SDL_SCANCODE_SPACE] && theNPC->isGhost){
       runWinScreen(e, quit, keyState, renderer);
+      hasSolved = 1;
     }
 
     if (keyState[SDL_SCANCODE_Q] || *quit){
@@ -204,7 +206,7 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
       SDL_DestroyTexture(BLBox);
       SDL_DestroyTexture(BRBox);
       SDL_DestroyTexture(CharTex);
-      return;
+      return hasSolved;
     }
 
     SDL_RenderClear(renderer);
@@ -218,4 +220,5 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
     //Update Screen
     SDL_RenderPresent(renderer);
   }
+  return 0;
 }

@@ -114,6 +114,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     SDL_Rect collide;
     SDL_Rect convCollide;
     int hasCollided = 0;
+    int hasSolved = 0;
     //Enter Game Loop
     while(!(*quit)) {
         //SDL time and delta value
@@ -149,15 +150,19 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
         //Talk to an NPC
         if (keyState[SDL_SCANCODE_X] && discussbool)
-            enter_discussion(e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
+            hasSolved = enter_discussion(e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
 
         // Quit may have changed during the dialogue, so it's best to check 
         if (*quit) {
-            std::fstream save;
-            save.open("save.txt", std::fstream::out);
-            save << "Here will be the seed\n" << player->positionPNG.x << "\n" << player->positionPNG.y << "\n";
-            save << itemList[0] << "\n" << itemList[1] << "\n" << itemList[2] << "\n" << itemList[3] << "\n";
-            save.close();
+            if (hasSolved == 0) {
+                std::fstream save;
+                save.open("save.txt", std::fstream::out);
+                save << "Here will be the seed\n" << player->positionPNG.x << "\n" << player->positionPNG.y << "\n";
+                save << itemList[0] << "\n" << itemList[1] << "\n" << itemList[2] << "\n" << itemList[3] << "\n";
+                save.close();
+            } else {
+                remove("save.txt");
+            }
             return;
         }
 
