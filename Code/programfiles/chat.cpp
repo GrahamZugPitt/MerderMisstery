@@ -1,5 +1,23 @@
+#include <iostream>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <string>
+#include <cstring>
+#include <sstream>
+#include <unistd.h>
+#include <arpa/inet.h>
+
 #include "chat.hpp"
 #include "main_helper.hpp"
+#include "Users.h"
+
+using namespace std;
 
 // The Chat screen template
 const std::string chatScreenPath = "Art/Chat/chat_template.png";
@@ -59,7 +77,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
   }
 
   //initialize messages from server into serverMessageRect
-  update_messages(renderer);
+  update_messages(renderer, "");
 
   //initialize user input
   initialize_input(renderer);
@@ -83,11 +101,94 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
   //Enable text input
   SDL_StartTextInput();
 
+  //Adding Client Code Initialization
+  int sockfd;
+  struct addrinfo hints, *servinfo, *p;
+  struct timeval tv;
+  int rv;
+  //char s[INET6_ADDRSTRLEN];
+  fd_set master;
+  fd_set temp;
+
+  tv.tv_sec = 0;
+
+  FD_ZERO(&master);
+  FD_ZERO(&temp);
+  //FD_SET(sockfd, &master);
+
+  User this_user;
+
+  memset(&hints, 0, sizeof hints);
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+
+  //This will be subject to change with the username password thing hostname page
+  //First string is the host name and second is the port number
+  if ((rv = getaddrinfo("colton-VirtualBox", "9034", &hints, &servinfo)) != 0){
+    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+    return;
+  }
+
+  for(p = servinfo; p != NULL; p = p->ai_next){
+    if((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+      perror("client: socket");
+      continue;
+    }
+    if(connect(sockfd, p->ai_addr, p->ai_addrlen) == -1){
+      close(sockfd);
+      perror("client connect");
+      continue;
+    }
+    break;
+  }
+
+  if(p == NULL){
+    fprintf(stderr, "client: failed to connect\n");
+    return;
+  }
+
+  freeaddrinfo(servinfo);
+
+  //commandline username and password until front end is up
+  while(true){
+    string username;
+    cout << "\nEnter your username: ";
+    cin >> username;
+
+    string password;
+    cout << "\nEnter your password: ";
+    cin >> password;
+
+    //find the usernmae in the database and make sure it's valid
+    this_user = this_user.find_user(username);
+    if(this_user.get_username().compare(username) != 0){
+      cout << "\nSorry, this username does not exist\n";
+      continue;
+    }
+
+    if(this_user.check_password(username, password) == false){
+      cout << "\nSorry, your password is incorrect\n";
+      continue;
+    }
+    else{
+      break;
+    }
+  }
+
+  FD_SET(sockfd, &master);
+
+  //info to send and receive data
+  char buf[4096];
+  FD_SET(sockfd, &master);
+
+  string text;
+
   //Wait for user to exit chat
   while (inChat == true && !(*quit)) {
 
     //The rerender text flag
     bool renderText = false;
+    bool send_text = false;
 
     while (SDL_PollEvent(&e) != 0) {
 
@@ -105,10 +206,12 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
         //Handle 'sending' text by pressing enter or return
         else if(e.key.keysym.sym == SDLK_RETURN) {
           // here is where the 'sending' to the file will happen
-          inputText=" ";
+          //inputText=" ";
           renderText = true;
-          std::cout << "Input was 'sent'\n";
-
+          send_text = true;
+          text = inputText;
+          inputText = "";
+          //std::cout << "Input was 'sent': " << text << "\n";
         }
         //Handle copy
         else if(e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL) {
@@ -127,6 +230,36 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
           //Append character
           inputText += e.text.text;
           renderText = true;
+        }
+      }
+    }
+
+    temp = master;
+    select(sockfd+1, &temp, nullptr, nullptr, &tv);
+
+
+    if (FD_ISSET(sockfd, &temp)){ //if(text.size() > 0){
+      //cout << "also got here before the seg" << endl;
+      memset(&buf, 0, sizeof buf);
+      int bytesReceived = recv(sockfd, buf, 4096, 0);//this guy blocks until it receives from the server
+      if(bytesReceived > 0){
+        text = string(buf, 0, bytesReceived);
+        renderText = true;
+        //cout << string(buf, 0, bytesReceived);
+      }
+      else{
+        break;
+      }
+    }
+    if (send_text){ 
+      if(text.size() > 0){
+        text = this_user.get_username() + ": " + text;
+
+        int sendResult = send(sockfd, text.c_str(), text.size() + 1, 0);
+        send_text = false;
+
+        if(sendResult <= 0){
+          break;
         }
       }
     }
@@ -153,9 +286,9 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
         blankRect.w = textW; // controls the width of the rect
 
       //update messages from server
-      update_messages(renderer);
+      update_messages(renderer, text);
       update_render(renderer);
-
+      
       SDL_RenderDrawRect(renderer, &blankRect);
       SDL_RenderFillRect(renderer, &blankRect);
       SDL_RenderPresent(renderer);
@@ -210,17 +343,11 @@ void initialize_input(SDL_Renderer* renderer){
   inputRect.h = textH; //113; // controls the height of the rect
 } //end initialize_input
 
-void update_messages(SDL_Renderer* renderer){
+void update_messages(SDL_Renderer* renderer, string textFromServer){
   //Read in data structure from the server, Colton ;)
   //Need to make sure to append \n (new line) to the end of each message so that
-  //it reads in like the example text below
 
   //take past messages from server and make them a surface --> texture
-  textFromServer = "User1: this is from the server kinda but not really "\
-   "becuaase i am just typing a bunch of shit to try and see if the text will "\
-   "wrap to the next line \nUser2: Thats dope! \nUser3: Rad! \nUser4: The cooliest"\
-   "\nUser5: The cooliest \nUser6: The cooliest \nUser7: The cooliest \nUser8: The cooliest";
-   /////// THIS ABOVE STRING CAN BE REPLACED BY A STRING READING FILE INPUT FROM THE SERVER////////
 
   //convert server text into 'message' char needed for TTF_RenderText_Blended_Wrapped
   char message[textFromServer.size() + 1];
