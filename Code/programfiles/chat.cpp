@@ -159,7 +159,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
     cout << "\nEnter your password: ";
     cin >> password;
 
-    //find the usernmae in the database and make sure it's valid
+    //find the username in the database and make sure it's valid
     this_user = this_user.find_user(username);
     if(this_user.get_username().compare(username) != 0){
       cout << "\nSorry, this username does not exist\n";
@@ -174,8 +174,6 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
       break;
     }
   }
-
-  FD_SET(sockfd, &master);
 
   //info to send and receive data
   char buf[4096];
@@ -238,19 +236,19 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
     select(sockfd+1, &temp, nullptr, nullptr, &tv);
 
 
+    //if the socket has information to receive
     if (FD_ISSET(sockfd, &temp)){ //if(text.size() > 0){
-      //cout << "also got here before the seg" << endl;
       memset(&buf, 0, sizeof buf);
       int bytesReceived = recv(sockfd, buf, 4096, 0);//this guy blocks until it receives from the server
       if(bytesReceived > 0){
         text = string(buf, 0, bytesReceived);
         renderText = true;
-        //cout << string(buf, 0, bytesReceived);
       }
       else{
         break;
       }
     }
+    //if the user has pressed enter
     if (send_text){ 
       if(text.size() > 0){
         text = this_user.get_username() + ": " + text;
@@ -344,8 +342,6 @@ void initialize_input(SDL_Renderer* renderer){
 } //end initialize_input
 
 void update_messages(SDL_Renderer* renderer, string textFromServer){
-  //Read in data structure from the server, Colton ;)
-  //Need to make sure to append \n (new line) to the end of each message so that
 
   //take past messages from server and make them a surface --> texture
 
