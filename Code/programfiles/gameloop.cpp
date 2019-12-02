@@ -82,7 +82,7 @@ void init(NPC *npcs, WorldObject *worldObjects, SDL_Renderer *renderer){
   npcs[random].ghostThisNPC();
 }
 
-void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan, int player_x, int player_y){
+void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan, int player_x, int player_y, int itemList[4]){
     // Initialize world texture, player texture, and camera
     SDL_Texture *bg = loadFiles(mapImgPath, renderer);
     SDL_Texture *interactPromptingTex = loadFiles(interactImgPath, renderer);
@@ -109,7 +109,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     RedBuilding rBuilding;    // North  (Murder *Ominous music playing*)
   //PurpleBuilding pBuilding; // Central (Courtyard)
     
-    int itemList[] = {0, 0, 0, 0};
 
     // Collision dectction variables
     SDL_Rect collide;
@@ -157,6 +156,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
             std::fstream save;
             save.open("save.txt", std::fstream::out);
             save << "Here will be the seed\n" << player->positionPNG.x << "\n" << player->positionPNG.y << "\n";
+            save << itemList[0] << "\n" << itemList[1] << "\n" << itemList[2] << "\n" << itemList[3] << "\n";
             save.close();
             return;
         }

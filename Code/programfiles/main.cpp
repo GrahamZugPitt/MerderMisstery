@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
     while(!quit){
       int initial_x = 2275;
       int initial_y = 136;
+      int itemList[] = {0, 0, 0, 0};
       menuloop(e, &quit, keyState, renderer);
 
       std::fstream save;
@@ -46,10 +47,17 @@ int main(int argc, char *argv[]) {
         std::string in_str = "";
         std::getline(save, in_str);  // First read is for seed
         std::getline(save, in_str);  // Second read is for location.x
-        
         initial_x = std::stoi(in_str);
-        std::getline(save, in_str);  // Second read is for location.y
+        std::getline(save, in_str);  // Third read is for location.y
         initial_y = std::stoi(in_str);
+        std::getline(save, in_str);  // Third read is for item 1
+        itemList[0] = std::stoi(in_str);
+        std::getline(save, in_str);  // Third read is for item 2
+        itemList[1] = std::stoi(in_str);
+        std::getline(save, in_str);  // Third read is for item 3
+        itemList[2] = std::stoi(in_str);
+        std::getline(save, in_str);  // Third read is for item 4
+        itemList[3] = std::stoi(in_str);
       }
       save.close();
 
@@ -59,7 +67,7 @@ int main(int argc, char *argv[]) {
         // Please don't ask why I'm handling this so poorly
         // You weren't there
         // You wouldn't understand
-        gameloop(e, &quit, keyState, renderer, farnan, initial_x, initial_y);
+        gameloop(e, &quit, keyState, renderer, farnan, initial_x, initial_y, itemList);
       }
     }
 
