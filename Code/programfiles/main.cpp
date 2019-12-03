@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
         // Please don't ask why I'm handling this so poorly
         // You weren't there
         // You wouldn't understand
-        gameloop(e, &quit, keyState, renderer, farnan, initial_x, initial_y, itemList);
+        gameloop(e, &quit, keyState, renderer, farnan, seed, initial_x, initial_y, itemList);
       }
     }
 
