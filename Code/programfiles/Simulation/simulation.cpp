@@ -1,228 +1,136 @@
-#include "event.cpp"
-#include "EventArray.cpp"
-#include <cstdlib>
-#include <ctime>
+#ifndef __SIMCPP__
+#define __SIMCPP__
 
+#include "simulation.hpp"
 
-const int SEED = 1;
-const int EVENT_MODE = 0;
-const int DEBUG_MODE = 0;
-const int OBSERVATION_MODE = 0;
-const int HEARSAY_MODE = 0;
-const int TOWN_SIZE = 12;
-const int LOCATION = 5;
-const int SELFCONTROL = 40;
-const int MURDER_MODE = 1;
-const int M = 982451653;
-const int MULTIPLIER = 373587883;
-int seed = 1; 
+int rand_seed = 1;
 int CLOCK = 0;
 
-enum relationshipDelta{
-	HATE = -75,
-	SDISLIKE = -60,
-	DESPISE = -30,
-	DISLIKE = -25,
-	DISCOMFORT = -10,
-	NEUTRAL = 0,
-	HAPPY = 5,
-	LIKE = 10,
-	LOVE = 25,
-};
-
-enum observer{
-	SUBJECT,
-	FIRSTHAND,
-	SECONDHAND,
-};
-
-enum location{
-	TOWN_HALL,
-	FACTORY,
-	MARKET,
-	INN,
-	CHURCH,
-};
-enum role{
-	MAYOR,
-	PRIEST,
-	WORKER,
-	MERCHANT,
-	POLICE,
-	INNKEEPER
-};
-enum trait{
-	LUST,
-	DISLOYALTY,
-	GREED,
-	WRATH,
-	DISHONESTY,
-	DEFAULT,
-	HL,
-};
-enum event{
-	CDATE, //0
-	INTRODUCE, //1
-	SOCIALIZE, //2
-	ENVY, //3
-	LIE, //4
-	ASKFORDISTANCE, //5
-	FLIRT, //6
-	DATE, //7
-	VERBALFIGHT, //8
-	ROB, //9
-	PHYSICALFIGHT, //10
-	SEX, //11
-	BREAKUP, //12
-};
-
-
-// Code for the custom random number generator that's platfor independent
-
+// Code for the custom random number generator that's hopefully platform independent
 int z_rand(){
-	seed = (seed*MULTIPLIER + 1) % M;
-	if(seed < 0)
-		seed = seed*-1;		
-	return seed;
+	rand_seed = (rand_seed*MULTIPLIER + 1) % M;
+	if(rand_seed < 0)
+		rand_seed = rand_seed*-1;
+	return rand_seed;
 }
 
-class NPClite{
-
-public:
-	std::string name;
-	int mood;
-	EventArray memories;
-	EventArray observations;
-	EventArray hearSay;
-	int relationships[TOWN_SIZE];
-	int personality[5];
-	int schedule[12];
-	int murderiness;
-	int role;
-	bool didMurder;
-	bool isDead;
-	bool lockDown;
-
-	NPClite(){
-		name = "";
-		role = -1;
-		for(int i = 0; i < TOWN_SIZE; i++)
-			relationships[i] = 0;
-		for(int i = 0; i < 5; i++){
-			personality[i] = (z_rand() % 101);
-		}
-		murderiness = 0;
-		mood = 0;
-		didMurder = false;
-		isDead = false;
-		lockDown = false;
-	}	
-
-	NPClite(std::string name, int role){ //constructor
-		this->name = name;
-		this->role = role;
-		for(int i = 0; i < TOWN_SIZE; i++)
-			relationships[i] = 0;
-		for(int i = 0; i < 5; i++){
-			personality[i] = (z_rand() % 101);
-		}
-		murderiness = 10;
-		mood = 0;
-		didMurder = false;
-		isDead = false;
-		lockDown = false;
-
-		switch(role){ //assign schedules
-			case MAYOR:
-				schedule[0] = MARKET;
-				schedule[1] = MARKET;
-				schedule[2] = FACTORY;
-				schedule[3] = INN;
-				schedule[4] = TOWN_HALL;
-				schedule[5] = MARKET;
-				schedule[6] = CHURCH;
-				schedule[7] = INN;
-				schedule[8] = CHURCH;
-				schedule[9] = MARKET;
-				schedule[10] = TOWN_HALL;
-				schedule[11] = MARKET;
-				break;
-			case PRIEST:
-				schedule[0] = FACTORY;
-				schedule[1] = MARKET;
-				schedule[2] = FACTORY;
-				schedule[3] = INN;
-				schedule[4] = TOWN_HALL;
-				schedule[5] = MARKET;
-				schedule[6] = CHURCH;
-				schedule[7] = INN;
-				schedule[8] = CHURCH;
-				schedule[9] = MARKET;
-				schedule[10] = TOWN_HALL;
-				schedule[11] = MARKET;
-				break;
-			case WORKER:
-				schedule[0] = FACTORY;
-				schedule[1] = MARKET;
-				schedule[2] = FACTORY;
-				schedule[3] = INN;
-				schedule[4] = TOWN_HALL;
-				schedule[5] = MARKET;
-				schedule[6] = FACTORY;
-				schedule[7] = INN;
-				schedule[8] = CHURCH;
-				schedule[9] = MARKET;
-				schedule[10] = TOWN_HALL;
-				schedule[11] = INN;
-				break;
-			case MERCHANT:
-				schedule[0] = MARKET;
-				schedule[1] = MARKET;
-				schedule[2] = INN;
-				schedule[3] = INN;
-				schedule[4] = MARKET;
-				schedule[5] = MARKET;
-				schedule[6] = INN;
-				schedule[7] = INN;
-				schedule[8] = CHURCH;
-				schedule[9] = MARKET;
-				schedule[10] = TOWN_HALL;
-				schedule[11] = MARKET;
-				break;
-			case POLICE:
-				schedule[0] = FACTORY;
-				schedule[1] = MARKET;
-				schedule[2] = FACTORY;
-				schedule[3] = INN;
-				schedule[4] = TOWN_HALL;
-				schedule[5] = MARKET;
-				schedule[6] = FACTORY;
-				schedule[7] = INN;
-				schedule[8] = CHURCH;
-				schedule[9] = MARKET;
-				schedule[10] = TOWN_HALL;
-				schedule[11] = INN;
-				break;
-			case INNKEEPER:
-				schedule[0] = MARKET;
-				schedule[1] = MARKET;
-				schedule[2] = INN;
-				schedule[3] = INN;
-				schedule[4] = MARKET;
-				schedule[5] = MARKET;
-				schedule[6] = INN;
-				schedule[7] = INN;
-				schedule[8] = CHURCH;
-				schedule[9] = MARKET;
-				schedule[10] = TOWN_HALL;
-				schedule[11] = INN;
-				break;
-
-		}
-
+// The NPClite constructors
+NPClite::NPClite(){
+	name = "";
+	role = -1;
+	for(int i = 0; i < TOWN_SIZE; i++)
+		relationships[i] = 0;
+	for(int i = 0; i < 5; i++){
+		personality[i] = (z_rand() % 101);
 	}
+	murderiness = 0;
+	mood = 0;
+	didMurder = false;
+	isDead = false;
+	lockDown = false;
+}
 
-};
+NPClite::NPClite(std::string name, int role){ //constructor
+	this->name = name;
+	this->role = role;
+	for(int i = 0; i < TOWN_SIZE; i++)
+		relationships[i] = 0;
+	for(int i = 0; i < 5; i++){
+		personality[i] = (z_rand() % 101);
+	}
+	murderiness = 10;
+	mood = 0;
+	didMurder = false;
+	isDead = false;
+	lockDown = false;
+
+	switch(role){ //assign schedules
+		case MAYOR:
+			schedule[0] = MARKET;
+			schedule[1] = MARKET;
+			schedule[2] = FACTORY;
+			schedule[3] = INN;
+			schedule[4] = TOWN_HALL;
+			schedule[5] = MARKET;
+			schedule[6] = CHURCH;
+			schedule[7] = INN;
+			schedule[8] = CHURCH;
+			schedule[9] = MARKET;
+			schedule[10] = TOWN_HALL;
+			schedule[11] = MARKET;
+			break;
+		case PRIEST:
+			schedule[0] = FACTORY;
+			schedule[1] = MARKET;
+			schedule[2] = FACTORY;
+			schedule[3] = INN;
+			schedule[4] = TOWN_HALL;
+			schedule[5] = MARKET;
+			schedule[6] = CHURCH;
+			schedule[7] = INN;
+			schedule[8] = CHURCH;
+			schedule[9] = MARKET;
+			schedule[10] = TOWN_HALL;
+			schedule[11] = MARKET;
+			break;
+		case WORKER:
+			schedule[0] = FACTORY;
+			schedule[1] = MARKET;
+			schedule[2] = FACTORY;
+			schedule[3] = INN;
+			schedule[4] = TOWN_HALL;
+			schedule[5] = MARKET;
+			schedule[6] = FACTORY;
+			schedule[7] = INN;
+			schedule[8] = CHURCH;
+			schedule[9] = MARKET;
+			schedule[10] = TOWN_HALL;
+			schedule[11] = INN;
+			break;
+		case MERCHANT:
+			schedule[0] = MARKET;
+			schedule[1] = MARKET;
+			schedule[2] = INN;
+			schedule[3] = INN;
+			schedule[4] = MARKET;
+			schedule[5] = MARKET;
+			schedule[6] = INN;
+			schedule[7] = INN;
+			schedule[8] = CHURCH;
+			schedule[9] = MARKET;
+			schedule[10] = TOWN_HALL;
+			schedule[11] = MARKET;
+			break;
+		case POLICE:
+			schedule[0] = FACTORY;
+			schedule[1] = MARKET;
+			schedule[2] = FACTORY;
+			schedule[3] = INN;
+			schedule[4] = TOWN_HALL;
+			schedule[5] = MARKET;
+			schedule[6] = FACTORY;
+			schedule[7] = INN;
+			schedule[8] = CHURCH;
+			schedule[9] = MARKET;
+			schedule[10] = TOWN_HALL;
+			schedule[11] = INN;
+			break;
+		case INNKEEPER:
+			schedule[0] = MARKET;
+			schedule[1] = MARKET;
+			schedule[2] = INN;
+			schedule[3] = INN;
+			schedule[4] = MARKET;
+			schedule[5] = MARKET;
+			schedule[6] = INN;
+			schedule[7] = INN;
+			schedule[8] = CHURCH;
+			schedule[9] = MARKET;
+			schedule[10] = TOWN_HALL;
+			schedule[11] = INN;
+			break;
+	}
+}
 
 //converts the integer value associated with an event to a string
 std::string eventConverter(int event){
@@ -554,7 +462,7 @@ void makeUpCoverUp(NPClite* town, int murderer, int victim){
 		if(numberOfLies > 3)
 			numberOfLies = 3;
 	for(int i = 0; i < numberOfLies; i++){
-		int npc1 = findRandomDisliked(town,murderer,victim);	
+		int npc1 = findRandomDisliked(town,murderer,victim);
 		int lieEvent = (z_rand() % 4) + 1;
 		switch(lieEvent){
 			case 1: lieEvent = VERBALFIGHT; break;
@@ -562,12 +470,12 @@ void makeUpCoverUp(NPClite* town, int murderer, int victim){
 			case 3: lieEvent = ROB; break;
 			case 4: lieEvent = ASKFORDISTANCE; break;
 		}
-		
+
 		int clockModifier = z_rand() % ((CLOCK % 4) + 1);
 		if(clockModifierMeta == -1)
 			clockModifierMeta = clockModifier;
 		if(clockModifierMeta == clockModifier)
-			clockModifier++;	
+			clockModifier++;
 
 		Event* lie = new Event(town[victim].name, town[npc1].name, lieEvent, CLOCK - clockModifier, town[npc1].schedule[(CLOCK - clockModifier)%12], FIRSTHAND);
 	town[murderer].observations.add(lie);
@@ -584,7 +492,7 @@ Event* makeUpLie(NPClite* town){
 		case 4: lieEvent = ROB; break;
 		case 5: lieEvent = SEX; break;
 	}
-		
+
 	int npc1 = z_rand() % TOWN_SIZE;
 	int npc2 = z_rand() % TOWN_SIZE;
 	while(npc1 == npc2){
@@ -713,11 +621,11 @@ void chooseAction(NPClite* town, int firstNPC, int secondNPC){
 	int lastEvent = getLastInteraction(town,firstNPC,secondNPC)->event;
 	switch(lastEvent){
 		case FLIRT:
-			
+
 			trait = roll(town,firstNPC,HL);
-			if(getLastInteraction(town,firstNPC,secondNPC)->npcName1.compare(town[firstNPC].name) != 0 && trait == DISHONESTY){	
+			if(getLastInteraction(town,firstNPC,secondNPC)->npcName1.compare(town[firstNPC].name) != 0 && trait == DISHONESTY){
 				askForDistance(town,firstNPC,secondNPC);
-				return;				
+				return;
 			}
 			if(trait == LUST && (!isDating(town,firstNPC) || town[firstNPC].personality[DISLOYALTY] > LOVE) && (!isDating(town,secondNPC) || town[secondNPC].personality[DISLOYALTY] > LOVE)){
 				sex(town,firstNPC,secondNPC);
@@ -825,7 +733,7 @@ void interact(NPClite* town){
 	}
 	for(int i = 0; i < TOWN_SIZE; i++){
 		towniesByLocation[i] = town[i].schedule[CLOCK%12];
-	}	
+	}
 	if(DEBUG_MODE)
 		std::cout << "\n";
 	for(int i = 0; i < LOCATION; i++){
@@ -863,12 +771,12 @@ bool didMurder(NPClite* town){
 					town[i].didMurder = true;
 					town[j].isDead = true;
 					makeUpCoverUp(town,i,j);
-					
+
 					if(MURDER_MODE){
 					std::cout << town[i].name << " is the murderer. \n \n\n\n\n\n\n\n\n\n\n\n\n";
 					std::cout << town[j].name << " is dead. \n";
 					}
-				
+
 				return true;
 			}
 		}
@@ -877,7 +785,7 @@ bool didMurder(NPClite* town){
 }
 void simulation(NPClite* town, int givenSeed) {
 	CLOCK = 0;
-	seed = givenSeed;
+	rand_seed = givenSeed;
 	if(SEED)
 		std::cout << "Seed: " << givenSeed << "\n";
 
@@ -917,3 +825,5 @@ void simulation(NPClite* town, int givenSeed) {
 		}
 	}
 }
+
+#endif

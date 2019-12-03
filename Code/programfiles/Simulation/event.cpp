@@ -1,8 +1,11 @@
 /*
 **
 **	Event class
-**	
-*/ 
+**
+*/
+
+#ifndef __EVENT__
+#define __EVENT__
 
 #include <iostream>
 #include <fstream>
@@ -26,7 +29,7 @@ class Event{
 			location = place;
 			isObserver = observer;
 		}
-		
+
 		Event(Event* e, int observer) {
 			npcName1 = e->npcName1;
 			npcName2 = e->npcName2;
@@ -35,7 +38,7 @@ class Event{
 			location = e->location;
 			isObserver = observer;
 		}
-		
+
 		Event(Event* e, int timeHeard, int observer) {
 			npcName1 = e->npcName1;
 			npcName2 = e->npcName2;
@@ -44,7 +47,7 @@ class Event{
 			location = e->location;
 			isObserver = observer;
 		}
-		
+
 		Event() { //IMPORTANT: Do not name an Npc "first," or "second," as the game may break.
 			time = 0;
 			npcName1 = "first";
@@ -52,7 +55,7 @@ class Event{
 			event = 0;
 			isObserver = false;
 		}
-		
+
 		void printEvent() {
 			std::string info = "";
 			info += npcName1;
@@ -70,8 +73,8 @@ class Event{
 			info += "\n";
 			std::cout << info;
 		}
-		
+
 		~Event() {}
 };
 
-
+#endif
