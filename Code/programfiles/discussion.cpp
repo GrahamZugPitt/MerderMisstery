@@ -1,5 +1,7 @@
+#ifndef __DISCUSSCPP__
+#define __DISCUSSCPP__
+
 #include "discussion.hpp"
-#include "main_helper.hpp"
 
 std::string discussionBoxPath = "Art/DiscussionImages/DiscussionBox.png";
 std::string selectedBoxPath = "Art/DiscussionImages/TextBoxSelected.png";
@@ -219,3 +221,5 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
     SDL_RenderPresent(renderer);
   }
 }
+
+#endif
