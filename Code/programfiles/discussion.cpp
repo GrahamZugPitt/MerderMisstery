@@ -30,36 +30,20 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
   SDL_Rect BRBoxRect = {br_x + 10, br_y, boxw - 20, boxh};
   SDL_Rect NameBoxRect = {880 - (nameboxw / 2), 300, nameboxw, nameboxh};
 
-  int selected = 1;
-
-
-  bool inDiscussion = true;
-
-  //Wait for user to exit chat
-  while (SDL_PollEvent(&e) != 0 || inDiscussion)
-  {
-    //Quit application
-    if(e.type == SDL_QUIT){
-        *quit = true;
-        return;
-    }
 
     if ((keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]) && theNPC->isGhost){
       runWinScreen(e, quit, keyState, renderer);
     }
 
-    // Earmark for later
-    if (keyState[SDL_SCANCODE_Q] || *quit){
-      SDL_DestroyTexture(discussionBoxTex);
-      SDL_DestroyTexture(selectedBoxTex);
-      SDL_DestroyTexture(deselectedBoxTex);
-      SDL_DestroyTexture(playerTex);
-      SDL_DestroyTexture(TLBox);
-      SDL_DestroyTexture(TRBox);
-      SDL_DestroyTexture(BLBox);
-      SDL_DestroyTexture(BRBox);
-      SDL_DestroyTexture(CharTex);
-      return;
-    }
+    SDL_RenderClear(renderer);
+
+    renderTexture(renderer, discussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
+    draw_peoples(renderer, playerTex, npcTex);
+    draw_boxes(selected, renderer, selectedBoxTex, deselectedBoxTex, w, h);
+    draw_text(renderer, TLBox, TLBoxRect, TRBox, TRBoxRect, BLBox, BLBoxRect, BRBox, BRBoxRect);
+    SDL_RenderCopy(renderer, CharTex, NULL, &NameBoxRect);
+
+    //Update Screen
+    SDL_RenderPresent(renderer);
   }
 }

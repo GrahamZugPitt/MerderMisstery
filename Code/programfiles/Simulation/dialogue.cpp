@@ -31,6 +31,12 @@ SDL_Texture* selectedBoxTex;
 SDL_Texture* deselectedBoxTex;
 SDL_Texture* playerTex;
 SDL_Texture* npcTex;
+SDL_Texture* CharTex;
+
+SDL_Rect NameBoxRect = {880 - (nameboxw / 2), 300, nameboxw, nameboxh};
+
+SDL_Color White = {255, 255, 255};
+SDL_Color Yellow = {255, 255, 0};
 
 std::vector<std::string> multiple_answers_vec;
 int answers_vec_size = 0;
@@ -107,14 +113,14 @@ void draw_peoples(SDL_Renderer *renderer, SDL_Texture *playerTex, SDL_Texture *n
   SDL_RenderCopy(renderer, npcTex, &crop, &pos);
 }
 
-void draw_boxes(int selectnum, SDL_Renderer *renderer, SDL_Texture *selected, SDL_Texture *deselected, int w, int h){
+void draw_boxes(int selectnum, SDL_Renderer *renderer, SDL_Texture *selected, SDL_Texture *deselected, int w, int h, bool bottom){
   if(selectnum != 1)
     renderTexture(renderer, deselected, useless, tl_x, tl_y, boxw, boxh, false);
   if(selectnum != 2)
     renderTexture(renderer, deselected, useless, tr_x, tr_y, boxw, boxh, false);
-  if(selectnum != 3)
+  if(selectnum != 3 && bottom)
     renderTexture(renderer, deselected, useless, bl_x, bl_y, boxw, boxh, false);
-  if(selectnum != 4)
+  if(selectnum != 4 && bottom)
     renderTexture(renderer, deselected, useless, br_x, br_y, boxw, boxh, false);
 
   switch(selectnum){
@@ -890,8 +896,14 @@ void multiple_answers_keyhandler(const Uint8 *keyState){
 int key_handler(const Uint8 *keyState, int talkingToNum){
   // If you wanna quit, we're out, no problem
   keyState = SDL_GetKeyboardState(NULL);
-  if (keyState[SDL_SCANCODE_Q])
+  if (keyState[SDL_SCANCODE_Q]){
+    SDL_DestroyTexture(discussionBoxTex);
+    SDL_DestroyTexture(selectedBoxTex);
+    SDL_DestroyTexture(deselectedBoxTex);
+    SDL_DestroyTexture(playerTex);
+    SDL_DestroyTexture(CharTex);
     return -1;
+  }
 
   if(dialogueState == INITIAL_FOUR){
     init_four_keyhandler(keyState, talkingToNum);
@@ -921,12 +933,19 @@ int key_handler(const Uint8 *keyState, int talkingToNum){
   return 1;
 }
 
-// Draws the model to the output terminal. Used for debugging purposes.
-void crude_draw_handler(){
-  // I was specifically told to not do this tee-hee
-  system("clear");
+// Draws the model to the screen.
+void draw_handler(SDL_Renderer *renderer){
+  SDL_RenderClear(renderer);
+  // Draw the menu box, detective, npc, and npc's name every time for sure
+  renderTexture(renderer, discussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
+  draw_peoples(renderer, playerTex, npcTex);
 
+  // Get the NPC's name on the screen (also for sure)
+  SDL_RenderCopy(renderer, CharTex, NULL, &NameBoxRect);
+
+  // Then the conditional stuff
   if(dialogueState == INITIAL_FOUR){
+    draw_boxes(selected, renderer, selectedBoxTex, deselectedBoxTex, w, h, true);
     printf("Selected is: %d\n", selected);
     printf("1: %s\n", TLString.c_str());
     printf("2: %s\n", TRString.c_str());
@@ -934,6 +953,7 @@ void crude_draw_handler(){
     printf("4: %s\n", BRString.c_str());
   }
   else if(dialogueState == WHAT_HAVE_YOU_TWO){
+    draw_boxes(selected, renderer, selectedBoxTex, deselectedBoxTex, w, h, false);
     printf("Selected is: %d\n", selected);
     printf("1: %s\n", TLString.c_str());
     printf("2: %s\n", TRString.c_str());
@@ -945,6 +965,9 @@ void crude_draw_handler(){
     printf("On page %d of %d\n", multiple_answers_page + 1, answers_vec_size);
     printf("ResponseString: %s\n", ResponseString.c_str());
   }
+
+  //Update Screen
+  SDL_RenderPresent(renderer);
 }
 
 // The function that gets called when it's time to get down to work for reals
@@ -967,13 +990,16 @@ void dialogue(NPClite* our_town, SDL_Event e, bool *quit, const Uint8 *keyState,
   TTF_Font *TNR = TTF_OpenFont("Art/Font/times-new-roman.ttf", 24); // Opens the font and sets the size
   if(!TNR)
     printf("TTF_OpenFont error: %s\n", TTF_GetError());
-  SDL_Color White = {255, 255, 255};
-  SDL_Color Yellow = {255, 255, 0};
-
-  SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
 
 	// Create the surfaces for the text messages
   SDL_Surface *TLsurfaceMessage, *TRsurfaceMessage, *BLsurfaceMessage, *BRsurfaceMessage, *CharNameSurface;
+
+  // Set up the name texture as well
+  CharNameSurface = TTF_RenderText_Solid(TNR, theNPC->getName().c_str(), Yellow);
+  CharTex = SDL_CreateTextureFromSurface(renderer, CharNameSurface);
+
+  SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
+
 
 	dialogueState = INITIAL_FOUR;
 
@@ -992,7 +1018,7 @@ void dialogue(NPClite* our_town, SDL_Event e, bool *quit, const Uint8 *keyState,
       if(shouldIquit == -1) return; // -1 means yes, I should quit
 
       // DRAW HANDLER
-      crude_draw_handler();
+      draw_handler(renderer);
     }
 	}
 }
