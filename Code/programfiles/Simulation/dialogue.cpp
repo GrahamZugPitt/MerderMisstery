@@ -24,7 +24,7 @@ int nameboxh = 50;
 int boxw, boxh, width_offset, height_offset, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, w, h, selected_x, selected_y, multiple_answers_page;
 int selected = 1;
 NPClite *town;
-bool triggerPressed = false;
+bool triggerPressed_dialogue = false;
 
 SDL_Texture* discussionBoxTex;
 SDL_Texture* selectedBoxTex;
@@ -779,8 +779,8 @@ void init_four_keyhandler(const Uint8 *keyState, int talkingToNum){
   // Pick one of the boxes
   if ((keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN])){
     // Need to only register space / enter once per press
-    if(!triggerPressed){
-      triggerPressed = true;
+    if(!triggerPressed_dialogue){
+      triggerPressed_dialogue = true;
       // The first two options just dumps you into an answer
       if(selected == 1){
         int npc = getNPC(); // Gives you the dead NPC
@@ -816,7 +816,7 @@ void init_four_keyhandler(const Uint8 *keyState, int talkingToNum){
     }
   }
   else{
-    triggerPressed = false;
+    triggerPressed_dialogue = false;
   }
 }
 
@@ -833,8 +833,8 @@ void what_two_keyhandler(const Uint8 *keyState, int talkingToNum){
   }
 
   if (keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]){
-    if(!triggerPressed){
-      triggerPressed = true;
+    if(!triggerPressed_dialogue){
+      triggerPressed_dialogue = true;
       // Both are multi-page answers
       if(selected == 1){
         dialogueState = MULTIPLE_ANSWERS;
@@ -869,7 +869,7 @@ void what_two_keyhandler(const Uint8 *keyState, int talkingToNum){
     }
   }
   else{
-    triggerPressed = false;
+    triggerPressed_dialogue = false;
   }
 }
 
@@ -877,10 +877,10 @@ void what_two_keyhandler(const Uint8 *keyState, int talkingToNum){
 void multiple_answers_keyhandler(const Uint8 *keyState){
   keyState = SDL_GetKeyboardState(NULL);
 
-  if(!triggerPressed){
+  if(!triggerPressed_dialogue){
     // Flip through the multiple pages with left and right arrow keys
     if (keyState[SDL_SCANCODE_A] || keyState[SDL_SCANCODE_LEFT]){
-      triggerPressed = true;
+      triggerPressed_dialogue = true;
       if(multiple_answers_page > 0){
          multiple_answers_page--;
          ResponseString = multiple_answers_vec[multiple_answers_page];
@@ -888,7 +888,7 @@ void multiple_answers_keyhandler(const Uint8 *keyState){
     }
 
     if (keyState[SDL_SCANCODE_D] || keyState[SDL_SCANCODE_RIGHT]){
-      triggerPressed = true;
+      triggerPressed_dialogue = true;
       if(multiple_answers_page < answers_vec_size - 1){
         multiple_answers_page++;
         ResponseString = multiple_answers_vec[multiple_answers_page];
@@ -897,14 +897,14 @@ void multiple_answers_keyhandler(const Uint8 *keyState){
 
     // Reset to the main page
     if (keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]){
-      triggerPressed = true;
+      triggerPressed_dialogue = true;
       dialogueState = INITIAL_FOUR;
       TLString = TLString1;
       TRString = TRString1;
     }
   }
   if(!(keyState[SDL_SCANCODE_A] || keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_D] || keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]))
-    triggerPressed = false;
+    triggerPressed_dialogue = false;
 }
 
 // Handles key input for the usual NPC conversation
@@ -933,15 +933,15 @@ int key_handler(const Uint8 *keyState, int talkingToNum){
     // If we're only at the one answer
     keyState = SDL_GetKeyboardState(NULL);
     if (keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]){
-        if(!triggerPressed){
-          triggerPressed = true;
+        if(!triggerPressed_dialogue){
+          triggerPressed_dialogue = true;
           dialogueState = INITIAL_FOUR;
           TLString = TLString1;
           TRString = TRString1;
         }
     }
     else{
-      triggerPressed = false;
+      triggerPressed_dialogue = false;
     }
   }
 
