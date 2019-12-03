@@ -12,13 +12,15 @@ const int ALL_BUTTON_TOP = 618;
 const int ALL_BUTTON_BOTTOM = 532;
 bool chatLoggedIn = false;
 
-void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
+std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
   // Load the title screens
   SDL_Texture* logoScreen = loadFiles(logoImgPath, renderer);
   bool next = false;
 
   int cursor_x;
   int cursor_y;
+
+  std::string seed = "";
 
   //Logo Screen Loop
   while(!next && !(*quit)) {
@@ -47,7 +49,10 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
           //Enter Seed Right-X value: 393
           case 107 ... 393:
             SDL_Delay(300);
-            enter_seed(e, &(*quit), keyState, renderer);
+            seed = enter_seed(e, &(*quit), keyState, renderer);
+            // If the player entered a seed, start the game
+            if(seed.compare("") != 0)
+              next = true;
             SDL_Delay(300);
             std::cout << "Exited Seed Loop\n";
             break;
@@ -96,5 +101,6 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     SDL_Texture* loadScreen = loadFiles(loadImgPath, renderer);
     SDL_RenderCopy(renderer, loadScreen, NULL, NULL);
     SDL_RenderPresent(renderer);
+    return seed;
   }
 }

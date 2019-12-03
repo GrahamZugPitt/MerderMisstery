@@ -34,14 +34,14 @@ int main(int argc, char *argv[]) {
     keyState = SDL_GetKeyboardState(NULL);
 
     while(!quit){
-      menuloop(e, &quit, keyState, renderer);
+      std::string seed = menuloop(e, &quit, keyState, renderer);
 
       if(!quit){
         // During the game, quit will have been set to true
         // Please don't ask why I'm handling this so poorly
         // You weren't there
         // You wouldn't understand
-        gameloop(e, &quit, keyState, renderer, farnan);
+        gameloop(e, &quit, keyState, renderer, farnan, seed);
       }
     }
 
