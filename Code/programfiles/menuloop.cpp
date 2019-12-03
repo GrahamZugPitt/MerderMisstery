@@ -1,6 +1,7 @@
 #include "gameloop.hpp"
 #include "main_helper.hpp"
 #include "chat.hpp"
+#include "chatLogin.hpp"
 #include "seed.hpp"
 #include "credits.hpp"
 
@@ -9,6 +10,7 @@ std::string loadImgPath = "Art/Logo/Loading.png";
 
 const int ALL_BUTTON_TOP = 618;
 const int ALL_BUTTON_BOTTOM = 532;
+bool chatLoggedIn = false;
 
 std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
   // Load the title screens
@@ -78,6 +80,11 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
     // Open Chat room
     if (keyState[SDL_SCANCODE_C]) {
       SDL_Delay(300);
+      if(!chatLoggedIn) {
+        enter_login(e, &(*quit), keyState, renderer);
+        chatLoggedIn=true;
+        std::cout << "Exited Chat Login Loop\n";
+      }
       enter_chat(e, &(*quit), keyState, renderer);
       SDL_Delay(300);
       std::cout << "Exited Chat Loop\n";
