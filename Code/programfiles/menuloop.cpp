@@ -58,7 +58,7 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
               logoScreen = loadFiles(logoImgPath, renderer);
             } else {
               SDL_Delay(300);
-              enter_seed(e, &(*quit), keyState, renderer);
+              seed = enter_seed(e, &(*quit), keyState, renderer);
               SDL_Delay(300);
               std::cout << "Exited Seed Loop\n";
             }
