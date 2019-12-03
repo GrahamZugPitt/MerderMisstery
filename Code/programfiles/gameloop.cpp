@@ -219,7 +219,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
             if (hasSolved == 0) {
                 std::fstream save;
                 save.open("save.txt", std::fstream::out);
-                save << "Here will be the seed\n" << player->positionPNG.x << "\n" << player->positionPNG.y << "\n";
+                save << seed << "\n" << player->positionPNG.x << "\n" << player->positionPNG.y << "\n";
                 save << itemList[0] << "\n" << itemList[1] << "\n" << itemList[2] << "\n" << itemList[3] << "\n";
                 save.close();
             } else {

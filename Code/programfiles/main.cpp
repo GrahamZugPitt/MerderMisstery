@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
       if (save) {
         std::string in_str = "";
         std::getline(save, in_str);  // First read is for seed
+        seed = in_str;
         std::getline(save, in_str);  // Second read is for location.x
         initial_x = std::stoi(in_str);
         std::getline(save, in_str);  // Third read is for location.y

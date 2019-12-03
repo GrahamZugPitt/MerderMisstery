@@ -18,7 +18,6 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
   save.open("save.txt", std::fstream::in);
   if (save) {
     logoImgPath = "Art/Logo/Continue_Screen.png";
-    std::cout << "This is where the new path for the start screen will go\n";
   }
   save.close();
   // Load the title screens
@@ -29,10 +28,10 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
   int cursor_y;
 
   std::string seed = "";
+  SDL_Event nullEvent;
 
   //Logo Screen Loop
   while(!next && !(*quit)) {
-
     while(SDL_PollEvent(&e) != 0) {
       if(e.type == SDL_QUIT) {
         (*quit) = true;
@@ -60,6 +59,9 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
               remove("save.txt");
               logoImgPath = "Art/Logo/Start_Screen.png";
               logoScreen = loadFiles(logoImgPath, renderer);
+              e = nullEvent;
+              save.open("save.txt", std::fstream::in);
+              save.close();
             } else {
               SDL_Delay(300);
               seed = enter_seed(e, &(*quit), keyState, renderer);
@@ -122,4 +124,5 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
     SDL_RenderPresent(renderer);
     return seed;
   }
+  return "";
 }
