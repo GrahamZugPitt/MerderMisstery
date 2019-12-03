@@ -33,6 +33,10 @@ SDL_Texture* playerTex;
 SDL_Texture* npcTex;
 SDL_Texture* CharTex;
 
+TTF_Font *TNR;
+SDL_Surface *surfaceMessage_dialogue;
+SDL_Texture *textureMessage_dialogue;
+
 SDL_Rect NameBoxRect = {880 - (nameboxw / 2), 300, nameboxw, nameboxh};
 
 SDL_Color White = {255, 255, 255};
@@ -53,36 +57,14 @@ std::string BLString;
 std::string BRString;
 std::string ResponseString = "Greetings, Detective.";
 
-// Helpers for my string placement function
-const int charwidth = 10;
-const int charheight = 10;
+const int text_size = 24;
 
 // Render a string to a rectangle onscreen, wrapping around if the text is too long
 int writeString(std::string message, SDL_Rect insideRect, SDL_Renderer *renderer){
-	// First make sure it'll fit inside the insideRect
-	if(((insideRect.w / charwidth) * (insideRect.h / charheight)) < message.length() * charwidth) return -1;
-	// Otherwise, create lists to render the whole thing
-	int numTexs = insideRect.h / charheight;
-	int texW = insideRect.w / charwidth;
-	char dividedStrings[texW][numTexs];
-	SDL_Surface *stringSurfaces[numTexs]; // Yes, an array of SDL_Surface pointers
-	SDL_Texture *stringTextures[numTexs]; // And texture pointers
-	SDL_Rect stringRects[numTexs]; // But just rects
-
-	// Fill the string array with characters
-	int i;
-	for(i = 0; i < message.length(); i++){
-		dividedStrings[i / texW][i % texW] = message.at(i);
-	}
-
-	// Set up the surface and texture (pointers)
-	for(i = 0; i < numTexs; i++){
-		char my_str[texW];
-		strncpy(my_str, dividedStrings[i * texW], texW);
-		stringSurfaces[i] = SDL_CreateTextureFromSurface(renderer, my_str);
-		// No idea if this will work, but it's where I left off
-		// TODO
-	}
+	// set message text surface and convert into texture, 1215 sets the text to
+  // wrap to the next line at that pixel
+  surfaceMessage_dialogue = TTF_RenderText_Blended_Wrapped(TNR, message.c_str(), Yellow, 1215);
+  textureMessage_dialogue = SDL_CreateTextureFromSurface(renderer, surfaceMessage_dialogue);
 
 }
 
@@ -1020,7 +1002,7 @@ void dialogue(NPClite* our_town, SDL_Event e, bool *quit, const Uint8 *keyState,
   setup_vars(selectedBoxTex, discussionBoxTex);
 
 	// Set up the text variables, values, etc
-  TTF_Font *TNR = TTF_OpenFont("Art/Font/times-new-roman.ttf", 24); // Opens the font and sets the size
+  TNR = TTF_OpenFont("Art/Font/times-new-roman.ttf", text_size); // Opens the font and sets the size
   if(!TNR)
     printf("TTF_OpenFont error: %s\n", TTF_GetError());
 
