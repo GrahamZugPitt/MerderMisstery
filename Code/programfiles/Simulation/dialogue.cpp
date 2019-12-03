@@ -3,6 +3,9 @@
 
 #include "dialogue.hpp"
 
+// PLEASE DELETE THIS LATER
+#include <stdlib.h>
+
 const int DIALOGUE_OPTION_COUNT = 40;
 const int NUMBER_OF_STATES = 10;
 const int DIALOGUE_OPTIONS_PER_STATE = 4;
@@ -18,19 +21,57 @@ SDL_Rect useless;
 int nameboxw = 100;
 int nameboxh = 50;
 
-int boxw, boxh, width_offset, height_offset, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, w, h, selected_x, selected_y, multiple_answers_page, num_answers;
+int boxw, boxh, width_offset, height_offset, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, w, h, selected_x, selected_y, multiple_answers_page;
+int selected = 1;
+NPClite *town;
+bool triggerPressed = false;
 
-std::string TLString = "Who do you think killed Butler?";
-std::string TRString = "What is your last memory of the victim?";
-std::string BLString = "How does Tom feel about Jerry?";
-std::string BRString = "Where were you last evening?";
+SDL_Texture* discussionBoxTex;
+SDL_Texture* selectedBoxTex;
+SDL_Texture* deselectedBoxTex;
+SDL_Texture* playerTex;
+SDL_Texture* npcTex;
+
+std::vector<std::string> multiple_answers_vec;
+int answers_vec_size = 0;
+int answer_vec_background_size = 0;
+
+std::string TLString1;
+std::string TRString1;
+std::string TLString2;
+std::string TRString2;
+
+std::string TLString;
+std::string TRString;
+std::string BLString;
+std::string BRString;
 std::string ResponseString = "Greetings, Detective.";
+
+// Returns the index of the dead NPC
+//		We need to talk about our naming conventions
+int getNPC(){
+	for(int i = 0; i < TOWN_SIZE; i++){
+		if(town[i].isDead)
+			return i;
+	}
+}
 
 // This first huge chunk is pulled from the discussion file (which is no longer around)
 // An initial function to get everything set up
 void setup_vars(SDL_Texture *selected, SDL_Texture *discussionBoxTex){
   SDL_QueryTexture(selected, NULL, NULL, &boxw, &boxh);
   SDL_QueryTexture(discussionBoxTex, NULL, NULL, &w, &h);
+
+  std::string vicName = town[getNPC()].name;
+  TLString1 = "Who dislikes " + vicName + "?";
+  TRString1 = "When was the last time you saw " + vicName + "?";
+  BLString = "What gossip have you heard?";
+  BRString = "What have you...?";
+  TLString2 = "What have you seen " + vicName + " do with others?";
+  TRString2 = "What have you done with " + vicName + "?";
+
+  TLString = TLString1;
+  TRString = TRString1;
 
   width_offset = (SCREEN_WIDTH - 2 * boxw) / 3;
   height_offset = (SCREEN_HEIGHT - h - 2 * boxh) / 3;
@@ -124,7 +165,7 @@ enum stateOptions{
   WHAT_HAVE_YOU_TWO,
   ONE_ANSWER,
   MULTIPLE_ANSWERS
-};
+} dialogueState;
 
 // Keeps track of which dialogue element entered one of the above states
 //  Init four doesn't given an answer, so we don't need one for that
@@ -135,6 +176,19 @@ enum whoSentYou{
   WHAT_ONE,
   WHAT_TWO
 } whereFrom;
+
+enum USELESSENUM{
+  NPCS1,
+  NPCS2,
+  NPCS3,
+  NPCS4,
+  ACTION1,
+  ACTION2,
+  ACTION3,
+  ACTION4,
+  SELF_OR_OTHERS,
+  INITIAL_STATE
+};
 
 enum dialogueOptions{
 	NPC0,
@@ -211,18 +265,9 @@ class dialogueOptionList{
 	}
 };
 
-// Returns the index of the dead NPC
-//		We need to talk about our naming conventions
-int getNPC(NPClite* town){
-	for(int i = 0; i < TOWN_SIZE; i++){
-		if(town[i].isDead)
-			return i;
-	}
-}
-
-// Just sets up the default stuff for the
-dialogueOptionList* initializeOptions(NPClite* town){
-	std::string dead = town[getNPC(town)].name;
+// Just sets up the default stuff for Graham's stuff. Not sure this is used anymore.
+dialogueOptionList* initializeOptions(){
+	std::string dead = town[getNPC()].name;
 	dialogueOption* o0 = new dialogueOption("Who dislikes " + dead + "?", HOWFEEL, NPCS1);
 	dialogueOption* o1 = new dialogueOption("When was the last time you saw " + dead + "?", WHENSEEN, NPCS1);
 	dialogueOption* o2 = new dialogueOption("What have you gossip have you heard?",HEARD, NPCS1);
@@ -418,27 +463,34 @@ std::string getTime(int time){
 }
 
 // Not 100% on why this one exists, but I'm sure as shit not touching it
-bool compareNames(NPClite* town, int npc1, std::string npc2){
+bool compareNames(int npc1, std::string npc2){
 	if(!town[npc1].name.compare(npc2))
 		return true;
 	return false;
 }
 
+int get_npc_number_from_name(std::string name){
+  for(int i = 0; i < 12; i++){
+    std::string town_name = town[i].name;
+    if(town_name.compare(name) == 0) return i;
+  }
+}
+
 // Print out an arbitrary event dialogue
-void printEventDialogue(Event* e){
-			ResponseString = e->npcName1 + " " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ". \n";
+std::string printEventDialogue(Event* e){
+			return e->npcName1 + " " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ". \n";
 }
 
 //
 std::string printEventDialogueFPF(Event* e){
-			ResponseString = "I " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ".";
+			return "I " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ".";
 }
 std::string printEventDialogueFPS(Event* e){
-			ResponseString = e->npcName1 + " " + eventConverterDialogue(e->event) + " me " + getTime(e->time) + " at " + locationConverter(e->location) + ".";
+			return e->npcName1 + " " + eventConverterDialogue(e->event) + " me " + getTime(e->time) + " at " + locationConverter(e->location) + ".";
 }
 
-void printEventDialogueGossip(Event* e){
-			ResponseString = "I heard " + e->npcName1 + " " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ". \n";
+std::string printEventDialogueGossip(Event* e){
+			return "I heard " + e->npcName1 + " " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ". \n";
 }
 
 bool suspeciousEvent(int event){
@@ -451,7 +503,7 @@ bool slightlySuspeciousEvent(int event){
 	return false;
 }
 
-bool sayPersonalEventMurderer(NPClite* town, int event, int beingInterrogated){
+bool sayPersonalEventMurderer(int event, int beingInterrogated){
 
 	if(town[beingInterrogated].didMurder)
 
@@ -464,9 +516,9 @@ bool sayPersonalEventMurderer(NPClite* town, int event, int beingInterrogated){
 	return false;
 }
 
-bool sayPersonalEvent(NPClite* town, int event, int beingInterrogated){
+bool sayPersonalEvent(int event, int beingInterrogated){
 	if(town[beingInterrogated].didMurder)
-		return sayPersonalEventMurderer(town,event,beingInterrogated);
+		return sayPersonalEventMurderer(event,beingInterrogated);
 	if((!suspeciousEvent(event)
 	|| town[beingInterrogated].personality[DISHONESTY] < LITERALLY_CANNOT_LIE)
 	&& (!slightlySuspeciousEvent(event)
@@ -476,18 +528,18 @@ bool sayPersonalEvent(NPClite* town, int event, int beingInterrogated){
 	return false;
 }
 
-void doneWithSelf(NPClite* town, int beingInterrogated, int npc){
+void doneWithSelf(int beingInterrogated, int npc){
 	bool anyEvent = false;
 	for(int i = 0; i < town[beingInterrogated].memories.getSize(); i++){
 		Event* e = town[beingInterrogated].memories.getMemory(i);
-		if(compareNames(town,npc,e->npcName1) && e->event != INTRODUCE && e->event != SOCIALIZE && !suspeciousEvent(e->event)){
+		if(compareNames(npc,e->npcName1) && e->event != INTRODUCE && e->event != SOCIALIZE && !suspeciousEvent(e->event)){
 			printEventDialogueFPS(e);
 			anyEvent = true;
 			}
-		if(compareNames(town,npc,e->npcName2)
+		if(compareNames(npc,e->npcName2)
 		&& e->event != INTRODUCE
 		&& e->event != SOCIALIZE
-		&& sayPersonalEvent(town, e->event, beingInterrogated)){
+		&& sayPersonalEvent(e->event, beingInterrogated)){
 			printEventDialogueFPF(e);
 			anyEvent = true;
 			}
@@ -496,16 +548,16 @@ void doneWithSelf(NPClite* town, int beingInterrogated, int npc){
 		ResponseString =  "I've only made small talk with " + town[npc].name + ".";
 }
 
-void doneWith(NPClite* town, int beingInterrogated, int npc){
+void doneWith(int beingInterrogated, int npc){
 	bool anyEvent = false;
 	for(int i = 0; i < town[beingInterrogated].observations.getSize(); i++){
 		Event* e = town[beingInterrogated].observations.getMemory(i);
-		if(compareNames(town,npc,e->npcName1) && e->event != INTRODUCE && e->event != SOCIALIZE){
-			printEventDialogue(e);
+		if(compareNames(npc,e->npcName1) && e->event != INTRODUCE && e->event != SOCIALIZE){
+			multiple_answers_vec.at(answers_vec_size++) = printEventDialogue(e);
 			anyEvent = true;
 			}
-		if(compareNames(town,npc,e->npcName2) && e->event != INTRODUCE && e->event != SOCIALIZE){
-			printEventDialogue(e);
+		if(compareNames(npc,e->npcName2) && e->event != INTRODUCE && e->event != SOCIALIZE){
+			multiple_answers_vec.at(answers_vec_size++) = printEventDialogue(e);
 			anyEvent = true;
 			}
 	}
@@ -513,11 +565,11 @@ void doneWith(NPClite* town, int beingInterrogated, int npc){
 	ResponseString = "I've only ever seen " + town[npc].name + " make small talk with others.";
 }
 
-std::string howFeel(NPClite* town, int npc, int beingInterrogated){
+std::string howFeel(int npc, int beingInterrogated){
 	std::string dislike = "";
 	bool nobody = true;
 	for(int i = 0; i < TOWN_SIZE; i++){
-		if(hasDoneEventMutual(town,INTRODUCE,beingInterrogated,i) && town[i].relationships[npc] < 0){
+		if(hasDoneEventMutual(town, INTRODUCE,beingInterrogated,i) && town[i].relationships[npc] < 0){
 			if(nobody){
 				if(i != beingInterrogated){
 					nobody = false;
@@ -548,8 +600,9 @@ bool eventsAreEqual(Event* e, Event* e2){
 	return false;
 }
 
-void heard(NPClite* town, int beingInterrogated){
-	Event* gossip[town[beingInterrogated].hearSay.getSize()];
+// Sets up our string vector
+void heard(int beingInterrogated){
+  Event* gossip[town[beingInterrogated].hearSay.getSize()];
 	int j = 0;
 	for(int i = 0; i < town[beingInterrogated].hearSay.getSize(); i++){
 		bool alreadyMentioned = false;
@@ -557,22 +610,27 @@ void heard(NPClite* town, int beingInterrogated){
 			if(eventsAreEqual(town[beingInterrogated].hearSay.getMemory(i), gossip[k]))
 			alreadyMentioned = true;
 		}
-		if(!alreadyMentioned && !wasInvolvedInEvent(town,town[beingInterrogated].hearSay.getMemory(i),beingInterrogated)){
-			printEventDialogueGossip(town[beingInterrogated].hearSay.getMemory(i));
-			gossip[j++] = town[beingInterrogated].hearSay.getMemory(i);
+		if(!alreadyMentioned && !wasInvolvedInEvent(town, town[beingInterrogated].hearSay.getMemory(i),beingInterrogated)){
+      // If we found a gossip that we want to say, stick it into our vector
+      if(answers_vec_size == answer_vec_background_size){
+        answer_vec_background_size++;
+        multiple_answers_vec.push_back("");
+      }
+			multiple_answers_vec.at(answers_vec_size++) = printEventDialogueGossip(town[beingInterrogated].hearSay.getMemory(i));
+      gossip[j++] = town[beingInterrogated].hearSay.getMemory(i);
 		}
 	}
 }
 
-std::string whenSeen(NPClite* town, int npc, int beingInterrogated){
+std::string whenSeen(int npc, int beingInterrogated){
 	ResponseString = "I can't remember when I last saw " + town[npc].name;
 	int event = -1;
 	int eventTime = -1;
 	Event* e = new Event();
 	bool wasObservation = false;
 	for(int i = town[beingInterrogated].memories.getSize() - 1; i > -1; i--){
-		if (wasInvolvedInEvent(town,town[beingInterrogated].memories.getMemory(i),npc) &&
-				sayPersonalEvent(town,town[beingInterrogated].memories.getMemory(i)->event,beingInterrogated)){
+		if (wasInvolvedInEvent(town, town[beingInterrogated].memories.getMemory(i),npc) &&
+				sayPersonalEvent(town[beingInterrogated].memories.getMemory(i)->event,beingInterrogated)){
 			event = town[beingInterrogated].memories.getMemory(i)->event;
 			eventTime = town[beingInterrogated].memories.getMemory(i)->time;
 			e = town[beingInterrogated].memories.getMemory(i);
@@ -581,7 +639,7 @@ std::string whenSeen(NPClite* town, int npc, int beingInterrogated){
 	}
 	if(town[beingInterrogated].observations.getSize()){
 		for(int i = town[beingInterrogated].observations.getSize() - 1; i > -1; i--){
-			if(wasInvolvedInEvent(town,town[beingInterrogated].observations.getMemory(i),npc) && town[beingInterrogated].observations.getMemory(i)->time > eventTime){
+			if(wasInvolvedInEvent(town, town[beingInterrogated].observations.getMemory(i),npc) && town[beingInterrogated].observations.getMemory(i)->time > eventTime){
 				event = town[beingInterrogated].observations.getMemory(i)->event;
 				eventTime = town[beingInterrogated].observations.getMemory(i)->time;
 				e = town[beingInterrogated].observations.getMemory(i);
@@ -592,16 +650,16 @@ std::string whenSeen(NPClite* town, int npc, int beingInterrogated){
 		}
 	if(event != -1){
 		if(!e->npcName1.compare(town[beingInterrogated].name)){
-		lastMemory = "I " + eventConverterDialogue(event) + " " + e->npcName2 + " at " + locationConverter(e->location) + ". That was " + getTime(eventTime);
-	return lastMemory;
+		ResponseString = "I " + eventConverterDialogue(event) + " " + e->npcName2 + " at " + locationConverter(e->location) + ". That was " + getTime(eventTime);
+	return ResponseString;
 	}
 		if(!e->npcName2.compare(town[beingInterrogated].name)){
-		lastMemory = e->npcName1 + " " + eventConverterDialogue(event) + " me" + " at " + locationConverter(e->location) + ". That was " + getTime(eventTime);
-	return lastMemory;
+		ResponseString = e->npcName1 + " " + eventConverterDialogue(event) + " me" + " at " + locationConverter(e->location) + ". That was " + getTime(eventTime);
+	return ResponseString;
 	}
-		lastMemory = e->npcName1 + " " + eventConverterDialogue(event) + " " + e->npcName2 + " at " + locationConverter(e->location) + ". That was " + getTime(eventTime);
+		ResponseString = e->npcName1 + " " + eventConverterDialogue(event) + " " + e->npcName2 + " at " + locationConverter(e->location) + ". That was " + getTime(eventTime);
 	}
-	return lastMemory;
+	return ResponseString;
 }
 
 bool selfOrOthers(dialogueOptionList* globalOptionList){
@@ -674,7 +732,7 @@ bool goodMurder(NPClite* town){
 }
 
 // Handle input for the main conversation menu
-void init_four_keyhandler(const Uint8 *keyState){
+void init_four_keyhandler(const Uint8 *keyState, int talkingToNum){
   keyState = SDL_GetKeyboardState(NULL);
 
   if (keyState[SDL_SCANCODE_W] || keyState[SDL_SCANCODE_UP]){
@@ -697,30 +755,52 @@ void init_four_keyhandler(const Uint8 *keyState){
     if(selected == 3) selected = 4;
   }
 
-  if (keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]){
-    // The first two options just dumps you into an answer
-    if(selected == 1){
-      dialogueState = ONE_ANSWER;
-      whereFrom = INIT_ONE;
+  // Pick one of the boxes
+  if ((keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN])){
+    // Need to only register space / enter once per press
+    if(!triggerPressed){
+      triggerPressed = true;
+      // The first two options just dumps you into an answer
+      if(selected == 1){
+        int npc = getNPC(); // Gives you the dead NPC
+        ResponseString = howFeel(npc, talkingToNum);
+        dialogueState = ONE_ANSWER;
+      }
+      else if(selected == 2){
+        int npc = getNPC();
+        ResponseString = whenSeen(npc,talkingToNum);
+        dialogueState = ONE_ANSWER;
+      }
+      else if(selected == 3){ // 3 will give you the first page of a (possibly) multi-page answer
+        dialogueState = MULTIPLE_ANSWERS;
+        multiple_answers_page = 0;
+        answers_vec_size = 0;
+
+        heard(talkingToNum); // The function that creates our multi-answer vec - tbh it's a black box to me
+
+        if(answers_vec_size == 0){
+          ResponseString = "I haven't heard any gossip about " + town[getNPC()].name + ".";
+          dialogueState = ONE_ANSWER;
+        }
+        else{
+          ResponseString = multiple_answers_vec[0];
+        }
+      }
+      else if(selected == 4){
+        dialogueState = WHAT_HAVE_YOU_TWO;
+        selected = 1;
+        TLString = TLString2;
+        TRString = TRString2;
+      }
     }
-    else if(selected == 2){
-      dialogueState = ONE_ANSWER;
-      whereFrom = INIT_TWO;
-    }
-    else if(selected == 3){ // 3 will give you the first page of a (possibly) multi-page answer
-      dialogueState = MULTIPLE_ANSWERS;
-      multiple_answers_page = 0;
-      whereFrom = INIT_THREE;
-    }
-    else if(selected == 4){
-      dialogueState = WHAT_HAVE_YOU_TWO;
-      selected = 1;
-    }
+  }
+  else{
+    triggerPressed = false;
   }
 }
 
 // Handle input from the "What have you..." menu
-void what_two_keyhandler(const Uint8 *keyState){
+void what_two_keyhandler(const Uint8 *keyState, int talkingToNum){
   keyState = SDL_GetKeyboardState(NULL);
 
   if (keyState[SDL_SCANCODE_A] || keyState[SDL_SCANCODE_LEFT]){
@@ -732,75 +812,153 @@ void what_two_keyhandler(const Uint8 *keyState){
   }
 
   if (keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]){
-    // The first two options just dumps you into an answer
-    if(selected == 1){
-      dialogueState = MULTIPLE_ANSWERS;
-      multiple_answers_page = 0;
-      whereFrom = WHAT_ONE;
+    if(!triggerPressed){
+      triggerPressed = true;
+      // Both are multi-page answers
+      if(selected == 1){
+        dialogueState = MULTIPLE_ANSWERS;
+        multiple_answers_page = 0;
+        answers_vec_size = 0;
+
+        doneWith(talkingToNum, getNPC());
+
+        if(answers_vec_size == 0){
+          ResponseString = "I've only seen " + town[getNPC()].name + " make smalltalk with people.";
+          dialogueState = ONE_ANSWER;
+        }
+        else{
+          ResponseString = multiple_answers_vec[0];
+        }
+      }
+      else if(selected == 2){
+        dialogueState = MULTIPLE_ANSWERS;
+        multiple_answers_page = 0;
+        answers_vec_size = 0;
+
+        doneWithSelf(talkingToNum, getNPC()); // The function that creates our multi-answer vec - tbh it's a black box to me
+
+        if(answers_vec_size == 0){
+          ResponseString = "I've only ever made smalltalk with " + town[getNPC()].name + ".";
+          dialogueState = ONE_ANSWER;
+        }
+        else{
+          ResponseString = multiple_answers_vec[0];
+        }
+      }
     }
-    else if(selected == 2){
-      dialogueState = MULTIPLE_ANSWERS;
-      multiple_answers_page = 0;
-      whereFrom = WHAT_TWO;
-    }
+  }
+  else{
+    triggerPressed = false;
   }
 }
 
 // Handle input from the multiple answer dialogue menu
-void multiple_answers_page(const Uint8 *keyState){
+void multiple_answers_keyhandler(const Uint8 *keyState){
   keyState = SDL_GetKeyboardState(NULL);
 
-  // Flip through the multiple pages with left and right arrow keys
-  if (keyState[SDL_SCANCODE_A] || keyState[SDL_SCANCODE_LEFT]){
-    if(multiple_answers_page < num_answers - 1) multiple_answers_page++;
-  }
+  if(!triggerPressed){
+    // Flip through the multiple pages with left and right arrow keys
+    if (keyState[SDL_SCANCODE_A] || keyState[SDL_SCANCODE_LEFT]){
+      triggerPressed = true;
+      if(multiple_answers_page > 0){
+         multiple_answers_page--;
+         ResponseString = multiple_answers_vec[multiple_answers_page];
+      }
+    }
 
-  if (keyState[SDL_SCANCODE_D] || keyState[SDL_SCANCODE_RIGHT]){
-    if(multiple_answers_page > 0) multiple_answers_page--;
-  }
+    if (keyState[SDL_SCANCODE_D] || keyState[SDL_SCANCODE_RIGHT]){
+      triggerPressed = true;
+      if(multiple_answers_page < answers_vec_size - 1){
+        multiple_answers_page++;
+        ResponseString = multiple_answers_vec[multiple_answers_page];
+      }
+    }
 
-  // Reset to the main page
-  if (keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]){
-    dialogueState = INITIAL_FOUR;
+    // Reset to the main page
+    if (keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]){
+      triggerPressed = true;
+      dialogueState = INITIAL_FOUR;
+      TLString = TLString1;
+      TRString = TRString1;
+    }
   }
+  if(!(keyState[SDL_SCANCODE_A] || keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_D] || keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]))
+    triggerPressed = false;
 }
 
 // Handles key input for the usual NPC conversation
-int key_handler(stateOptions dialogueState, const Uint8 *keyState){
+int key_handler(const Uint8 *keyState, int talkingToNum){
   // If you wanna quit, we're out, no problem
   keyState = SDL_GetKeyboardState(NULL);
   if (keyState[SDL_SCANCODE_Q])
     return -1;
 
   if(dialogueState == INITIAL_FOUR){
-    init_four_keyhandler(keyState);
+    init_four_keyhandler(keyState, talkingToNum);
   }
   else if(dialogueState == WHAT_HAVE_YOU_TWO){
-    what_two_keyhandler(keyState);
+    what_two_keyhandler(keyState, talkingToNum);
   }
   else if(dialogueState == MULTIPLE_ANSWERS){
     multiple_answers_keyhandler(keyState);
   }
-  else{
+  else if(dialogueState == ONE_ANSWER){
     // If we're only at the one answer
     keyState = SDL_GetKeyboardState(NULL);
-    if (keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN])
-      dialogueState = INITIAL_FOUR;
+    if (keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]){
+        if(!triggerPressed){
+          triggerPressed = true;
+          dialogueState = INITIAL_FOUR;
+          TLString = TLString1;
+          TRString = TRString1;
+        }
+    }
+    else{
+      triggerPressed = false;
+    }
   }
 
   return 1;
 }
 
+// Draws the model to the output terminal. Used for debugging purposes.
+void crude_draw_handler(){
+  // I was specifically told to not do this tee-hee
+  system("clear");
+
+  if(dialogueState == INITIAL_FOUR){
+    printf("Selected is: %d\n", selected);
+    printf("1: %s\n", TLString.c_str());
+    printf("2: %s\n", TRString.c_str());
+    printf("3: %s\n", BLString.c_str());
+    printf("4: %s\n", BRString.c_str());
+  }
+  else if(dialogueState == WHAT_HAVE_YOU_TWO){
+    printf("Selected is: %d\n", selected);
+    printf("1: %s\n", TLString.c_str());
+    printf("2: %s\n", TRString.c_str());
+  }
+  else if(dialogueState == ONE_ANSWER){
+    printf("ResponseString: %s\n", ResponseString.c_str());
+  }
+  else if(dialogueState == MULTIPLE_ANSWERS){
+    printf("On page %d of %d\n", multiple_answers_page + 1, answers_vec_size);
+    printf("ResponseString: %s\n", ResponseString.c_str());
+  }
+}
+
 // The function that gets called when it's time to get down to work for reals
-int dialogue(NPClite* town, SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, NPC *theNPC){
+void dialogue(NPClite* our_town, SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, NPC *theNPC){
 	// Discussion Code
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"); // No bluriness on resize
 	// Load the textures necessary for the menu
-  SDL_Texture* discussionBoxTex = loadFiles(discussionBoxPath, renderer);
-  SDL_Texture* selectedBoxTex = loadFiles(selectedBoxPath, renderer);
-  SDL_Texture* deselectedBoxTex = loadFiles(deselectedBoxPath, renderer);
-  SDL_Texture* playerTex = loadFiles(singlePlayerPathDisc, renderer);
-  SDL_Texture* npcTex = theNPC->texture;
+  discussionBoxTex = loadFiles(discussionBoxPath, renderer);
+  selectedBoxTex = loadFiles(selectedBoxPath, renderer);
+  deselectedBoxTex = loadFiles(deselectedBoxPath, renderer);
+  playerTex = loadFiles(singlePlayerPathDisc, renderer);
+  npcTex = theNPC->texture;
+
+  town = our_town;
 
 	// Initialize a bunch of values
   setup_vars(selectedBoxTex, discussionBoxTex);
@@ -812,54 +970,31 @@ int dialogue(NPClite* town, SDL_Event e, bool *quit, const Uint8 *keyState, SDL_
   SDL_Color White = {255, 255, 255};
   SDL_Color Yellow = {255, 255, 0};
 
+  SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
+
 	// Create the surfaces for the text messages
   SDL_Surface *TLsurfaceMessage, *TRsurfaceMessage, *BLsurfaceMessage, *BRsurfaceMessage, *CharNameSurface;
 
-	// Set up part 2 - Graham's stuff
-	dialogueOptionList* globalOptionList = initializeOptions(town);
-	stateOptions dialogueState = INITIAL_FOUR;
-	int npcBeingInterrogated = 0;
-	int input = -1;
-	//int currentQuestion = -1;
-	//int currentNPC = -1; useful if commented out functions are included
+	dialogueState = INITIAL_FOUR;
 
-	while(npcBeingInterrogated != -1){
-		// TODO: INPUT HANDLER
-    int shouldIquit = key_handler(dialogueState, keyState);
-    if(shouldIquit == -1) return; // -1 means yes, I should quit
+  // Will just keep looping until you quit
+	while(true){
+    // This way we're not doing a bunch of needless drawing
+    if(SDL_PollEvent(&e) != 0){
+      //Quit application
+      if(e.type == SDL_QUIT){
+          *quit = true;
+          return;
+      }
 
-    // TODO: TICK HANDLER
-    //    Update the data structure according to the state of the menu
-		int tag = globalOptionList[dialogueState].options[input]->tag;
-		dialogueState = globalOptionList[dialogueState].options[input]->nextTag;
-		std::string output = "";
-		if(tag == HOWFEEL){
-			int npc = getNPC(town);
-			output = howFeel(town, npc, npcBeingInterrogated);
-			ResponseString = output;
-		}
-		if(tag == WHENSEEN){
-			int npc = getNPC(town);
-			output = whenSeen(town,npc,npcBeingInterrogated);
-			ResponseString = output;
-		}
-		if(tag == HEARD){
-			heard(town,npcBeingInterrogated);
-		}
-		if(tag == DONEWITH){
-			bool isSelf = selfOrOthers(globalOptionList);
-			int npc = getNPC(town);
-			if(isSelf){
-				doneWithSelf(town,npcBeingInterrogated, npc);
-			}else{
-				doneWith(town,npcBeingInterrogated,npc);
-			}
-		}
-		dialogueState = INITIAL_STATE;
+      // INPUT HANDLER
+      int shouldIquit = key_handler(keyState, get_npc_number_from_name(theNPC->getName()));
+      if(shouldIquit == -1) return; // -1 means yes, I should quit
 
-    // TODO: DRAW HANDLER
+      // DRAW HANDLER
+      crude_draw_handler();
+    }
 	}
-	return 0;
 }
 
 #endif

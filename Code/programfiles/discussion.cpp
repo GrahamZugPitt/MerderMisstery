@@ -32,8 +32,6 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
 
   int selected = 1;
 
-  //Clear screen
-  SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
 
   bool inDiscussion = true;
 
@@ -50,6 +48,7 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
       runWinScreen(e, quit, keyState, renderer);
     }
 
+    // Earmark for later
     if (keyState[SDL_SCANCODE_Q] || *quit){
       SDL_DestroyTexture(discussionBoxTex);
       SDL_DestroyTexture(selectedBoxTex);
@@ -62,16 +61,5 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
       SDL_DestroyTexture(CharTex);
       return;
     }
-
-    SDL_RenderClear(renderer);
-
-    renderTexture(renderer, discussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
-    draw_peoples(renderer, playerTex, npcTex);
-    draw_boxes(selected, renderer, selectedBoxTex, deselectedBoxTex, w, h);
-    draw_text(renderer, TLBox, TLBoxRect, TRBox, TRBoxRect, BLBox, BLBoxRect, BRBox, BRBoxRect);
-    SDL_RenderCopy(renderer, CharTex, NULL, &NameBoxRect);
-
-    //Update Screen
-    SDL_RenderPresent(renderer);
   }
 }
