@@ -6,15 +6,7 @@
 #include <string>
 #include <map>
 #include "../programfiles/worldObjects.hpp"
-// This is just a dummy event until we can include an actual event
-class Event{
-	public:
-		std::string event;
-		Event(std::string str) :event{str}{};
-		Event(){
-			event = "NONE";
-		}
-};
+#include "../programfiles/Simulation/event.cpp"
 
 const int NPC_SPRITE_WIDTH = 60;
 const int NPC_SPRITE_HEIGHT = 88;
@@ -37,14 +29,14 @@ const unsigned int DARK_GREEN = 0xFF009F42;
 const unsigned int GREEN = 0xFF31E22a;
 const unsigned int LIGHT_GREEN = 0xFF8CF187;
 const unsigned int DARK_RED = 0xFF9A1414;
-const unsigned int WRATH = 0xFFE12323;
+const unsigned int WRATH_GRAFX = 0xFFE12323;
 const unsigned int LIGHT_RED = 0xFFED6363;
 const unsigned int DARK_BLUE = 0xFF090968;
 const unsigned int BLUE = 0xFF2A25D5;
 const unsigned int LIGHT_BLUE = 0xFF1AF3EB;
 const unsigned int ORANGE = 0xFFF69D1D;
 const unsigned int PURPLE = 0xFFA606C8;
-const unsigned int DISLOYAL = 0xFFDCF31A;
+const unsigned int DISLOYAL_GRAFX = 0xFFDCF31A;
 
 const int NPCColliderXOffset = 5;
 const int NPCColliderYOffset = 10;
@@ -70,6 +62,7 @@ class NPC {
 		SDL_Texture *texture;
 		Collidable NPCCollider;
 		Collidable NPCConversationCollider;
+		bool isGhost = false;
 		//Constructor
 		//NPC(std::string name, std::string spriteFileName, unsigned int dLust, unsigned int dLoyal, unsigned int dWrath);
 		NPC();

@@ -2,7 +2,7 @@
 #include "main_helper.hpp"
 #include "worldObjects.hpp"
 
-Player::Player(std::string playerTexturePath, SDL_Renderer *renderer){
+Player::Player(std::string playerTexturePath, SDL_Renderer *renderer, int player_x, int player_y){
     // Load several textures
     playerTexture = loadFiles(playerTexturePath, renderer);
     SDL_QueryTexture(playerTexture, NULL, NULL, &cropPNG.w, &cropPNG.h);
@@ -12,9 +12,10 @@ Player::Player(std::string playerTexturePath, SDL_Renderer *renderer){
     exitMessageTexture = loadFiles("Art/Messages/exitMessage.png", renderer);
 
     //Position of player sprite
-    positionPNG.x = (MAP_WIDTH / 2) - (PLAYER_WIDTH / 2);
-    positionPNG.y = (MAP_HEIGHT / 2) - (PLAYER_HEIGHT / 2);
+    positionPNG.x = player_x;
+    positionPNG.y = player_y;
 
+    xvel = yvel = 0.0;
     //Setting last positions for use in collisions
     lastX = positionPNG.x;
     lastY = positionPNG.y;
@@ -41,28 +42,42 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
     //True by default, animation is stopped if not running
     // Should probably revisit this code
     isRunning = true;
-
+    xvel = yvel = 0;
+    direction = 0;
     if(!farnan){
+        isRunning = false;
         //Determine which directional keypad arrow is clicked and apply appropriate movement / image
         if(keyState[SDL_SCANCODE_UP] || keyState[SDL_SCANCODE_W]) {
-            positionPNG.y -= playerSpeed * change;
+            yvel -= static_cast<int>(playerSpeed * change);
+            direction |= UP;
             cropPNG.y = frameHeight * 3;
+            isRunning = true;
         }
-        else if(keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_S]) {
-            positionPNG.y += playerSpeed * change;
+        if(keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_S]) {
+            yvel += static_cast<int>(playerSpeed * change);
+            direction |= DOWN;
             cropPNG.y = 0;
+            isRunning = true;
         }
-        else if(keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_A]) {
-            positionPNG.x -= playerSpeed * change;
+        if(keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_A]) {
+            xvel -= static_cast<int>(playerSpeed * change);
+            direction |= LEFT;
             cropPNG.y = frameHeight;
+            isRunning = true;
         }
-        else if(keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_D]) {
-            positionPNG.x += playerSpeed * change;
+        if(keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_D]) {
+            xvel += static_cast<int>(playerSpeed * change);
+            direction |= RIGHT;
             cropPNG.y = frameHeight * 2;
+            isRunning = true;
         }
-            else {
-            isRunning = false;
+        // alter velocities to account for diagonal movement
+        if (xvel != 0 && yvel != 0){
+            xvel = static_cast<int>(xvel * 0.8);
+            yvel = static_cast<int>(yvel * 0.8);
         }
+        positionPNG.x += xvel;
+        positionPNG.y += yvel;
     } else {
         //Determine which directional keypad arrow is clicked and apply appropriate movement / image
         if(keyState[SDL_SCANCODE_UP] && keyState[SDL_SCANCODE_W] && keyState[SDL_SCANCODE_M]) {
@@ -88,7 +103,7 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
     //User is not clicking key, so player is no longer running
 
     //Animate the player sprite by flashing frames
-    if(isRunning) {
+    if(isRunning && (xvel != 0.0 || yvel != 0.0)) {
         counter += change;
         if(counter >= 0.08f) {
             counter = 0;
@@ -116,18 +131,7 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
         positionPNG.y -= playerSpeed * change;
     }
 
-    if (lastY > positionPNG.y) {
-        direction = 'U';
-        overWriteY = positionPNG.y;
-    } else if (lastY < positionPNG.y) {
-        direction = 'D';
-    } else if (lastX < positionPNG.x) {
-        direction = 'R';
-    } else if (lastX > positionPNG.x) {
-        direction = 'L';
-    } else {
-        direction = 'a';
-    }
+
     lastX = positionPNG.x;
     lastY = positionPNG.y;
 }
@@ -146,19 +150,76 @@ bool Player::collision(SDL_Renderer *rendererPointer, const Uint8 *keyState){
     return false;
 }
 
+// void Player::alterPosition(SDL_Rect *collide) {
+//     if (direction == 'L') {
+//         positionPNG.x += (*collide).w;
+//     }
+//     if (direction == 'R') {
+//         positionPNG.x -= (*collide).w;
+//     }
+//     if (direction == 'U') {
+//         positionPNG.y += (*collide).h;
+//     }
+//     if (direction == 'D') {
+//         positionPNG.y -= (*collide).h;
+//     }
+//     lastX = positionPNG.x;
+//     lastY = positionPNG.y;
+// }
+
 void Player::alterPosition(SDL_Rect *collide) {
-    if (direction == 'U') {
-        positionPNG.y += (*collide).h;
+    // collision from moving left
+    switch (direction){
+        case ( UP ):{
+            positionPNG.y += (*collide).h;
+            break;
+        }
+        case ( DOWN ):{
+            positionPNG.y -= (*collide).h;
+            break;
+        }
+        case ( LEFT ):{
+            positionPNG.x += (*collide).w;
+            break;
+        }
+        case ( RIGHT ):{
+            positionPNG.x -= (*collide).w;
+            break;
+        }
+        case ( UP|RIGHT ):{
+            if(collide->w > collide->h){
+                positionPNG.y += collide->h;
+            } else {
+                positionPNG.x -= collide->w;
+            }
+            break;
+        }
+        case ( UP|LEFT ):{
+            if(collide->w > collide->h){
+                positionPNG.y += collide->h;
+            } else {
+                positionPNG.x += collide->w;
+            }
+            break;
+        }
+        case ( DOWN|RIGHT ):{
+            if(collide->w > collide->h){
+                positionPNG.y -= collide->h;
+            } else {
+                positionPNG.x -= collide->w;
+            }
+            break;
+        }
+        case ( DOWN|LEFT ):{
+            if(collide->w > collide->h){
+                positionPNG.y -= collide->h;
+            } else {
+                positionPNG.x += collide->w;
+            }
+            break;
+        }
     }
-    if (direction == 'D') {
-        positionPNG.y -= (*collide).h;
-    }
-    if (direction == 'L') {
-        positionPNG.x += (*collide).w;
-    }
-    if (direction == 'R') {
-        positionPNG.x -= (*collide).w;
-    }
+
     lastX = positionPNG.x;
     lastY = positionPNG.y;
 }

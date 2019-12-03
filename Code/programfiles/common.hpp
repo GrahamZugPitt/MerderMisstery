@@ -10,6 +10,10 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <SDL2/SDL_ttf.h>
+
+#include <SDL2/SDL_ttf.h>
+#include <cmath>
 
 //Declaring Global Variables
 const int MAP_WIDTH = 3840;
@@ -20,5 +24,7 @@ const int PLAYER_WIDTH = 64;
 const int PLAYER_HEIGHT = 88;
 const int X_FRAMES = 3;
 const int Y_FRAMES = 4;
+
+
 
 #endif

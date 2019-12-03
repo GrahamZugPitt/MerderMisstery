@@ -102,13 +102,13 @@ int NPC::initSprite(std::string charName, std::string spriteFileName, unsigned i
 	}
 	if (personality[traits[1]] >= 25){
 		std::cout << "disloyalty colors swapped" << std::endl;
-		img.swapColor((unsigned int) 0xFF0000FF, DISLOYAL);
+		img.swapColor((unsigned int) 0xFF0000FF, DISLOYAL_GRAFX);
 	} else {
 		img.swapColor((unsigned int)0xFF0000FF, dLoyal);
 	}
 	if (personality[traits[3]] >= 25){
 		std::cout << "wrath colors swapped" << std::endl;
-		img.swapColor((unsigned int) 0xFFFF0000, WRATH);
+		img.swapColor((unsigned int) 0xFFFF0000, WRATH_GRAFX);
 	} else {
 		img.swapColor((unsigned int) 0xFFFF0000, dWrath);
 	} if (personality[traits[2]] >= 25){
@@ -128,6 +128,8 @@ int NPC::initSprite(std::string charName, std::string spriteFileName, unsigned i
     else
     {
         //Create texture from player sprite surface we just created
+				// And set The Render Scale Quality so we don't get fuzziness on zoom
+			  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
         texture = SDL_CreateTextureFromSurface(renderer, surface);
 
         //Check if texture was able to be made
@@ -202,6 +204,7 @@ void NPC::renderToScreen(SDL_Renderer *renderer, float timechange, SDL_Rect camP
 					crop.x = 7;
 					goingRight = true;
 				}
+  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 			}
 		}
 	}
@@ -251,8 +254,9 @@ std::string NPC::getSpriteName(){
 }
 
 void NPC::ghostThisNPC(){
-	mapPos.x = 2050;
-	mapPos.y = 200;
+	isGhost = true;
+	mapPos.x = 2064;
+	mapPos.y = 80;
 	SDL_SetTextureAlphaMod(texture, 100);
 	NPCCollider = *(new Collidable(mapPos.x + NPCColliderXOffset, mapPos.y + NPCColliderYOffset, NPCColliderWidth, NPCColliderHeight));
 	NPCConversationCollider = *(new Collidable(mapPos.x + ConvoColliderXOffset, mapPos.y + ConvoColliderYOffset, ConvoColliderWidth, ConvoColliderHeight));
