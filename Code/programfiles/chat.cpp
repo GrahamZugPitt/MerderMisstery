@@ -1,18 +1,3 @@
-#include <iostream>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <string>
-#include <cstring>
-#include <sstream>
-#include <unistd.h>
-#include <arpa/inet.h>
-
 #include "chat.hpp"
 #include "main_helper.hpp"
 #include "Users.h"
@@ -249,7 +234,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
       }
     }
     //if the user has pressed enter
-    if (send_text){ 
+    if (send_text){
       if(text.size() > 0){
         text = this_user.get_username() + ": " + text;
 
@@ -286,7 +271,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
       //update messages from server
       update_messages(renderer, text);
       update_render(renderer);
-      
+
       SDL_RenderDrawRect(renderer, &blankRect);
       SDL_RenderFillRect(renderer, &blankRect);
       SDL_RenderPresent(renderer);
