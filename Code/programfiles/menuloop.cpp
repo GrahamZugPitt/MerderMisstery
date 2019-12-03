@@ -11,7 +11,7 @@ std::string loadImgPath = "Art/Logo/Loading.png";
 const int ALL_BUTTON_TOP = 618;
 const int ALL_BUTTON_BOTTOM = 532;
 
-void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
+std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
   std::fstream save;
   save.open("save.txt", std::fstream::in);
   if (save) {
@@ -25,6 +25,8 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
   int cursor_x;
   int cursor_y;
+
+  std::string seed = "";
 
   //Logo Screen Loop
   while(!next && !(*quit)) {
@@ -59,6 +61,9 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
             } else {
               SDL_Delay(300);
               seed = enter_seed(e, &(*quit), keyState, renderer);
+              // If the player entered a seed, start the game
+              if(seed.compare("") != 0)
+                next = true;
               SDL_Delay(300);
               std::cout << "Exited Seed Loop\n";
             }
@@ -108,5 +113,6 @@ void menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     SDL_Texture* loadScreen = loadFiles(loadImgPath, renderer);
     SDL_RenderCopy(renderer, loadScreen, NULL, NULL);
     SDL_RenderPresent(renderer);
+    return seed;
   }
 }

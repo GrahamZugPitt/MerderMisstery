@@ -102,13 +102,13 @@ int NPC::initSprite(std::string charName, std::string spriteFileName, unsigned i
 	}
 	if (personality[traits[1]] >= 25){
 		std::cout << "disloyalty colors swapped" << std::endl;
-		img.swapColor((unsigned int) 0xFF0000FF, DISLOYAL);
+		img.swapColor((unsigned int) 0xFF0000FF, DISLOYAL_GRAFX);
 	} else {
 		img.swapColor((unsigned int)0xFF0000FF, dLoyal);
 	}
 	if (personality[traits[3]] >= 25){
 		std::cout << "wrath colors swapped" << std::endl;
-		img.swapColor((unsigned int) 0xFFFF0000, WRATH);
+		img.swapColor((unsigned int) 0xFFFF0000, WRATH_GRAFX);
 	} else {
 		img.swapColor((unsigned int) 0xFFFF0000, dWrath);
 	} if (personality[traits[2]] >= 25){

@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
       int initial_x = 2275;
       int initial_y = 136;
       int itemList[] = {0, 0, 0, 0};
-      menuloop(e, &quit, keyState, renderer);
+      std::string seed = menuloop(e, &quit, keyState, renderer);
 
       std::fstream save;
       save.open("save.txt", std::fstream::in);
