@@ -131,7 +131,7 @@ std::string init(NPC *npcs, SDL_Renderer *renderer, WorldObject *worldObjects, s
   worldObjects[0].initObject("Art/Merder Objects/bat.png", renderer, 960, 855, 100, 50, 5, 5, 100, 50);
   worldObjects[1].initObject("Art/Merder Objects/Hammer_1.png", renderer, 1371, 1660, 50, 80, 5, 5, 50, 80);
   worldObjects[2].initObject("Art/Merder Objects/Pickaxe_1.png", renderer, 2158, 1760, 80, 80, 5, 5, 80, 80);
-  worldObjects[3].initObject("Art/Merder Objects/butcher_knife.png", renderer, 2510, 855, 80, 80, 0, 0, 70, 70);  
+  worldObjects[3].initObject("Art/Merder Objects/butcher_knife.png", renderer, 2510, 855, 80, 80, 0, 0, 70, 70);
 
   // Make one of them a ghost
   int i;
@@ -174,7 +174,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
     //Sign collisions
     //SDL_Rect sign1;
-    
+
 
     // Collision dectction variables
     SDL_Rect collide;
@@ -216,19 +216,19 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
         //Talk to an NPC
         if (keyState[SDL_SCANCODE_X] && discussbool)
-            hasSolved = enter_discussion(e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
+          dialogue(town, e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
 
-        // Quit may have changed during the dialogue, so it's best to check 
+        // Quit may have changed during the dialogue, so it's best to check
         if (*quit) {
-            if (hasSolved == 0) {
-                std::fstream save;
-                save.open("save.txt", std::fstream::out);
-                save << seed << "\n" << player->positionPNG.x << "\n" << player->positionPNG.y << "\n";
-                save << itemList[0] << "\n" << itemList[1] << "\n" << itemList[2] << "\n" << itemList[3] << "\n";
-                save.close();
-            } else {
-                remove("save.txt");
-            }
+          if (hasSolved == 0) {
+            std::fstream save;
+            save.open("save.txt", std::fstream::out);
+            save << seed << "\n" << player->positionPNG.x << "\n" << player->positionPNG.y << "\n";
+            save << itemList[0] << "\n" << itemList[1] << "\n" << itemList[2] << "\n" << itemList[3] << "\n";
+            save.close();
+          } else {
+            remove("save.txt");
+          }
             return;
         }
 
@@ -405,7 +405,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         }
 
         //check for collision with signs
-        
+
         if (itemList[0] == 0) {
             worldObjects[0].renderToScreen(renderer, cam);
         }
