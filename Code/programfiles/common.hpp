@@ -25,4 +25,6 @@ const int PLAYER_HEIGHT = 88;
 const int X_FRAMES = 3;
 const int Y_FRAMES = 4;
 
+
+
 #endif

@@ -1,18 +1,3 @@
-#include <iostream>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <string>
-#include <cstring>
-#include <sstream>
-#include <unistd.h>
-#include <arpa/inet.h>
-
 #include "chat.hpp"
 #include "main_helper.hpp"
 #include "Users.h"
@@ -299,7 +284,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
     // Get the Keyboard State
     keyState = SDL_GetKeyboardState(NULL);
 
-    // Open Chat room
+    // Close Chat room
     if (keyState[SDL_SCANCODE_LCTRL] || keyState[SDL_SCANCODE_RCTRL])
     {
       if (keyState[SDL_SCANCODE_E])

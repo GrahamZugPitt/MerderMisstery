@@ -10,7 +10,7 @@ void roll_credits(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* 
   std::string dir = "Art/Credit Pictures/";
 	std::string ext = "CreditPicture.png";
 	std::vector <std::string> imgstrs{"Alex", "Bove", "Brindock", "Bryan",
-    "Darpun", "dves", "Griffin", "Jahnke", "Jiang", "ShawnBlake", "Zug"};
+    "Darpun", "dves", "Griffin", "Jahnke", "ShawnBlake", "Zug"};
 	for(auto name: imgstrs){
 		std::string full = dir + name + ext;
 
