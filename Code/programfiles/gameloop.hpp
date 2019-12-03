@@ -20,7 +20,8 @@
 #include "YellowBuilding.hpp"
 #include "RedBuilding.hpp"
 #include <time.h>
+#include <fstream>
 
-void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan, std::string seed);
+void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan, std::string seed, int player_x, int player_y, int itemList[4]);
 
 #endif

@@ -2,7 +2,7 @@
 #include "main_helper.hpp"
 #include "worldObjects.hpp"
 
-Player::Player(std::string playerTexturePath, SDL_Renderer *renderer){
+Player::Player(std::string playerTexturePath, SDL_Renderer *renderer, int player_x, int player_y){
     // Load several textures
     playerTexture = loadFiles(playerTexturePath, renderer);
     SDL_QueryTexture(playerTexture, NULL, NULL, &cropPNG.w, &cropPNG.h);
@@ -12,8 +12,8 @@ Player::Player(std::string playerTexturePath, SDL_Renderer *renderer){
     exitMessageTexture = loadFiles("Art/Messages/exitMessage.png", renderer);
 
     //Position of player sprite
-    positionPNG.x = 2275;
-    positionPNG.y = 136;
+    positionPNG.x = player_x;
+    positionPNG.y = player_y;
 
     xvel = yvel = 0.0;
     //Setting last positions for use in collisions

@@ -143,11 +143,11 @@ std::string init(NPC *npcs, SDL_Renderer *renderer, WorldObject *worldObjects, s
   return seed;
 }
 
-void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan, std::string seed){
+void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, bool farnan, std::string seed, int player_x, int player_y, int itemList[4]){
     // Initialize world texture, player texture, and camera
     SDL_Texture *bg = loadFiles(mapImgPath, renderer);
     SDL_Texture *interactPromptingTex = loadFiles(interactImgPath, renderer);
-    Player *player = new Player(playerImgPath, renderer);
+    Player *player = new Player(playerImgPath, renderer, player_x, player_y);
     SDL_Rect cam = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
     NPClite town[12];
 
@@ -170,13 +170,13 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     YellowBuilding yBuilding; // South West (Residences?)
     RedBuilding rBuilding;    // North  (Murder *Ominous music playing*)
   //PurpleBuilding pBuilding; // Central (Courtyard)
-
-    int itemList[] = {0, 0, 0, 0};
+    
 
     // Collision dectction variables
     SDL_Rect collide;
     SDL_Rect convCollide;
     int hasCollided = 0;
+    int hasSolved = 0;
     //Enter Game Loop
     while(!(*quit)) {
         //SDL time and delta value
@@ -212,11 +212,21 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
         //Talk to an NPC
         if (keyState[SDL_SCANCODE_X] && discussbool)
-            enter_discussion(e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
+            hasSolved = enter_discussion(e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
 
-        // Quit may have changed during the dialogue, so it's best to check
-        if (*quit)
+        // Quit may have changed during the dialogue, so it's best to check 
+        if (*quit) {
+            if (hasSolved == 0) {
+                std::fstream save;
+                save.open("save.txt", std::fstream::out);
+                save << seed << "\n" << player->positionPNG.x << "\n" << player->positionPNG.y << "\n";
+                save << itemList[0] << "\n" << itemList[1] << "\n" << itemList[2] << "\n" << itemList[3] << "\n";
+                save.close();
+            } else {
+                remove("save.txt");
+            }
             return;
+        }
 
         //Move Player
         player->move(time_change, keyState, farnan);

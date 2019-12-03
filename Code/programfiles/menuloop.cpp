@@ -4,6 +4,7 @@
 #include "chatLogin.hpp"
 #include "seed.hpp"
 #include "credits.hpp"
+#include  <fstream>
 
 std::string logoImgPath = "Art/Logo/Start_Screen.png";
 std::string loadImgPath = "Art/Logo/Loading.png";
@@ -13,6 +14,12 @@ const int ALL_BUTTON_BOTTOM = 532;
 bool chatLoggedIn = false;
 
 std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
+  std::fstream save;
+  save.open("save.txt", std::fstream::in);
+  if (save) {
+    logoImgPath = "Art/Logo/Continue_Screen.png";
+  }
+  save.close();
   // Load the title screens
   SDL_Texture* logoScreen = loadFiles(logoImgPath, renderer);
   bool next = false;
@@ -21,10 +28,10 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
   int cursor_y;
 
   std::string seed = "";
+  SDL_Event nullEvent;
 
   //Logo Screen Loop
   while(!next && !(*quit)) {
-
     while(SDL_PollEvent(&e) != 0) {
       if(e.type == SDL_QUIT) {
         (*quit) = true;
@@ -48,20 +55,34 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
           //Enter Seed Left-X value: 107
           //Enter Seed Right-X value: 393
           case 107 ... 393:
-            SDL_Delay(300);
-            seed = enter_seed(e, &(*quit), keyState, renderer);
-            // If the player entered a seed, start the game
-            if(seed.compare("") != 0)
-              next = true;
-            SDL_Delay(300);
-            std::cout << "Exited Seed Loop\n";
+            if (save) {  // Replace the seed call to the abort
+              remove("save.txt");
+              logoImgPath = "Art/Logo/Start_Screen.png";
+              logoScreen = loadFiles(logoImgPath, renderer);
+              e = nullEvent;
+              save.open("save.txt", std::fstream::in);
+              save.close();
+            } else {
+              SDL_Delay(300);
+              seed = enter_seed(e, &(*quit), keyState, renderer);
+              // If the player entered a seed, start the game
+              if(seed.compare("") != 0)
+                next = true;
+              SDL_Delay(300);
+              std::cout << "Exited Seed Loop\n";
+            }
             break;
 
           //Start Game Left-X value: 492
           //Start Game Right-X value: 779
           case 492 ... 779:
-            std::cout << "Start Game\n";
-            next = true; // Start the game
+            if (save) { //TODO: Replace the start call to the continue call
+              std::cout << "Start Game\n";
+              next = true; // Start the game
+            } else {
+              std::cout << "Start Game\n";
+              next = true; // Start the game
+            }
             break;
 
           //Roll Credits Left-X value: 876
@@ -103,4 +124,5 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
     SDL_RenderPresent(renderer);
     return seed;
   }
+  return "";
 }
