@@ -8,6 +8,11 @@ const std::string chatLoginPath = "Art/Chat/chat_login.png";
 //initialize chatScreen texture
 SDL_Texture* chatLoginScreen;
 
+// The Chat error template
+const std::string chatErrorPath = "Art/Chat/chat_error.png";
+//initialize chatError texture
+SDL_Texture* chatError;
+
 //inLogin boolean value
 bool inLogin;
 
@@ -128,6 +133,14 @@ void enter_login(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* r
   //First string is the host name and second is the port number
   if ((rv = getaddrinfo("colton-VirtualBox", "9034", &hints, &servinfo)) != 0){
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+    //set chat error texture
+    chatError = loadFiles(chatErrorPath, renderer);
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, chatError, NULL, NULL); //Render chat error page
+    SDL_RenderPresent(renderer);
+    SDL_Delay(3000);
+    SDL_RenderClear(renderer);
+    SDL_DestroyTexture(chatError);
     return;
   }
 
