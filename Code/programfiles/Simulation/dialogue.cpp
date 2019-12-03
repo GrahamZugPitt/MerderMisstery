@@ -8,7 +8,109 @@ const int NUMBER_OF_STATES = 10;
 const int DIALOGUE_OPTIONS_PER_STATE = 4;
 const int CHOOSE_NPC_MODE = 1;
 
+std::string discussionBoxPath = "Art/DiscussionImages/DiscussionBox.png";
+std::string selectedBoxPath = "Art/DiscussionImages/TextBoxSelected.png";
+std::string deselectedBoxPath = "Art/DiscussionImages/TextBoxDeselected.png";
+std::string singlePlayerPathDisc = "Art/Player/SinglePlayer.png";
 
+SDL_Rect useless;
+
+int nameboxw = 100;
+int nameboxh = 50;
+
+int boxw, boxh, width_offset, height_offset, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, w, h, selected_x, selected_y;
+
+std::string TLString = "Who do you think killed Butler?";
+std::string TRString = "What is your last memory of the victim?";
+std::string BLString = "How does Tom feel about Jerry?";
+std::string BRString = "Where were you last evening?";
+std::string ResponseString = "Greetings, Detective.";
+
+// This first huge chunk is pulled from the discussion file (which is no longer around)
+// An initial function to get everything set up
+void setup_vars(SDL_Texture *selected, SDL_Texture *discussionBoxTex){
+  SDL_QueryTexture(selected, NULL, NULL, &boxw, &boxh);
+  SDL_QueryTexture(discussionBoxTex, NULL, NULL, &w, &h);
+
+  width_offset = (SCREEN_WIDTH - 2 * boxw) / 3;
+  height_offset = (SCREEN_HEIGHT - h - 2 * boxh) / 3;
+
+  tl_x = width_offset;
+  tl_y = SCREEN_HEIGHT - h + height_offset;
+
+  tr_x = tl_x + boxw + width_offset;
+  tr_y = tl_y;
+
+  bl_x = tl_x;
+  bl_y = tl_y + boxh + height_offset - 25;
+
+  br_x = tr_x;
+  br_y = bl_y;
+}
+
+void draw_peoples(SDL_Renderer *renderer, SDL_Texture *playerTex, SDL_Texture *npcTex){
+  renderTexture(renderer, playerTex, useless, 277, 36, 224, 288, false);
+
+  SDL_Rect crop, pos;
+
+  crop.x = 12;
+	crop.y = 12;
+	crop.w = 56;
+	crop.h = 72;
+
+  pos.x = 779;
+	pos.y = 36;
+	pos.w = 224;
+	pos.h = 288;
+
+  SDL_RenderCopy(renderer, npcTex, &crop, &pos);
+}
+
+void draw_boxes(int selectnum, SDL_Renderer *renderer, SDL_Texture *selected, SDL_Texture *deselected, int w, int h){
+  if(selectnum != 1)
+    renderTexture(renderer, deselected, useless, tl_x, tl_y, boxw, boxh, false);
+  if(selectnum != 2)
+    renderTexture(renderer, deselected, useless, tr_x, tr_y, boxw, boxh, false);
+  if(selectnum != 3)
+    renderTexture(renderer, deselected, useless, bl_x, bl_y, boxw, boxh, false);
+  if(selectnum != 4)
+    renderTexture(renderer, deselected, useless, br_x, br_y, boxw, boxh, false);
+
+  switch(selectnum){
+    case 1:
+      selected_x = tl_x;
+      selected_y = tl_y;
+      break;
+    case 2:
+      selected_x = tr_x;
+      selected_y = tr_y;
+      break;
+    case 3:
+      selected_x = bl_x;
+      selected_y = bl_y;
+      break;
+    default: // Only other possible case is 4 so this is an else
+      selected_x = br_x;
+      selected_y = br_y;
+      break;
+  }
+
+  renderTexture(renderer, selected, useless, selected_x, selected_y, boxw, boxh, false);
+}
+
+// The function to actually draw the text boxes on the screen
+void draw_text(SDL_Renderer *renderer, SDL_Texture *TLBox, SDL_Rect TLBoxRect, SDL_Texture *TRBox, SDL_Rect TRBoxRect, SDL_Texture *BLBox, SDL_Rect BLBoxRect, SDL_Texture *BRBox, SDL_Rect BRBoxRect){
+  SDL_RenderCopy(renderer, TLBox, NULL, &TLBoxRect);
+  SDL_RenderCopy(renderer, TRBox, NULL, &TRBoxRect);
+  SDL_RenderCopy(renderer, BLBox, NULL, &BLBoxRect);
+  SDL_RenderCopy(renderer, BRBox, NULL, &BRBoxRect);
+}
+
+// End of Griffin's code, moving on to Graham's
+// Note all the comments are Griffin's, because Graham doesn't comment his code *angery emoji*
+// jk Graham didn't expect me to have to look at it so it's not his fault
+
+// Setting up enums for use in the simulation & dialogue
 enum dishonesty{
 	LITERALLY_CANNOT_LIE = 5,
 	SOMEWHAT_DISHONEST = 10,
@@ -50,6 +152,7 @@ enum dialogueOptions{
 	FILLER,
 };
 
+// Class to represent a dialogue option
 class dialogueOption{
 	public:
 		int nextTag;
@@ -70,6 +173,7 @@ class dialogueOption{
 	~dialogueOption();
 };
 
+// Container for dialogue options
 class dialogueOptionList{
 	public:
 		dialogueOption** options;
@@ -94,21 +198,15 @@ class dialogueOptionList{
 	}
 
 	void printState(){
-		for(int i = 0; i < DIALOGUE_OPTIONS_PER_STATE; i++)
-			std::cout << i << ") " << options[i]->option << "\n"; //TODO: This is the function that prints out each dialogue option for a given state. Change this so that options[i] is blitted to the ith dialogue rectangle.
+		TLString = options[0]->option;
+		TLString = options[1]->option;
+		TLString = options[2]->option;
+		TLString = options[3]->option;
 	}
-
-
 };
 
-
-
-std::string response(int option){
-	switch(option){
-
-	}
-}
-
+// Returns the index of the dead NPC
+//		We need to talk about our naming conventions
 int getNPC(NPClite* town){
 	for(int i = 0; i < TOWN_SIZE; i++){
 		if(town[i].isDead)
@@ -116,6 +214,7 @@ int getNPC(NPClite* town){
 	}
 }
 
+// Just sets up the default stuff for the
 dialogueOptionList* initializeOptions(NPClite* town){
 	std::string dead = town[getNPC(town)].name;
 	dialogueOption* o0 = new dialogueOption("Who dislikes " + dead + "?", HOWFEEL, NPCS1);
@@ -223,6 +322,8 @@ dialogueOptionList* initializeOptions(NPClite* town){
 
 	return globalList;
 }
+
+// Maps from the event enum to string reps
 std::string eventConverterDialogue(int event){
 	switch(event){
 		case CDATE:
@@ -255,6 +356,7 @@ std::string eventConverterDialogue(int event){
 	return "performed an unperformable action on";
 }
 
+// Pretty much the same as before, just with talking to the player
 std::string eventConverterAskEvent(int event){
 	switch(event){
 		case CDATE:
@@ -285,6 +387,7 @@ std::string eventConverterAskEvent(int event){
 	return "performed an unperformable action on";
 }
 
+// Returns a time rep of game time
 std::string getTime(int time){
 	std::string statement = "";
 	int days = (CLOCK - time)/4;
@@ -308,6 +411,7 @@ std::string getTime(int time){
 	return statement;
 }
 
+// Not 100% on why this one exists, but I'm sure as shit not touching it
 bool compareNames(NPClite* town, int npc1, std::string npc2){
 	if(!town[npc1].name.compare(npc2))
 		return true;
@@ -315,18 +419,19 @@ bool compareNames(NPClite* town, int npc1, std::string npc2){
 }
 
 void printEventDialogue(Event* e){
-			std::cout << e->npcName1 << " " << eventConverterDialogue(e->event) << " " << e->npcName2 << " " << getTime(e->time) << " at " << locationConverter(e->location) << ". \n"; //TODO: Change std::cout to a blit to the screen.
+			ResponseString = e->npcName1 + " " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ". \n"; //TODO: Change std::cout to a blit to the screen.
 }
 
-void printEventDialogueFPF(Event* e){
-			std::cout << "I " << eventConverterDialogue(e->event) << " " << e->npcName2 << " " << getTime(e->time) << " at " << locationConverter(e->location) << ". \n";	//TODO: Change std::cout to a blit to the screen.
+// Return different dialogue options
+std::string printEventDialogueFPF(Event* e){
+			ResponseString = "I " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ".";	//TODO: Change std::cout to a blit to the screen.
 }
-void printEventDialogueFPS(Event* e){
-			std::cout << e->npcName1 << " " << eventConverterDialogue(e->event) << " me " << getTime(e->time) << " at " << locationConverter(e->location) << ". \n"; //TODO: Change std::cout to a blit to the screen.
+std::string printEventDialogueFPS(Event* e){
+			ResponseString = e->npcName1 + " " + eventConverterDialogue(e->event) + " me " + getTime(e->time) + " at " + locationConverter(e->location) + "."; //TODO: Change std::cout to a blit to the screen.
 }
 
 void printEventDialogueGossip(Event* e){
-			std::cout << "I heard " << e->npcName1 << " " << eventConverterDialogue(e->event) << " " << e->npcName2 << " " << getTime(e->time) << " at " << locationConverter(e->location) << ". \n"; //TODO: Change std::cout to a blit to the screen.
+			ResponseString = "I heard " + e->npcName1 + " " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ". \n"; //TODO: Change std::cout to a blit to the screen.
 }
 
 bool suspeciousEvent(int event){
@@ -382,7 +487,7 @@ void doneWithSelf(NPClite* town, int beingInterrogated, int npc){
 			}
 	}
 	if(!anyEvent)
-		std::cout << "I've only made small talk with " << town[npc].name + "."; //TODO: Change std::cout to a blit to the screen.
+		ResponseString =  "I've only made small talk with " + town[npc].name + ".";
 }
 
 void doneWith(NPClite* town, int beingInterrogated, int npc){
@@ -399,7 +504,7 @@ void doneWith(NPClite* town, int beingInterrogated, int npc){
 			}
 	}
 	if(!anyEvent)
-	std::cout << "I've only ever seen " << town[npc].name + " make small talk with others."; //TODO: Change std::cout to a blit to the screen.
+	ResponseString = "I've only ever seen " + town[npc].name + " make small talk with others.";
 }
 std::string howFeel(NPClite* town, int npc, int beingInterrogated){
 	std::string dislike = "";
@@ -453,14 +558,14 @@ void heard(NPClite* town, int beingInterrogated){
 }
 
 std::string whenSeen(NPClite* town, int npc, int beingInterrogated){
-	std::string lastMemory = "I can't remember when I last saw " + town[npc].name; //TODO: Change std::cout to a blit to the screen.
+	ResponseString = "I can't remember when I last saw " + town[npc].name;
 	int event = -1;
 	int eventTime = -1;
 	Event* e = new Event();
 	bool wasObservation = false;
 	for(int i = town[beingInterrogated].memories.getSize() - 1; i > -1; i--){
-		if(wasInvolvedInEvent(town,town[beingInterrogated].memories.getMemory(i),npc) &&
-sayPersonalEvent(town,town[beingInterrogated].memories.getMemory(i)->event,beingInterrogated)){
+		if (wasInvolvedInEvent(town,town[beingInterrogated].memories.getMemory(i),npc) &&
+				sayPersonalEvent(town,town[beingInterrogated].memories.getMemory(i)->event,beingInterrogated)){
 			event = town[beingInterrogated].memories.getMemory(i)->event;
 			eventTime = town[beingInterrogated].memories.getMemory(i)->time;
 			e = town[beingInterrogated].memories.getMemory(i);
@@ -561,9 +666,31 @@ bool goodMurder(NPClite* town){
 	return false;
 }
 
-
-
+// The function that gets called when it's time to get down to work for reals
 int dialogue(NPClite* town){
+	// Discussion Code
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"); // No bluriness on resize
+	// Load the textures necessary for the menu
+  SDL_Texture* discussionBoxTex = loadFiles(discussionBoxPath, renderer);
+  SDL_Texture* selectedBoxTex = loadFiles(selectedBoxPath, renderer);
+  SDL_Texture* deselectedBoxTex = loadFiles(deselectedBoxPath, renderer);
+  SDL_Texture* playerTex = loadFiles(singlePlayerPathDisc, renderer);
+  SDL_Texture* npcTex = theNPC->texture;
+
+	// Initialize a bunch of values
+  setup_vars(selectedBoxTex, discussionBoxTex);
+
+	// Set up the text variables, values, etc
+  TTF_Font *TNR = TTF_OpenFont("Art/Font/times-new-roman.ttf", 24); // Opens the font and sets the size
+  if(!TNR)
+    printf("TTF_OpenFont error: %s\n", TTF_GetError());
+  SDL_Color White = {255, 255, 255};
+  SDL_Color Yellow = {255, 255, 0};
+
+	// Create the surfaces for the text messages
+  SDL_Surface *TLsurfaceMessage, *TRsurfaceMessage, *BLsurfaceMessage, *BRsurfaceMessage, *CharNameSurface;
+
+	// Set up part 2 - Graham's stuff
 	dialogueOptionList* globalOptionList = initializeOptions(town);
 	int dialogueState = INITIAL_STATE;
 	int npcBeingInterrogated = 0;
@@ -572,12 +699,6 @@ int dialogue(NPClite* town){
 	//int currentNPC = -1; useful if commented out functions are included
 
 	while(npcBeingInterrogated != -1){
-		if(CHOOSE_NPC_MODE){
-			std::cout << "\n" << "Who to Interrogate?" << "\n";
-			for(int i = 0; i < TOWN_SIZE; i++)
-				std::cout << i << ") " << town[i].name << "\n";
-			std::cin >> npcBeingInterrogated; //TODO: npcBeingInterrogated should be changed so that it is always set to the integer representing the position of the NPC being talked to in the town array. Perhaps this should be an added argument to the dialogue function.
-		}
 		input = -1;
 		globalOptionList[dialogueState].printState();
 		//TODO: This while loop can be taken out after implementing a dialogue selection.
@@ -590,12 +711,12 @@ int dialogue(NPClite* town){
 		if(tag == HOWFEEL){
 			int npc = getNPC(town);
 			output = howFeel(town, npc, npcBeingInterrogated);
-			std::cout << output; //TODO: Change std::cout to a blit to the screen.
+			ResponseString = output;
 		}
 		if(tag == WHENSEEN){
 			int npc = getNPC(town);
 			output = whenSeen(town,npc,npcBeingInterrogated);
-			std::cout << output; //TODO: Change std::cout to a blit to the screen.
+			ResponseString = output;
 		}
 		if(tag == HEARD){
 			heard(town,npcBeingInterrogated);

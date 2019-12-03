@@ -212,7 +212,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
         //Talk to an NPC
         if (keyState[SDL_SCANCODE_X] && discussbool)
-            enter_discussion(e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
+            dialogue(town, e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
 
         // Quit may have changed during the dialogue, so it's best to check
         if (*quit)
