@@ -13,8 +13,9 @@
 #include "../NPC_Gen/npc.hpp"
 #include "Simulation/simulation.hpp"
 
-#include "CyanBuilding.hpp"
+#include "Sign1.hpp"
 
+#include "CyanBuilding.hpp"
 #include "BlueBuilding.hpp"
 #include "GreenBuilding.hpp"
 #include "YellowBuilding.hpp"
