@@ -53,6 +53,39 @@ std::string BLString;
 std::string BRString;
 std::string ResponseString = "Greetings, Detective.";
 
+// Helpers for my string placement function
+const int charwidth = 10;
+const int charheight = 10;
+
+// Render a string to a rectangle onscreen, wrapping around if the text is too long
+int writeString(std::string message, SDL_Rect insideRect, SDL_Renderer *renderer){
+	// First make sure it'll fit inside the insideRect
+	if(((insideRect.w / charwidth) * (insideRect.h / charheight)) < message.length() * charwidth) return -1;
+	// Otherwise, create lists to render the whole thing
+	int numTexs = insideRect.h / charheight;
+	int texW = insideRect.w / charwidth;
+	char dividedStrings[texW][numTexs];
+	SDL_Surface *stringSurfaces[numTexs]; // Yes, an array of SDL_Surface pointers
+	SDL_Texture *stringTextures[numTexs]; // And texture pointers
+	SDL_Rect stringRects[numTexs]; // But just rects
+
+	// Fill the string array with characters
+	int i;
+	for(i = 0; i < message.length(); i++){
+		dividedStrings[i / texW][i % texW] = message.at(i);
+	}
+
+	// Set up the surface and texture (pointers)
+	for(i = 0; i < numTexs; i++){
+		char my_str[texW];
+		strncpy(my_str, dividedStrings[i * texW], texW);
+		stringSurfaces[i] = SDL_CreateTextureFromSurface(renderer, my_str);
+		// No idea if this will work, but it's where I left off
+		// TODO
+	}
+
+}
+
 // Returns the index of the dead NPC
 //		We need to talk about our naming conventions
 int getNPC(){
@@ -992,14 +1025,9 @@ void dialogue(NPClite* our_town, SDL_Event e, bool *quit, const Uint8 *keyState,
     printf("TTF_OpenFont error: %s\n", TTF_GetError());
 
 	// Create the surfaces for the text messages
-  SDL_Surface *TLsurfaceMessage, *TRsurfaceMessage, *BLsurfaceMessage, *BRsurfaceMessage, *CharNameSurface;
-
-  // Set up the name texture as well
-  CharNameSurface = TTF_RenderText_Solid(TNR, theNPC->getName().c_str(), Yellow);
+  SDL_Surface *CharNameSurface = TTF_RenderText_Solid(TNR, theNPC->getName().c_str(), Yellow);
   CharTex = SDL_CreateTextureFromSurface(renderer, CharNameSurface);
-
   SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
-
 
 	dialogueState = INITIAL_FOUR;
 
