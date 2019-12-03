@@ -46,30 +46,6 @@ void enter_discussion(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Render
         return;
     }
 
-    // Input Handler
-    // Get the Keyboard State
-    keyState = SDL_GetKeyboardState(NULL);
-
-    if (keyState[SDL_SCANCODE_W] || keyState[SDL_SCANCODE_UP]){
-      if(selected == 3) selected = 1;
-      if(selected == 4) selected = 2;
-    }
-
-    if (keyState[SDL_SCANCODE_A] || keyState[SDL_SCANCODE_LEFT]){
-      if(selected == 2) selected = 1;
-      if(selected == 4) selected = 3;
-    }
-
-    if (keyState[SDL_SCANCODE_S] || keyState[SDL_SCANCODE_DOWN]){
-      if(selected == 1) selected = 3;
-      if(selected == 2) selected = 4;
-    }
-
-    if (keyState[SDL_SCANCODE_D] || keyState[SDL_SCANCODE_RIGHT]){
-      if(selected == 1) selected = 2;
-      if(selected == 3) selected = 4;
-    }
-
     if ((keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]) && theNPC->isGhost){
       runWinScreen(e, quit, keyState, renderer);
     }

@@ -18,7 +18,7 @@ SDL_Rect useless;
 int nameboxw = 100;
 int nameboxh = 50;
 
-int boxw, boxh, width_offset, height_offset, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, w, h, selected_x, selected_y;
+int boxw, boxh, width_offset, height_offset, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, w, h, selected_x, selected_y, multiple_answers_page, num_answers;
 
 std::string TLString = "Who do you think killed Butler?";
 std::string TRString = "What is your last memory of the victim?";
@@ -117,18 +117,24 @@ enum dishonesty{
 	VERY_DISHONEST = 15,
 };
 
+// Referring to the four possible states of dialogue
+//  in a normal conversation (not with the ghost)
 enum stateOptions{
-	INITIAL_STATE,
-	NPCS1,
-	NPCS2,
-	NPCS3,
-	NPCS4,
-	ACTION1,
-	ACTION2,
-	ACTION3,
-	ACTION4,
-	SELF_OR_OTHERS,
+	INITIAL_FOUR,
+  WHAT_HAVE_YOU_TWO,
+  ONE_ANSWER,
+  MULTIPLE_ANSWERS
 };
+
+// Keeps track of which dialogue element entered one of the above states
+//  Init four doesn't given an answer, so we don't need one for that
+enum whoSentYou{
+  INIT_ONE,
+  INIT_TWO,
+  INIT_THREE,
+  WHAT_ONE,
+  WHAT_TWO
+} whereFrom;
 
 enum dialogueOptions{
 	NPC0,
@@ -418,20 +424,21 @@ bool compareNames(NPClite* town, int npc1, std::string npc2){
 	return false;
 }
 
+// Print out an arbitrary event dialogue
 void printEventDialogue(Event* e){
-			ResponseString = e->npcName1 + " " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ". \n"; //TODO: Change std::cout to a blit to the screen.
+			ResponseString = e->npcName1 + " " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ". \n";
 }
 
-// Return different dialogue options
+//
 std::string printEventDialogueFPF(Event* e){
-			ResponseString = "I " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ".";	//TODO: Change std::cout to a blit to the screen.
+			ResponseString = "I " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ".";
 }
 std::string printEventDialogueFPS(Event* e){
-			ResponseString = e->npcName1 + " " + eventConverterDialogue(e->event) + " me " + getTime(e->time) + " at " + locationConverter(e->location) + "."; //TODO: Change std::cout to a blit to the screen.
+			ResponseString = e->npcName1 + " " + eventConverterDialogue(e->event) + " me " + getTime(e->time) + " at " + locationConverter(e->location) + ".";
 }
 
 void printEventDialogueGossip(Event* e){
-			ResponseString = "I heard " + e->npcName1 + " " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ". \n"; //TODO: Change std::cout to a blit to the screen.
+			ResponseString = "I heard " + e->npcName1 + " " + eventConverterDialogue(e->event) + " " + e->npcName2 + " " + getTime(e->time) + " at " + locationConverter(e->location) + ". \n";
 }
 
 bool suspeciousEvent(int event){
@@ -458,7 +465,6 @@ bool sayPersonalEventMurderer(NPClite* town, int event, int beingInterrogated){
 }
 
 bool sayPersonalEvent(NPClite* town, int event, int beingInterrogated){
-
 	if(town[beingInterrogated].didMurder)
 		return sayPersonalEventMurderer(town,event,beingInterrogated);
 	if((!suspeciousEvent(event)
@@ -506,6 +512,7 @@ void doneWith(NPClite* town, int beingInterrogated, int npc){
 	if(!anyEvent)
 	ResponseString = "I've only ever seen " + town[npc].name + " make small talk with others.";
 }
+
 std::string howFeel(NPClite* town, int npc, int beingInterrogated){
 	std::string dislike = "";
 	bool nobody = true;
@@ -666,8 +673,126 @@ bool goodMurder(NPClite* town){
 	return false;
 }
 
+// Handle input for the main conversation menu
+void init_four_keyhandler(const Uint8 *keyState){
+  keyState = SDL_GetKeyboardState(NULL);
+
+  if (keyState[SDL_SCANCODE_W] || keyState[SDL_SCANCODE_UP]){
+    if(selected == 3) selected = 1;
+    if(selected == 4) selected = 2;
+  }
+
+  if (keyState[SDL_SCANCODE_A] || keyState[SDL_SCANCODE_LEFT]){
+    if(selected == 2) selected = 1;
+    if(selected == 4) selected = 3;
+  }
+
+  if (keyState[SDL_SCANCODE_S] || keyState[SDL_SCANCODE_DOWN]){
+    if(selected == 1) selected = 3;
+    if(selected == 2) selected = 4;
+  }
+
+  if (keyState[SDL_SCANCODE_D] || keyState[SDL_SCANCODE_RIGHT]){
+    if(selected == 1) selected = 2;
+    if(selected == 3) selected = 4;
+  }
+
+  if (keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]){
+    // The first two options just dumps you into an answer
+    if(selected == 1){
+      dialogueState = ONE_ANSWER;
+      whereFrom = INIT_ONE;
+    }
+    else if(selected == 2){
+      dialogueState = ONE_ANSWER;
+      whereFrom = INIT_TWO;
+    }
+    else if(selected == 3){ // 3 will give you the first page of a (possibly) multi-page answer
+      dialogueState = MULTIPLE_ANSWERS;
+      multiple_answers_page = 0;
+      whereFrom = INIT_THREE;
+    }
+    else if(selected == 4){
+      dialogueState = WHAT_HAVE_YOU_TWO;
+      selected = 1;
+    }
+  }
+}
+
+// Handle input from the "What have you..." menu
+void what_two_keyhandler(const Uint8 *keyState){
+  keyState = SDL_GetKeyboardState(NULL);
+
+  if (keyState[SDL_SCANCODE_A] || keyState[SDL_SCANCODE_LEFT]){
+    if(selected == 2) selected = 1;
+  }
+
+  if (keyState[SDL_SCANCODE_D] || keyState[SDL_SCANCODE_RIGHT]){
+    if(selected == 1) selected = 2;
+  }
+
+  if (keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]){
+    // The first two options just dumps you into an answer
+    if(selected == 1){
+      dialogueState = MULTIPLE_ANSWERS;
+      multiple_answers_page = 0;
+      whereFrom = WHAT_ONE;
+    }
+    else if(selected == 2){
+      dialogueState = MULTIPLE_ANSWERS;
+      multiple_answers_page = 0;
+      whereFrom = WHAT_TWO;
+    }
+  }
+}
+
+// Handle input from the multiple answer dialogue menu
+void multiple_answers_page(const Uint8 *keyState){
+  keyState = SDL_GetKeyboardState(NULL);
+
+  // Flip through the multiple pages with left and right arrow keys
+  if (keyState[SDL_SCANCODE_A] || keyState[SDL_SCANCODE_LEFT]){
+    if(multiple_answers_page < num_answers - 1) multiple_answers_page++;
+  }
+
+  if (keyState[SDL_SCANCODE_D] || keyState[SDL_SCANCODE_RIGHT]){
+    if(multiple_answers_page > 0) multiple_answers_page--;
+  }
+
+  // Reset to the main page
+  if (keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN]){
+    dialogueState = INITIAL_FOUR;
+  }
+}
+
+// Handles key input for the usual NPC conversation
+int key_handler(stateOptions dialogueState, const Uint8 *keyState){
+  // If you wanna quit, we're out, no problem
+  keyState = SDL_GetKeyboardState(NULL);
+  if (keyState[SDL_SCANCODE_Q])
+    return -1;
+
+  if(dialogueState == INITIAL_FOUR){
+    init_four_keyhandler(keyState);
+  }
+  else if(dialogueState == WHAT_HAVE_YOU_TWO){
+    what_two_keyhandler(keyState);
+  }
+  else if(dialogueState == MULTIPLE_ANSWERS){
+    multiple_answers_keyhandler(keyState);
+  }
+  else{
+    // If we're only at the one answer
+    keyState = SDL_GetKeyboardState(NULL);
+    if (keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN])
+      dialogueState = INITIAL_FOUR;
+  }
+
+  return 1;
+}
+
 // The function that gets called when it's time to get down to work for reals
-int dialogue(NPClite* town){
+int dialogue(NPClite* town, SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, NPC *theNPC){
 	// Discussion Code
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"); // No bluriness on resize
 	// Load the textures necessary for the menu
@@ -692,19 +817,19 @@ int dialogue(NPClite* town){
 
 	// Set up part 2 - Graham's stuff
 	dialogueOptionList* globalOptionList = initializeOptions(town);
-	int dialogueState = INITIAL_STATE;
+	stateOptions dialogueState = INITIAL_FOUR;
 	int npcBeingInterrogated = 0;
 	int input = -1;
 	//int currentQuestion = -1;
 	//int currentNPC = -1; useful if commented out functions are included
 
 	while(npcBeingInterrogated != -1){
-		input = -1;
-		globalOptionList[dialogueState].printState();
-		//TODO: This while loop can be taken out after implementing a dialogue selection.
-		while(input < 0 || input > 3){
-			std::cin >> input; //TODO: This input represents a selection of a dialogue option, so replace it with an integer representation of each dialogue option. (e.g. a 0 represents the "who dislikes (murdered) question.)
-		}
+		// TODO: INPUT HANDLER
+    int shouldIquit = key_handler(dialogueState, keyState);
+    if(shouldIquit == -1) return; // -1 means yes, I should quit
+
+    // TODO: TICK HANDLER
+    //    Update the data structure according to the state of the menu
 		int tag = globalOptionList[dialogueState].options[input]->tag;
 		dialogueState = globalOptionList[dialogueState].options[input]->nextTag;
 		std::string output = "";
@@ -730,7 +855,9 @@ int dialogue(NPClite* town){
 				doneWith(town,npcBeingInterrogated,npc);
 			}
 		}
-			dialogueState = INITIAL_STATE;
+		dialogueState = INITIAL_STATE;
+
+    // TODO: DRAW HANDLER
 	}
 	return 0;
 }
