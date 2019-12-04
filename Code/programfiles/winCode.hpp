@@ -4,5 +4,6 @@
 #include "common.hpp"
 
 void runWinScreen(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer);
+void runLoseScreen(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer);
 
 #endif

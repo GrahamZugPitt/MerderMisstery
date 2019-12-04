@@ -4,9 +4,9 @@
 #include <ctime>
 
 
-const int SEED = 1;
+const int SEED = 0;
 const int EVENT_MODE = 0;
-const int DEBUG_MODE = 0;
+const int DEBUG_MODE = 1;
 const int OBSERVATION_MODE = 0;
 const int HEARSAY_MODE = 0;
 const int TOWN_SIZE = 12;
@@ -15,7 +15,7 @@ const int SELFCONTROL = 40;
 const int MURDER_MODE = 1;
 const int M = 982451653;
 const int MULTIPLIER = 373587883;
-int seed = 1; 
+unsigned int seed = 1; 
 int CLOCK = 0;
 
 enum relationshipDelta{
@@ -97,6 +97,7 @@ public:
 	int relationships[TOWN_SIZE];
 	int personality[5];
 	int schedule[12];
+	int goal[12];
 	int murderiness;
 	int role;
 	bool didMurder;
@@ -110,6 +111,9 @@ public:
 			relationships[i] = 0;
 		for(int i = 0; i < 5; i++){
 			personality[i] = (z_rand() % 101);
+		}
+		for(int i = 0; i < TOWN_SIZE; i++){
+			goal[i] = -1;
 		}
 		murderiness = 0;
 		mood = 0;
@@ -126,6 +130,12 @@ public:
 		for(int i = 0; i < 5; i++){
 			personality[i] = (z_rand() % 101);
 		}
+		memories.wipe();
+		observations.wipe();
+		hearSay.wipe();
+		for(int i = 0; i < TOWN_SIZE; i++){
+			goal[i] = -1;
+		}		
 		murderiness = 10;
 		mood = 0;
 		didMurder = false;
@@ -221,7 +231,6 @@ public:
 		}
 
 	}
-
 };
 
 //converts the integer value associated with an event to a string
@@ -300,11 +309,32 @@ bool isEventType(NPClite* town, Event* e, int eventType){
 }
 
 int findObserver(NPClite* town, int firstNPC, int secondNPC){
+	int obs[TOWN_SIZE];
+	int obsCount = 0;
 	for(int i = 0; i < TOWN_SIZE; i++){
-		if(i != firstNPC && i != secondNPC && town[i].schedule[CLOCK%12] == town[firstNPC].schedule[CLOCK%12])
-	return i;
+		obs[i] = -1;
+	}
+	for(int i = 0; i < TOWN_SIZE; i++){
+		if(i != firstNPC && i != secondNPC && town[i].schedule[CLOCK%12] == town[firstNPC].schedule[CLOCK%12]){
+		obs[i] = i;
+		obsCount++;
+		}
+	}
+	if(!obsCount)
+		return - 1;
+	int theObserver = z_rand() % obsCount;
+	for(int i = 0; i < TOWN_SIZE; i++){
+		if(i != firstNPC && i != secondNPC && town[i].schedule[CLOCK%12] == town[firstNPC].schedule[CLOCK%12]){
+		if(!theObserver)
+			return i;
+		theObserver--;
+		}
 	}
 return -1;
+}
+
+bool sameLocation(NPClite* town, int npc1, int npc2){
+	return (town[npc1].schedule[CLOCK%12] == town[npc2].schedule[CLOCK%12]);
 }
 
 void changeRelationship(NPClite* town, int firstNPC, int secondNPC, int deltaRelationship){
@@ -704,6 +734,73 @@ int roll(NPClite* town, int person, int type){
 
 }
 
+int setGoal(NPClite* town, int npc2, int prevAction){
+	switch(prevAction){
+		case FLIRT:{
+			int result = roll(town,npc2,HL);
+			if(result == DISHONESTY)
+				return ASKFORDISTANCE;
+			if(result == LUST)
+				return SEX;
+			break;
+			}
+		case DATE:{
+			int result = roll(town,npc2,DISLOYALTY);
+			if(result == DISLOYALTY)
+				return BREAKUP;
+			return DATE;
+			break;
+			}
+		case SEX:{
+			int result = roll(town,npc2,DISLOYALTY);
+			if(result == DEFAULT)
+				return DATE;
+			break;
+			}
+		case ENVY:{
+			int result = roll(town,npc2,WRATH);
+			if(result == DEFAULT)
+				return ASKFORDISTANCE;
+			return VERBALFIGHT;
+			break;
+			}
+		case ROB:{
+			int result = roll(town,npc2,WRATH);
+			if(result == DEFAULT)
+				return VERBALFIGHT;
+			return PHYSICALFIGHT;
+			break;
+			}
+		case VERBALFIGHT:{
+			int result = roll(town,npc2,WRATH);
+			if(result == WRATH)
+				return PHYSICALFIGHT;
+			break;
+			}
+		case PHYSICALFIGHT:{
+			break;
+			}
+		case LIE:{
+			break;
+			}
+		case ASKFORDISTANCE:{
+			int result = roll(town,npc2,WRATH);
+			if(result == WRATH)
+				return VERBALFIGHT;
+			}
+		case SOCIALIZE:{
+			break;
+			}
+		case BREAKUP:{
+			int result = roll(town,npc2,WRATH);
+			if(result == WRATH){
+				return VERBALFIGHT;
+			}
+			}
+	}
+	return -1;
+}
+
 void chooseAction(NPClite* town, int firstNPC, int secondNPC){
 	if(!hasDoneEventMutual(town,INTRODUCE,firstNPC,secondNPC)){
 		introduce(town,firstNPC,secondNPC);
@@ -815,6 +912,35 @@ void swap(int* current, int a, int b, int currentNoInteract){
 	}
 }
 
+void doGoal(NPClite* town, int firstNPC, int secondNPC, int goal){
+	switch(goal){
+		case FLIRT:
+			flirt(town,firstNPC,secondNPC);
+		case DATE:
+			date(town,firstNPC,secondNPC);
+		case SEX:
+			sex(town,firstNPC,secondNPC);
+		case ENVY:
+			envy(town,firstNPC,secondNPC);
+		case ROB:
+			rob(town,firstNPC,secondNPC);
+		case VERBALFIGHT:
+			verbalFight(town,firstNPC,secondNPC);
+		case PHYSICALFIGHT:
+			physicalFight(town,firstNPC,secondNPC);
+		case LIE:
+			lie(town,firstNPC,secondNPC);
+		case ASKFORDISTANCE:
+			askForDistance(town,firstNPC,secondNPC);
+		case SOCIALIZE:
+			socialize(town,firstNPC,secondNPC);
+		case BREAKUP:
+			breakUp(town,firstNPC,secondNPC);
+	}
+	town[firstNPC].goal[secondNPC] = -1;
+}
+
+
 void interact(NPClite* town){
 	int* towniesByLocation = new int[TOWN_SIZE];
 	int* locationPeopleCount = new int[LOCATION];
@@ -836,14 +962,33 @@ void interact(NPClite* town){
 			}
 		}
 		while(numberInLocation > 1){
+			int goal = -1;
+			int goalTarget = -1;
 			int a = z_rand() % numberInLocation;
-			int b = z_rand() % numberInLocation;
-			while(a == b)
-				b = z_rand() % numberInLocation;
-			chooseAction(town, current[a], current[b]);
-			numberInLocation = numberInLocation - 2;
-			swap(current,a,b,numberInLocation);
-
+			for(int i = 0; i < TOWN_SIZE; i++){
+				if(town[a].goal[i] > goal && sameLocation(town,a,i)){
+					goal = town[a].goal[i];
+					goalTarget = i;
+				}
+			}
+			if(goalTarget > -1){
+				doGoal(town,a,goalTarget,goal);
+				town[goalTarget].goal[a] = setGoal(town, goalTarget, goal);
+				numberInLocation = numberInLocation - 2;
+				swap(current,a,goalTarget,numberInLocation);
+			}else{
+				int b = z_rand() % numberInLocation;
+				while(a == b)
+					b = z_rand() % numberInLocation;
+				int lastEvent = -1;
+				chooseAction(town, current[a], current[b]);
+				if(hasDoneEventMutual(town,INTRODUCE,a,b))
+					int lastEvent = getLastInteraction(town,a,b)->event;
+				if(lastEvent > 0)				
+					setGoal(town,b,lastEvent);
+				numberInLocation = numberInLocation - 2;
+				swap(current,a,b,numberInLocation);
+			}
 		}
 	}
 }
@@ -875,7 +1020,8 @@ bool didMurder(NPClite* town){
 	}
 	return false;
 }
-void simulation(NPClite* town, int givenSeed) {
+
+void simulation(NPClite* town, unsigned int givenSeed) {
 	CLOCK = 0;
 	seed = givenSeed;
 	if(SEED)

@@ -3,18 +3,18 @@
 
 #include "dialogue.hpp"
 
-// PLEASE DELETE THIS LATER
-#include <stdlib.h>
-
 const int DIALOGUE_OPTION_COUNT = 40;
 const int NUMBER_OF_STATES = 10;
 const int DIALOGUE_OPTIONS_PER_STATE = 4;
 const int CHOOSE_NPC_MODE = 1;
 
+// All the different "dialogue boxes" with relevant context info
 std::string normaldiscussionBoxPath = "Art/DiscussionImages/DiaScrQ2.png";
 std::string answerdiscussionBoxPath = "Art/DiscussionImages/DiaScrA2.png";
 std::string multipleanswersdiscussionBoxPath = "Art/DiscussionImages/DiaScrAs2.png";
+std::string chooseMurdererPath = "Art/DiscussionImages/Ghost2.png";
 
+// Various images to be sprinkled
 std::string selectedBoxPath = "Art/DiscussionImages/TextBoxSelected.png";
 std::string deselectedBoxPath = "Art/DiscussionImages/TextBoxDeselected.png";
 std::string singlePlayerPathDisc = "Art/Player/SinglePlayer.png";
@@ -32,6 +32,7 @@ bool triggerPressed_dialogue = false;
 SDL_Texture* normaldiscussionBoxTex;
 SDL_Texture* answerdiscussionBoxTex;
 SDL_Texture* multipleanswersdiscussionBoxTex;
+SDL_Texture* chooseMurdererTex;
 
 SDL_Texture* selectedBoxTex;
 SDL_Texture* deselectedBoxTex;
@@ -64,6 +65,8 @@ std::string BRString;
 std::string ResponseString = "Greetings, Detective.";
 
 const int text_size = 45;
+
+int wonLost = 0;
 
 // Render a string to a rectangle onscreen, wrapping around if the text is too long
 void renderStringOnRect(std::string message, SDL_Rect insideRect, SDL_Renderer *renderer){
@@ -175,6 +178,32 @@ void draw_boxes(int selectnum, SDL_Renderer *renderer, SDL_Texture *selected, SD
   renderTexture(renderer, selected, useless, selected_x, selected_y, boxw, boxh, false);
 }
 
+// Just so I can use it in the below function
+int getNPC();
+
+void draw_choose_murderer_options(SDL_Renderer *renderer){
+  int x = 50;
+  int y = SCREEN_HEIGHT - h + 30;
+  int dead = getNPC();
+
+  int i;
+  for(i = 0; i < 12; i++){
+    SDL_Rect personBox = {x + (i % 4) * 296, y + (i / 4) * 95, 285, 80};
+    if(selected - 1 == i){
+      renderTexture(renderer, selectedBoxTex, useless, personBox.x, personBox.y, personBox.w, personBox.h, false);
+    }
+    else{
+      if(i != dead)
+        renderTexture(renderer, deselectedBoxTex, useless, personBox.x, personBox.y, personBox.w, personBox.h, false);
+    }
+
+    personBox.x += 50;
+    personBox.y += 20;
+    if(i != dead)
+      renderStringOnRect(town[i].name, personBox, renderer);
+  }
+}
+
 // The function to actually draw the text boxes on the screen
 void draw_text(SDL_Renderer *renderer, SDL_Texture *TLBox, SDL_Rect TLBoxRect, SDL_Texture *TRBox, SDL_Rect TRBoxRect, SDL_Texture *BLBox, SDL_Rect BLBoxRect, SDL_Texture *BRBox, SDL_Rect BRBoxRect){
   SDL_RenderCopy(renderer, TLBox, NULL, &TLBoxRect);
@@ -200,7 +229,8 @@ enum stateOptions{
 	INITIAL_FOUR,
   WHAT_HAVE_YOU_TWO,
   ONE_ANSWER,
-  MULTIPLE_ANSWERS
+  MULTIPLE_ANSWERS,
+  GHOST
 } dialogueState;
 
 // Keeps track of which dialogue element entered one of the above states
@@ -498,6 +528,19 @@ std::string getTime(int time){
 	return statement;
 }
 
+void growVector(){
+      if(answers_vec_size == answer_vec_background_size){
+        answer_vec_background_size++;
+        multiple_answers_vec.push_back("");
+      }
+}
+
+void setVector(){
+	multiple_answers_page = 0;
+        answers_vec_size = 0;
+	answer_vec_background_size = 0;
+}
+
 // Not 100% on why this one exists, but I'm sure as shit not touching it
 bool compareNames(int npc1, std::string npc2){
 	if(!town[npc1].name.compare(npc2))
@@ -569,14 +612,16 @@ void doneWithSelf(int beingInterrogated, int npc){
 	for(int i = 0; i < town[beingInterrogated].memories.getSize(); i++){
 		Event* e = town[beingInterrogated].memories.getMemory(i);
 		if(compareNames(npc,e->npcName1) && e->event != INTRODUCE && e->event != SOCIALIZE && !suspeciousEvent(e->event)){
-			printEventDialogueFPS(e);
+			growVector();
+			multiple_answers_vec.at(answers_vec_size++) = printEventDialogueFPS(e);
 			anyEvent = true;
 			}
 		if(compareNames(npc,e->npcName2)
 		&& e->event != INTRODUCE
 		&& e->event != SOCIALIZE
 		&& sayPersonalEvent(e->event, beingInterrogated)){
-			printEventDialogueFPF(e);
+			growVector();
+			multiple_answers_vec.at(answers_vec_size++) = printEventDialogueFPF(e);
 			anyEvent = true;
 			}
 	}
@@ -589,10 +634,12 @@ void doneWith(int beingInterrogated, int npc){
 	for(int i = 0; i < town[beingInterrogated].observations.getSize(); i++){
 		Event* e = town[beingInterrogated].observations.getMemory(i);
 		if(compareNames(npc,e->npcName1) && e->event != INTRODUCE && e->event != SOCIALIZE){
+			growVector();
 			multiple_answers_vec.at(answers_vec_size++) = printEventDialogue(e);
 			anyEvent = true;
 			}
 		if(compareNames(npc,e->npcName2) && e->event != INTRODUCE && e->event != SOCIALIZE){
+			growVector();
 			multiple_answers_vec.at(answers_vec_size++) = printEventDialogue(e);
 			anyEvent = true;
 			}
@@ -648,10 +695,7 @@ void heard(int beingInterrogated){
 		}
 		if(!alreadyMentioned && !wasInvolvedInEvent(town, town[beingInterrogated].hearSay.getMemory(i),beingInterrogated)){
       // If we found a gossip that we want to say, stick it into our vector
-      if(answers_vec_size == answer_vec_background_size){
-        answer_vec_background_size++;
-        multiple_answers_vec.push_back("");
-      }
+	growVector();
 			multiple_answers_vec.at(answers_vec_size++) = printEventDialogueGossip(town[beingInterrogated].hearSay.getMemory(i));
       gossip[j++] = town[beingInterrogated].hearSay.getMemory(i);
 		}
@@ -809,8 +853,7 @@ void init_four_keyhandler(const Uint8 *keyState, int talkingToNum){
       }
       else if(selected == 3){ // 3 will give you the first page of a (possibly) multi-page answer
         dialogueState = MULTIPLE_ANSWERS;
-        multiple_answers_page = 0;
-        answers_vec_size = 0;
+        setVector();
 
         heard(talkingToNum); // The function that creates our multi-answer vec - tbh it's a black box to me
 
@@ -853,8 +896,7 @@ void what_two_keyhandler(const Uint8 *keyState, int talkingToNum){
       // Both are multi-page answers
       if(selected == 1){
         dialogueState = MULTIPLE_ANSWERS;
-        multiple_answers_page = 0;
-        answers_vec_size = 0;
+        setVector();
 
         doneWith(talkingToNum, getNPC());
 
@@ -868,8 +910,7 @@ void what_two_keyhandler(const Uint8 *keyState, int talkingToNum){
       }
       else if(selected == 2){
         dialogueState = MULTIPLE_ANSWERS;
-        multiple_answers_page = 0;
-        answers_vec_size = 0;
+        setVector();
 
         doneWithSelf(talkingToNum, getNPC()); // The function that creates our multi-answer vec - tbh it's a black box to me
 
@@ -922,6 +963,46 @@ void multiple_answers_keyhandler(const Uint8 *keyState){
     triggerPressed_dialogue = false;
 }
 
+// Handle input when you're trying to choose the murderer
+void ghost_keyhandler(const Uint8 *keyState){
+  keyState = SDL_GetKeyboardState(NULL);
+  int dead = getNPC() + 1;
+
+  if(!triggerPressed_dialogue){
+    if (keyState[SDL_SCANCODE_W] || keyState[SDL_SCANCODE_UP]){
+      triggerPressed_dialogue = true;
+      if(selected > 4 && selected - 4 != dead) selected -= 4;
+    }
+
+    if (keyState[SDL_SCANCODE_A] || keyState[SDL_SCANCODE_LEFT]){
+      triggerPressed_dialogue = true;
+      if((selected - 1) % 4 > 0 && selected - 1 != dead) selected -= 1;
+    }
+
+    if (keyState[SDL_SCANCODE_S] || keyState[SDL_SCANCODE_DOWN]){
+      triggerPressed_dialogue = true;
+      if(selected < 9 && selected + 4 != dead) selected += 4;
+    }
+
+    if (keyState[SDL_SCANCODE_D] || keyState[SDL_SCANCODE_RIGHT]){
+      triggerPressed_dialogue = true;
+      if((selected - 1) % 4 < 3 && selected + 1 != dead) selected += 1;
+    }
+
+    // Pick one of the boxes
+    if ((keyState[SDL_SCANCODE_SPACE] || keyState[SDL_SCANCODE_RETURN])){
+      triggerPressed_dialogue = true;
+      // You win!!
+      if(town[selected-1].didMurder){
+        wonLost = 1;
+      }
+      else{
+        wonLost = -1;
+      }
+    }
+  }
+}
+
 // Handles key input for the usual NPC conversation
 int key_handler(const Uint8 *keyState, int talkingToNum){
   // If you wanna quit, we're out, no problem
@@ -930,6 +1011,7 @@ int key_handler(const Uint8 *keyState, int talkingToNum){
     SDL_DestroyTexture(normaldiscussionBoxTex);
     SDL_DestroyTexture(answerdiscussionBoxTex);
     SDL_DestroyTexture(multipleanswersdiscussionBoxTex);
+    SDL_DestroyTexture(chooseMurdererTex);
     SDL_DestroyTexture(selectedBoxTex);
     SDL_DestroyTexture(deselectedBoxTex);
     SDL_DestroyTexture(playerTex);
@@ -960,6 +1042,9 @@ int key_handler(const Uint8 *keyState, int talkingToNum){
     else{
       triggerPressed_dialogue = false;
     }
+  }
+  else if(dialogueState == GHOST){
+    ghost_keyhandler(keyState);
   }
 
   return 1;
@@ -1009,30 +1094,34 @@ void draw_handler(SDL_Renderer *renderer){
     renderTexture(renderer, normaldiscussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
     draw_boxes(selected, renderer, selectedBoxTex, deselectedBoxTex, w, h, true);
     draw_init_text(renderer);
-    printf("Selected is: %d\n", selected);
-    printf("1: %s\n", TLString.c_str());
-    printf("2: %s\n", TRString.c_str());
-    printf("3: %s\n", BLString.c_str());
-    printf("4: %s\n", BRString.c_str());
+    //printf("Selected is: %d\n", selected);
+    //printf("1: %s\n", TLString.c_str());
+    //printf("2: %s\n", TRString.c_str());
+    //printf("3: %s\n", BLString.c_str());
+    //printf("4: %s\n", BRString.c_str());
   }
   else if(dialogueState == WHAT_HAVE_YOU_TWO){
     renderTexture(renderer, normaldiscussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
     draw_boxes(selected, renderer, selectedBoxTex, deselectedBoxTex, w, h, false);
     draw_secondary_text(renderer);
-    printf("Selected is: %d\n", selected);
-    printf("1: %s\n", TLString.c_str());
-    printf("2: %s\n", TRString.c_str());
+    //printf("Selected is: %d\n", selected);
+    //printf("1: %s\n", TLString.c_str());
+    //printf("2: %s\n", TRString.c_str());
   }
   else if(dialogueState == ONE_ANSWER){
     renderTexture(renderer, answerdiscussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
     draw_response_text(renderer);
-    printf("ResponseString: %s\n", ResponseString.c_str());
+    //printf("ResponseString: %s\n", ResponseString.c_str());
   }
   else if(dialogueState == MULTIPLE_ANSWERS){
     renderTexture(renderer, multipleanswersdiscussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
     draw_response_text(renderer);
-    printf("On page %d of %d\n", multiple_answers_page + 1, answers_vec_size);
-    printf("ResponseString: %s\n", ResponseString.c_str());
+    //printf("On page %d of %d\n", multiple_answers_page + 1, answers_vec_size);
+    //printf("ResponseString: %s\n", ResponseString.c_str());
+  }
+  else if(dialogueState == GHOST){
+    renderTexture(renderer, chooseMurdererTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
+    draw_choose_murderer_options(renderer);
   }
 
   //Update Screen
@@ -1047,6 +1136,7 @@ void dialogue(NPClite* our_town, SDL_Event e, bool *quit, const Uint8 *keyState,
   normaldiscussionBoxTex = loadFiles(normaldiscussionBoxPath, renderer);
   answerdiscussionBoxTex = loadFiles(answerdiscussionBoxPath, renderer);
   multipleanswersdiscussionBoxTex = loadFiles(multipleanswersdiscussionBoxPath, renderer);
+  chooseMurdererTex = loadFiles(chooseMurdererPath, renderer);
 
   selectedBoxTex = loadFiles(selectedBoxPath, renderer);
   deselectedBoxTex = loadFiles(deselectedBoxPath, renderer);
@@ -1068,10 +1158,21 @@ void dialogue(NPClite* our_town, SDL_Event e, bool *quit, const Uint8 *keyState,
   CharTex = SDL_CreateTextureFromSurface(renderer, CharNameSurface);
   SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
 
-	dialogueState = INITIAL_FOUR;
+	if(theNPC->isGhost)
+    dialogueState = GHOST;
+  else
+    dialogueState = INITIAL_FOUR;
 
   // Will just keep looping until you quit
 	while(true){
+    // You won!
+    if(wonLost == 1){
+      runWinScreen(e, quit, keyState, renderer);
+    }// Or you lost!
+    else if(wonLost == -1){
+      runLoseScreen(e, quit, keyState, renderer);
+    }
+
     // This way we're not doing a bunch of needless drawing
     if(SDL_PollEvent(&e) != 0){
       //Quit application
@@ -1086,6 +1187,9 @@ void dialogue(NPClite* our_town, SDL_Event e, bool *quit, const Uint8 *keyState,
 
       // DRAW HANDLER
       draw_handler(renderer);
+    }
+    else if(triggerPressed_dialogue){
+      triggerPressed_dialogue = false;
     }
 	}
 }

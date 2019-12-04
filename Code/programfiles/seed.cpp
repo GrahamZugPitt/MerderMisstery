@@ -178,7 +178,7 @@ std::string enter_seed(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rende
 
       SDL_RenderClear(renderer);
       //make sure to end things and return seed
-      return "";
+      return seedInput;
     }
   }
 }

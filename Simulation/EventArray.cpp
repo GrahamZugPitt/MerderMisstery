@@ -9,6 +9,11 @@ public:
 		this->memories = new Event[1000]; 
 		maxSize = 99;
 	}
+	void wipe(){
+		for(int i = 0; i < 1000; i++){
+			memories[i] = *(new Event());
+		}
+	}
 	void expand(){
 		Event* temp = new Event[2*size];
 		for(int i = 0; i < size; i++){
