@@ -68,7 +68,7 @@ enum event{
 };
 
 // A few constants used in the sim and dialogue classes
-const int SEED = 1;
+const int SEED = 0;
 const int EVENT_MODE = 0;
 const int DEBUG_MODE = 0;
 const int OBSERVATION_MODE = 0;
@@ -76,7 +76,7 @@ const int HEARSAY_MODE = 0;
 const int TOWN_SIZE = 12;
 const int LOCATION = 5;
 const int SELFCONTROL = 40;
-const int MURDER_MODE = 1;
+const int MURDER_MODE = 0;
 const int M = 982451653;
 const int MULTIPLIER = 373587883;
 
