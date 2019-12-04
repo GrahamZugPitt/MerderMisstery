@@ -74,7 +74,7 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
           //Start Game Left-X value: 492
           //Start Game Right-X value: 779
           case 492 ... 779:
-            if (save) { //TODO: Replace the start call to the continue call
+            if (save) { 
               std::cout << "Start Game\n";
               next = true; // Start the game
               //clear logoScreen render
@@ -156,7 +156,7 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
     SDL_RenderPresent(renderer);
     return seed;
   }
-  return "";
+  return seed;
 }
 
 void render_menu(SDL_Renderer* renderer){

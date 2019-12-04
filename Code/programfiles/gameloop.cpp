@@ -167,7 +167,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     // Create the NPCs (offloaded for brevity)
     NPC npcs[NPC_NUM];
     WorldObject worldObjects[WORLD_OBJECT_NUM];
-    init(npcs, renderer, worldObjects, seed, town);
+    seed = init(npcs, renderer, worldObjects, seed, town);
 
     // Used for framerate independence
     int curr_time = 0;
@@ -247,6 +247,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         if (*quit) {
           if (hasSolved == 0) {
             std::fstream save;
+            std::cout << seed << "\n";
             save.open("save.txt", std::fstream::out);
             save << seed << "\n" << player->positionPNG.x << "\n" << player->positionPNG.y << "\n";
             save << itemList[0] << "\n" << itemList[1] << "\n" << itemList[2] << "\n" << itemList[3] << "\n";
