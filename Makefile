@@ -42,7 +42,7 @@ murder.o: $(OBJ_FILES) #wo.o
 	$(CC) -o $@ $^ $(LINKER_FLAGS) -std=c++14
 
 clean:
-	rm *.o ./Art/NPCs/*m.bmp
+	rm *.o ./Art/NPCs/*m.bmp save.txt
 
 farnan:
 	make
