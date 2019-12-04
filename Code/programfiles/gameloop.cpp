@@ -186,6 +186,20 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
     //Sign collisions
     //SDL_Rect sign1;
+    SDL_Texture* townHallMessage;
+    SDL_Texture* murderMessage;
+    SDL_Texture* innMessage;
+    SDL_Texture* churchMessage;
+    SDL_Texture* factoryMessage;
+    SDL_Texture* marketCentralMessage;
+    SDL_Rect messageDestination;
+
+    townHallMessage = loadFiles("Art/Messages/townHall.png", renderer);
+    murderMessage = loadFiles("Art/Messages/murder.png", renderer);
+    innMessage = loadFiles("Art/Messages/inn.png", renderer);
+    churchMessage = loadFiles("Art/Messages/church.png", renderer);
+    factoryMessage = loadFiles("Art/Messages/factory.png", renderer);
+    marketCentralMessage = loadFiles("Art/Messages/marketCentral.png", renderer);
 
 
     // Collision dectction variables
@@ -269,20 +283,20 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         SDL_Rect sign5p2;
         SDL_Rect sign6;
 
-        SDL_Texture* townHallMessage;
-        SDL_Texture* murderMessage;
-        SDL_Texture* innMessage;
-        SDL_Texture* churchMessage;
-        SDL_Texture* factoryMessage;
-        SDL_Texture* marketCentralMessage;
-        SDL_Rect messageDestination;
+        // SDL_Texture* townHallMessage;
+        // SDL_Texture* murderMessage;
+        // SDL_Texture* innMessage;
+        // SDL_Texture* churchMessage;
+        // SDL_Texture* factoryMessage;
+        // SDL_Texture* marketCentralMessage;
+        // SDL_Rect messageDestination;
 
-        townHallMessage = loadFiles("Art/Messages/townHall.png", renderer);
-        murderMessage = loadFiles("Art/Messages/murder.png", renderer);
-        innMessage = loadFiles("Art/Messages/inn.png", renderer);
-        churchMessage = loadFiles("Art/Messages/church.png", renderer);
-        factoryMessage = loadFiles("Art/Messages/factory.png", renderer);
-        marketCentralMessage = loadFiles("Art/Messages/marketCentral.png", renderer);
+        // townHallMessage = loadFiles("Art/Messages/townHall.png", renderer);
+        // murderMessage = loadFiles("Art/Messages/murder.png", renderer);
+        // innMessage = loadFiles("Art/Messages/inn.png", renderer);
+        // churchMessage = loadFiles("Art/Messages/church.png", renderer);
+        // factoryMessage = loadFiles("Art/Messages/factory.png", renderer);
+        // marketCentralMessage = loadFiles("Art/Messages/marketCentral.png", renderer);
 
         //Sign rect positions and widths
         sign1.x = 1000;
