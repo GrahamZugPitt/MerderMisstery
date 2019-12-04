@@ -11,8 +11,8 @@ class RedBuilding{
         bool checkCollision(SDL_Rect *playerRect, SDL_Rect *overlap);
 
     private:
-        SDL_Rect rect = {1449, 22, 909, 808};
-        Collidable walls[7];
+        SDL_Rect rect = {1498, 30, 880, 512};
+        Collidable walls[13];
 };
 
 #endif

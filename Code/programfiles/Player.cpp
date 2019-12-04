@@ -39,6 +39,13 @@ Player::Player(std::string playerTexturePath, SDL_Renderer *renderer, int player
     isRunning = false;
 }
 
+// Misc stuff to collide with
+SDL_Rect ponds[17] = {{1510, 564, 336, 124},{2028, 564, 337, 124},{2290, 1056, 337, 125},{1256, 1946, 460, 126},
+                    {1498, 732, 93, 76}, {1085, 1929, 95, 74}, {1090, 935, 468, 32}, {998, 1068, 563, 28},
+                    {873, 1840, 379, 31},{1572, 1815, 99, 31}, {1609, 1295, 288, 35}, {1999, 1295, 288, 34},
+                    {1809, 1534, 289, 35},{1813, 1683, 283, 30},{1811, 1814, 287, 31}, {1812, 1943, 286, 30},
+                    {2307, 1977, 657, 33}};
+
 void Player::move(float change, const Uint8 *keyState, bool farnan, NPC *npcs, CyanBuilding cBuilding,
     BlueBuilding bBuilding, GreenBuilding gBuilding, YellowBuilding yBuilding, RedBuilding rBuilding){
     //True by default, animation is stopped if not running
@@ -88,6 +95,13 @@ void Player::move(float change, const Uint8 *keyState, bool farnan, NPC *npcs, C
                   hasCollided = 2;
               }
           }
+          for(i = 0; i < 17; i++){
+            if(SDL_HasIntersection(&ponds[i], &positionPNG)){
+                SDL_IntersectRect(&ponds[i], &positionPNG, &collide);
+                hasCollided = 4;
+                break;
+            }
+          }
           //Check building collisions
           if (cBuilding.checkCollision(&(positionPNG), &collide)) {
               hasCollided = 3;
@@ -105,7 +119,7 @@ void Player::move(float change, const Uint8 *keyState, bool farnan, NPC *npcs, C
               hasCollided = 3;
           }
           if(hasCollided){
-            alterPositionHoriz(&collide);
+              alterPositionHoriz(&collide);
           }
           hasCollided = 0;
         positionPNG.y += yvel;
@@ -115,6 +129,13 @@ void Player::move(float change, const Uint8 *keyState, bool farnan, NPC *npcs, C
                   hasCollided = 2;
               }
           }
+          for(i = 0; i < 17; i++){
+            if(SDL_HasIntersection(&ponds[i], &positionPNG)){
+                SDL_IntersectRect(&ponds[i], &positionPNG, &collide);
+                hasCollided = 4;
+                break;
+            }
+          }
           //Check building collisions
           if (cBuilding.checkCollision(&(positionPNG), &collide)) {
               hasCollided = 3;
@@ -132,7 +153,6 @@ void Player::move(float change, const Uint8 *keyState, bool farnan, NPC *npcs, C
               hasCollided = 3;
           }
           if(hasCollided){
-            std::cout << collide.h << " " << collide.w <<std::endl;
             alterPositionVert(&collide);
           }
           hasCollided = 0;
@@ -226,9 +246,9 @@ bool Player::collision(SDL_Renderer *rendererPointer, const Uint8 *keyState){
 // }
 void Player::alterPositionHoriz(SDL_Rect *collide){
     if( direction & LEFT ){
-        positionPNG.x += collide->w;
+        positionPNG.x += collide->w+1;
     } else if (direction & RIGHT){
-        positionPNG.x -= collide->w;
+        positionPNG.x -= collide->w+1;
     }
 }
 

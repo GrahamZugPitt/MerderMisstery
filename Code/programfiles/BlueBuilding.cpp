@@ -1,15 +1,15 @@
 #include "BlueBuilding.hpp"
 
 BlueBuilding::BlueBuilding(){
-    walls[0].setRectValues(2560, 918, 70, 18);
-    walls[1].setRectValues(2653, 921, 18, 288);
-    walls[2].setRectValues(2655, 1189, 264, 17);
-    walls[3].setRectValues(2902, 441, 17, 767);
-    walls[4].setRectValues(2655, 439, 262, 15);
-    walls[5].setRectValues(2654, 439, 15, 313);
-    walls[6].setRectValues(2393, 734, 277, 17);
-    walls[7].setRectValues(2392, 737, 18, 198);
-    walls[8].setRectValues(2392, 917, 40, 19);
+    walls[0].setRectValues(2392, 735, 16, 202);
+    walls[1].setRectValues(2408, 735, 247, 17);
+    walls[2].setRectValues(2655, 438, 16, 314);
+    walls[3].setRectValues(2671, 438, 232, 18);
+    walls[4].setRectValues(2903, 438, 17, 771);
+    walls[5].setRectValues(2671, 1191, 232, 18);
+    walls[6].setRectValues(2654, 920, 17, 289);
+    walls[7].setRectValues(2539, 920, 115, 16);
+    walls[8].setRectValues(2408, 920, 51, 16);
 }
 
 bool BlueBuilding::checkCollision(SDL_Rect *playerRect, SDL_Rect *overlap){

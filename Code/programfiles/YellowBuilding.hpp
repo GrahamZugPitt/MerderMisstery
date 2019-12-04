@@ -11,8 +11,8 @@ class YellowBuilding{
         bool checkCollision(SDL_Rect *playerRect, SDL_Rect *overlap);
 
     private:
-        SDL_Rect rect = {835, 1202, 708, 888};
-        Collidable walls[6];
+        SDL_Rect rect = {870, 1203, 689, 638};
+        Collidable walls[7];
 };
 
 #endif
