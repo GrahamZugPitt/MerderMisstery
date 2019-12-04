@@ -78,6 +78,7 @@ class NPC {
 		void setSpriteName(std::string filename);
 		void renderToScreen(SDL_Renderer *renderer, float timechange, SDL_Rect camPos);
 		void ghostThisNPC();
+		int getPersonality(int i);
 	private:
 		int spriteRow;
 		std::string name;

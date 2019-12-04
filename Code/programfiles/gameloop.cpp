@@ -2,7 +2,6 @@
 #define __GAMELOOPCPP__
 
 #include "gameloop.hpp"
-#include <iostream>
 
 // Add some vars to be used below
 std::string mapImgPath = "Art/MapSamples/SampleMap.png";
@@ -10,6 +9,7 @@ std::string playerImgPath = "Art/Player/PlayerSpriteSheet.png";
 std::string interactImgPath = "Art/Messages/interact.png";
 const int NPC_NUM = 12;
 const int WORLD_OBJECT_NUM = 4;
+const int PERSONALITY_TRAITS = 5;
 
 //NPC Constants
 const int NPC_WIDTH = 60;
@@ -18,8 +18,18 @@ const int NPC_HEIGHT = 88;
 int npcdiscuss = 0;
 bool discussbool = false;
 
+NPClite* npcToNPClite(NPClite* town, NPC* npcs){
+	for(int i = 0; i < NPC_NUM; i++){
+		town[i].name = npcs[i].getName();
+		for(int j = 0; j < PERSONALITY_TRAITS; j++){
+			town[i].personality[j] = (npcs[i].getPersonality(j) + 100)/2; 
+		}
+	}
+	return town;
+}
+
 // Return the seed so we can use it later if necessary
-std::string simTown(NPClite *town, std::string seed){
+std::string simTown(NPClite *town, NPC* npcs, std::string seed){
   int seedint = -1;
 
   if(seed.compare("") == 0){ // If you don't have one, we'll just use the time
@@ -39,10 +49,8 @@ std::string simTown(NPClite *town, std::string seed){
   const char *seedCharray = seed.c_str();
   int i;
   for(i = 0; i < seed.length(); i++){
-    seedint = seedCharray[i];
+    seedint = ((seedCharray[i] * seedint) % M) + 1;
   }
-
-  std::cout << "Your seed is: " << seed << std::endl;
 
   // Dunno if it has to be positive, but may as well.
   if(seedint < 1) seedint = (-1 * seedint) + 1;
@@ -51,18 +59,18 @@ std::string simTown(NPClite *town, std::string seed){
 
   int goodKill = 0;
 	while(goodKill == 0){
-		NPClite jarrett("Benedict", MERCHANT); //0
-		NPClite kim("Liam", MERCHANT); //1
-		NPClite pope("Micheal", MERCHANT); //2
-		NPClite gaben("Kyle", MERCHANT); //3
-		NPClite marie("David", WORKER); //4
-		NPClite lary("Erick", WORKER); //5
-		NPClite luigi("Frank", WORKER); //6
-		NPClite albert("Gail", WORKER); //7
-		NPClite dennis("Henry", MAYOR); //8
-		NPClite helen("Isaac", POLICE); //9
-		NPClite merge("Jake", INNKEEPER); //10
-		NPClite sigmund("Charles", PRIEST); //11
+		NPClite jarrett("Dennis", MERCHANT); //0
+		NPClite kim("Dennis", MERCHANT); //1
+		NPClite pope("Dennis", MERCHANT); //2
+		NPClite gaben("Dennis", MERCHANT); //3
+		NPClite marie("Dennis", WORKER); //4
+		NPClite lary("Dennis", WORKER); //5
+		NPClite luigi("Dennis", WORKER); //6
+		NPClite albert("Dennis", WORKER); //7
+		NPClite dennis("Dennis", MAYOR); //8
+		NPClite helen("Dennis", POLICE); //9
+		NPClite merge("Dennis", INNKEEPER); //10
+		NPClite sigmund("Dennis", PRIEST); //11
 		town[0] = jarrett;
 		town[1] = kim;
 		town[2] = pope;
@@ -75,7 +83,8 @@ std::string simTown(NPClite *town, std::string seed){
 		town[9] = helen;
 		town[10] = merge;
 		town[11] = sigmund;
-	  simulation(town, seedint);
+		npcToNPClite(town, npcs);
+	        simulation(town, seedint);
     // Removing the goodMurder stuff for now, since it's causing weird issues
     //if(goodMurder(town))
       goodKill = 1;
@@ -87,8 +96,6 @@ std::string simTown(NPClite *town, std::string seed){
 // Has to return the seed because we'll need it later
 std::string init(NPC *npcs, SDL_Renderer *renderer, WorldObject *worldObjects, std::string seed, NPClite *town){
   // Runs the simulation. I know, it looks so innocuous. Kinda nifty, right?
-  seed = simTown(town, seed);
-  std::cout << "Your seed is: " << seed << std::endl;
 
   // Set up the front end NPCs
   //   Presumably this is where the backend info will be pushed to the front end
@@ -132,6 +139,8 @@ std::string init(NPC *npcs, SDL_Renderer *renderer, WorldObject *worldObjects, s
   worldObjects[1].initObject("Art/Merder Objects/Hammer_1.png", renderer, 1371, 1660, 50, 80, 5, 5, 50, 80);
   worldObjects[2].initObject("Art/Merder Objects/Pickaxe_1.png", renderer, 2158, 1760, 80, 80, 5, 5, 80, 80);
   worldObjects[3].initObject("Art/Merder Objects/butcher_knife.png", renderer, 2510, 855, 80, 80, 0, 0, 70, 70);
+  seed = simTown(town, npcs, seed);
+  std::cout << "Your seed is: " << seed << std::endl;
 
   // Make one of them a ghost
   int i;
@@ -171,10 +180,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
     YellowBuilding yBuilding; // South West (Residences?)
     RedBuilding rBuilding;    // North  (Murder *Ominous music playing*)
   //PurpleBuilding pBuilding; // Central (Courtyard)
-
-    //Sign collisions
-    //SDL_Rect sign1;
-
+    
 
     // Collision dectction variables
     SDL_Rect collide;
@@ -190,6 +196,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         frames_rendered++;
         fr_timer += (curr_time - last_time);
         if(fr_timer >= 1000){
+          std::cout << "fps: " << frames_rendered << std::endl;
           fr_timer = 0;
           frames_rendered = 0;
         }
@@ -215,19 +222,19 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
         //Talk to an NPC
         if (keyState[SDL_SCANCODE_X] && discussbool)
-          dialogue(town, e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
+            hasSolved = enter_discussion(e, &(*quit), keyState, renderer, &(npcs[npcdiscuss]));
 
-        // Quit may have changed during the dialogue, so it's best to check
+        // Quit may have changed during the dialogue, so it's best to check 
         if (*quit) {
-          if (hasSolved == 0) {
-            std::fstream save;
-            save.open("save.txt", std::fstream::out);
-            save << seed << "\n" << player->positionPNG.x << "\n" << player->positionPNG.y << "\n";
-            save << itemList[0] << "\n" << itemList[1] << "\n" << itemList[2] << "\n" << itemList[3] << "\n";
-            save.close();
-          } else {
-            remove("save.txt");
-          }
+            if (hasSolved == 0) {
+                std::fstream save;
+                save.open("save.txt", std::fstream::out);
+                save << seed << "\n" << player->positionPNG.x << "\n" << player->positionPNG.y << "\n";
+                save << itemList[0] << "\n" << itemList[1] << "\n" << itemList[2] << "\n" << itemList[3] << "\n";
+                save.close();
+            } else {
+                remove("save.txt");
+            }
             return;
         }
 
@@ -244,74 +251,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         //render npcs
         int i=0;
         int indiscusscollider = 0;
-        SDL_Rect positionPNG;
-
-        //Signs
-        SDL_Rect sign1;
-        SDL_Rect sign1p2;
-        SDL_Rect sign2;
-        SDL_Rect sign3;
-        SDL_Rect sign4;
-        SDL_Rect sign5;
-        SDL_Rect sign5p2;
-        SDL_Rect sign6;
-
-        SDL_Texture* townHallMessage;
-        SDL_Texture* murderMessage;
-        SDL_Texture* innMessage;
-        SDL_Texture* churchMessage;
-        SDL_Texture* factoryMessage;
-        SDL_Texture* marketCentralMessage;
-        SDL_Rect messageDestination;
-
-        townHallMessage = loadFiles("Art/Messages/townHall.png", renderer);
-        murderMessage = loadFiles("Art/Messages/murder.png", renderer);
-        innMessage = loadFiles("Art/Messages/inn.png", renderer);
-        churchMessage = loadFiles("Art/Messages/church.png", renderer);
-        factoryMessage = loadFiles("Art/Messages/factory.png", renderer);
-        marketCentralMessage = loadFiles("Art/Messages/marketCentral.png", renderer);
-
-        //Sign rect positions and widths
-        sign1.x = 1000;
-        sign1.y = 500;
-        sign1.w = 60;
-        sign1.h = 400;
-        sign1p2.x = 1000;
-        sign1p2.y = 500;
-        sign1p2.w = 400;
-        sign1p2.h = 300;
-
-        sign2.x = 1525;
-        sign2.y = 20;
-        sign2.w = 800;
-        sign2.h = 500;
-
-        sign3.x = 950;
-        sign3.y = 1250;
-        sign3.w = 550;
-        sign3.h = 500;
-
-        sign4.x = 2175;
-        sign4.y = 1550;
-        sign4.w = 750;
-        sign4.h = 405;
-
-        sign5.x = 2450;
-        sign5.y = 800;
-        sign5.w = 275;
-        sign5.h = 100;
-        sign5p2.x = 2700;
-        sign5p2.y = 450;
-        sign5p2.w = 200;
-        sign5p2.h = 725;
-
-        sign6.x = 1600;
-        sign6.y = 700;
-        sign6.w = 750;
-        sign6.h = 600;
-
-        positionPNG.w = 30;
-        positionPNG.h = 30;
 
         // check for collisions
         // Loop through twice to accomidate corner sections where the player may collide with 2 objects
@@ -322,68 +261,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
                   hasCollided = 2;
               }
           }
-
-          //Locate player and show appropriate sign
-          if(SDL_HasIntersection(&(player->positionPNG), &sign1) || SDL_HasIntersection(&(player->positionPNG), &sign1p2))
-          {
-
-            messageDestination.x = 0;
-            messageDestination.y = 600;
-            messageDestination.w = 300;
-            messageDestination.h = 100;
-            SDL_RenderCopy(renderer, townHallMessage, NULL, &messageDestination);
-          }
-
-          if(SDL_HasIntersection(&(player->positionPNG), &sign2))
-          {
-
-                messageDestination.x = 0;
-                messageDestination.y = 600;
-                messageDestination.w = 300;
-                messageDestination.h = 100;
-                SDL_RenderCopy(renderer, murderMessage, NULL, &messageDestination);
-          }
-
-          if(SDL_HasIntersection(&(player->positionPNG), &sign3))
-          {
-
-                messageDestination.x = 0;
-                messageDestination.y = 600;
-                messageDestination.w = 300;
-                messageDestination.h = 100;
-                SDL_RenderCopy(renderer, innMessage, NULL, &messageDestination);
-          }
-
-          if(SDL_HasIntersection(&(player->positionPNG), &sign4))
-          {
-
-                messageDestination.x = 0;
-                messageDestination.y = 600;
-                messageDestination.w = 300;
-                messageDestination.h = 100;
-                SDL_RenderCopy(renderer, churchMessage, NULL, &messageDestination);
-          }
-
-          if(SDL_HasIntersection(&(player->positionPNG), &sign5) || SDL_HasIntersection(&(player->positionPNG), &sign5p2))
-          {
-
-                messageDestination.x = 0;
-                messageDestination.y = 600;
-                messageDestination.w = 300;
-                messageDestination.h = 100;
-                SDL_RenderCopy(renderer, factoryMessage, NULL, &messageDestination);
-          }
-
-          if(SDL_HasIntersection(&(player->positionPNG), &sign6))
-          {
-
-                messageDestination.x = 0;
-                messageDestination.y = 600;
-                messageDestination.w = 300;
-                messageDestination.h = 100;
-                SDL_RenderCopy(renderer, marketCentralMessage, NULL, &messageDestination);
-          }
-
           //Check building collisions
           if (cBuilding.checkCollision(&(player->positionPNG), &collide)) {
               hasCollided = 3;
@@ -420,8 +297,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
                 indiscusscollider = true;
             }
         }
-
-        //check for collision with signs
 
         if (itemList[0] == 0) {
             worldObjects[0].renderToScreen(renderer, cam);
