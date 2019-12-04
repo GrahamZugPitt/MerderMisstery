@@ -186,6 +186,20 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
 
     //Sign collisions
     //SDL_Rect sign1;
+    SDL_Texture* townHallMessage;
+    SDL_Texture* murderMessage;
+    SDL_Texture* innMessage;
+    SDL_Texture* churchMessage;
+    SDL_Texture* factoryMessage;
+    SDL_Texture* marketCentralMessage;
+    SDL_Rect messageDestination;
+
+    townHallMessage = loadFiles("Art/Messages/townHall.png", renderer);
+    murderMessage = loadFiles("Art/Messages/murder.png", renderer);
+    innMessage = loadFiles("Art/Messages/inn.png", renderer);
+    churchMessage = loadFiles("Art/Messages/church.png", renderer);
+    factoryMessage = loadFiles("Art/Messages/factory.png", renderer);
+    marketCentralMessage = loadFiles("Art/Messages/marketCentral.png", renderer);
 
 
     // Collision dectction variables
@@ -244,7 +258,8 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         }
 
         //Move Player
-        player->move(time_change, keyState, farnan);
+        //player->move(time_change, keyState, farnan);
+        player->move(time_change, keyState, farnan, npcs, cBuilding, bBuilding, gBuilding, yBuilding, rBuilding);
 
         //Clear screen
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -268,20 +283,20 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         SDL_Rect sign5p2;
         SDL_Rect sign6;
 
-        SDL_Texture* townHallMessage;
-        SDL_Texture* murderMessage;
-        SDL_Texture* innMessage;
-        SDL_Texture* churchMessage;
-        SDL_Texture* factoryMessage;
-        SDL_Texture* marketCentralMessage;
-        SDL_Rect messageDestination;
+        // SDL_Texture* townHallMessage;
+        // SDL_Texture* murderMessage;
+        // SDL_Texture* innMessage;
+        // SDL_Texture* churchMessage;
+        // SDL_Texture* factoryMessage;
+        // SDL_Texture* marketCentralMessage;
+        // SDL_Rect messageDestination;
 
-        townHallMessage = loadFiles("Art/Messages/townHall.png", renderer);
-        murderMessage = loadFiles("Art/Messages/murder.png", renderer);
-        innMessage = loadFiles("Art/Messages/inn.png", renderer);
-        churchMessage = loadFiles("Art/Messages/church.png", renderer);
-        factoryMessage = loadFiles("Art/Messages/factory.png", renderer);
-        marketCentralMessage = loadFiles("Art/Messages/marketCentral.png", renderer);
+        // townHallMessage = loadFiles("Art/Messages/townHall.png", renderer);
+        // murderMessage = loadFiles("Art/Messages/murder.png", renderer);
+        // innMessage = loadFiles("Art/Messages/inn.png", renderer);
+        // churchMessage = loadFiles("Art/Messages/church.png", renderer);
+        // factoryMessage = loadFiles("Art/Messages/factory.png", renderer);
+        // marketCentralMessage = loadFiles("Art/Messages/marketCentral.png", renderer);
 
         //Sign rect positions and widths
         sign1.x = 1000;
@@ -329,11 +344,11 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         // Loop through twice to accomidate corner sections where the player may collide with 2 objects
         for (int axisI = 0; axisI < 2; axisI++){
           // Check NPC Collisions
-          for(i = 0; i < NPC_NUM; i++){
-              if (npcs[i].NPCCollider.checkCollision(&(player->positionPNG), &collide)){
-                  hasCollided = 2;
-              }
-          }
+          // for(i = 0; i < NPC_NUM; i++){
+          //     if (npcs[i].NPCCollider.checkCollision(&(player->positionPNG), &collide)){
+          //         hasCollided = 2;
+          //     }
+          // }
 
           //Locate player and show appropriate sign
           if(SDL_HasIntersection(&(player->positionPNG), &sign1) || SDL_HasIntersection(&(player->positionPNG), &sign1p2))
@@ -397,26 +412,26 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
           }
 
           //Check building collisions
-          if (cBuilding.checkCollision(&(player->positionPNG), &collide)) {
-              hasCollided = 3;
-          }
-          if (bBuilding.checkCollision(&(player->positionPNG), &collide)) {
-              hasCollided = 3;
-          }
-          if (gBuilding.checkCollision(&(player->positionPNG), &collide)) {
-              hasCollided = 3;
-          }
-          if (yBuilding.checkCollision(&(player->positionPNG), &collide)) {
-              hasCollided = 3;
-          }
-          if (rBuilding.checkCollision(&(player->positionPNG), &collide)) {
-              hasCollided = 3;
-          }
-          if(hasCollided){
-            player->alterPosition(&collide);
-          } else {
-            axisI = 2;
-          }
+          // if (cBuilding.checkCollision(&(player->positionPNG), &collide)) {
+          //     hasCollided = 3;
+          // }
+          // if (bBuilding.checkCollision(&(player->positionPNG), &collide)) {
+          //     hasCollided = 3;
+          // }
+          // if (gBuilding.checkCollision(&(player->positionPNG), &collide)) {
+          //     hasCollided = 3;
+          // }
+          // if (yBuilding.checkCollision(&(player->positionPNG), &collide)) {
+          //     hasCollided = 3;
+          // }
+          // if (rBuilding.checkCollision(&(player->positionPNG), &collide)) {
+          //     hasCollided = 3;
+          // }
+          // if(hasCollided){
+          //   player->alterPosition(&collide);
+          // } else {
+          //   axisI = 2;
+          // }
           hasCollided = 0;
         }
 
@@ -471,7 +486,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         player->render(renderer, &cam);
 
         // Check Collisions
-        player->collision(renderer, keyState);
+        //player->collision(renderer, keyState);
 
         //Update Screen
         SDL_RenderPresent(renderer);
