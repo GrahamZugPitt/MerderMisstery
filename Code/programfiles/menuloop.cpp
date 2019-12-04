@@ -22,6 +22,8 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
   int cursor_x;
   int cursor_y;
 
+  vector<string> credentials;
+
   std::string seed = "";
   SDL_Event nullEvent;
 
@@ -126,7 +128,7 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
         //clear logoScreen render
         SDL_DestroyTexture(logoScreen);
 
-        enter_login(e, &(*quit), keyState, renderer);
+        credentials = enter_login(e, &(*quit), keyState, renderer);
         chatLoggedIn=true;
         std::cout << "Exited Chat Login Loop\n";
 
@@ -136,7 +138,7 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
       //clear logoScreen render
       SDL_DestroyTexture(logoScreen);
 
-      enter_chat(e, &(*quit), keyState, renderer);
+      enter_chat(e, &(*quit), keyState, renderer, credentials);
       std::cout << "Exited Chat Loop\n";
 
       //Logo Screen Render

@@ -12,8 +12,9 @@ const std::string friendScreenPath = "Art/Chat/friends.png";
 SDL_Texture* chatScreen;
 SDL_Texture* friendScreen;
 
-//inChat boolean value
+//inChat and inFriends boolean value
 bool inChat;
+bool inFriends;
 
 //Set White variable in rgb format
 const SDL_Color textWhite = {255, 255, 255};
@@ -55,7 +56,7 @@ const int WIFI_RIGHT = 902;
     User input box bottom y: 710
 */
 
-void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
+void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, vector<string> credentials){
   std::cout << "Entered Chat Loop\n";
 
   //set inChat boolean value
@@ -124,7 +125,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
   //This will be subject to change with the username password thing hostname page
   //First string is the host name and second is the port number
-  if ((rv = getaddrinfo("NeuroMancer", "9034", &hints, &servinfo)) != 0){
+  if ((rv = getaddrinfo(credentials[2].c_str(), "9034", &hints, &servinfo)) != 0){
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
     return;
   }
@@ -149,16 +150,12 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
   freeaddrinfo(servinfo);
 
-  //commandline username and password until front end is up
+  //username and password check
+  string username = credentials[0];
+  string password = credentials[1];
+
+  //add something that makes the error page show up here/////////////////////////////////////////////////////////////
   while(true){
-    string username;
-    cout << "\nEnter your username: ";
-    cin >> username;
-
-    string password;
-    cout << "\nEnter your password: ";
-    cin >> password;
-
     //find the username in the database and make sure it's valid
     this_user = this_user.find_user(username);
     if(this_user.get_username().compare(username) != 0){
@@ -214,7 +211,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
 
           //set friendsFromServer string to be friends
-          friendsFromServer = "THIS REPLACED BY SERVER TEXT OF FRIENDS";
+          friendsFromServer = "Your Friend List: " + this_user.get_friends().stringList();
           /////////^^^^^^^^REPLACE THIS ONE WITH INPUT FROMS ERVER^^^^^^^///////
 
 
@@ -240,25 +237,29 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
           friendsRect.w = textW;
           friendsRect.h = textH;
 
+          SDL_RenderCopy(renderer, textureFriends, NULL, &friendsRect);
           SDL_RenderPresent(renderer);
 
           // Get the Keyboard State
           keyState = SDL_GetKeyboardState(NULL);
 
-          while(true){
-            if(keyState[SDL_SCANCODE_LCTRL] || keyState[SDL_SCANCODE_RCTRL]){
-              if (keyState[SDL_SCANCODE_E]){
-                std::cout << "Exiting friends\n";
-
-                //clear friends ttf text
-                SDL_DestroyTexture(textureFriends);
-
-                //clear friends background
-                SDL_DestroyTexture(friendScreen);
-                SDL_RenderClear(renderer);
-
-                break;
+          while(inFriends && !(*quit)){
+            while(SDL_PollEvent(&e) != 0) {
+              if(e.type == SDL_QUIT) {
+                (*quit) = true;
               }
+            }
+
+            if(keyState[SDL_SCANCODE_E]){
+              std::cout << "Exiting friends\n";
+              inFriends = false;
+
+              //clear friends ttf text
+              SDL_DestroyTexture(textureFriends);
+
+              //clear friends background
+              SDL_DestroyTexture(friendScreen);
+              SDL_RenderClear(renderer);
             }
           }
         } //end if wifi is clicked

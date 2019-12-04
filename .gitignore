@@ -6,6 +6,7 @@
 *.ko
 *.obj
 *.elf
+*m.bmp
 
 # Linker output
 *.ilk
@@ -55,4 +56,5 @@ dkms.conf
 
 # output files
 *.vtk
+*.txt
 ParaView/

@@ -249,6 +249,10 @@ std::string NPC::getName(){
 	return name;
 }
 
+int NPC::getPersonality(int i){
+	return personality[traits[i]];
+}
+
 std::string NPC::getSpriteName(){
 	return spriteFileName;
 }
