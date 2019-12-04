@@ -56,7 +56,7 @@ const int WIFI_RIGHT = 902;
     User input box bottom y: 710
 */
 
-void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
+void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer, vector<string> credentials){
   std::cout << "Entered Chat Loop\n";
 
   //set inChat boolean value
@@ -125,7 +125,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
   //This will be subject to change with the username password thing hostname page
   //First string is the host name and second is the port number
-  if ((rv = getaddrinfo("192.168.1.16", "9034", &hints, &servinfo)) != 0){
+  if ((rv = getaddrinfo(credentials[2].c_str(), "9034", &hints, &servinfo)) != 0){
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
     return;
   }
@@ -150,16 +150,12 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
   freeaddrinfo(servinfo);
 
-  //commandline username and password until front end is up
+  //username and password check
+  string username = credentials[0];
+  string password = credentials[1];
+
+  //add something that makes the error page show up here/////////////////////////////////////////////////////////////
   while(true){
-    string username;
-    cout << "\nEnter your username: ";
-    cin >> username;
-
-    string password;
-    cout << "\nEnter your password: ";
-    cin >> password;
-
     //find the username in the database and make sure it's valid
     this_user = this_user.find_user(username);
     if(this_user.get_username().compare(username) != 0){
@@ -215,7 +211,6 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
 
           //set friendsFromServer string to be friends
-          //cout << this_user.get_friends().stringList() << endl;
           friendsFromServer = "Your Friend List: " + this_user.get_friends().stringList();
           /////////^^^^^^^^REPLACE THIS ONE WITH INPUT FROMS ERVER^^^^^^^///////
 

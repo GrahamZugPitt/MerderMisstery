@@ -218,8 +218,8 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         keyState = SDL_GetKeyboardState(NULL);
 
         // Open Chat room
-        if (keyState[SDL_SCANCODE_C])
-            enter_chat(e, &(*quit), keyState, renderer);
+        /*if (keyState[SDL_SCANCODE_C])
+            enter_chat(e, &(*quit), keyState, renderer);*/
 
         // Open the inventory
         if (keyState[SDL_SCANCODE_I])
