@@ -59,6 +59,7 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
               e = nullEvent;
               save.open("save.txt", std::fstream::in);
               save.close();
+              render_menu(renderer);
             } else {
               seed = enter_seed(e, &(*quit), keyState, renderer);
               // If the player entered a seed, start the game
@@ -74,17 +75,10 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
           //Start Game Left-X value: 492
           //Start Game Right-X value: 779
           case 492 ... 779:
-            if (save) { //TODO: Replace the start call to the continue call
               std::cout << "Start Game\n";
               next = true; // Start the game
               //clear logoScreen render
               SDL_DestroyTexture(logoScreen);
-            } else {
-              std::cout << "Start Game\n";
-              next = true; // Start the game
-              //clear logoScreen render
-              SDL_DestroyTexture(logoScreen);
-            }
             break;
 
           //Roll Credits Left-X value: 876
@@ -156,7 +150,7 @@ std::string menuloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Rendere
     SDL_RenderPresent(renderer);
     return seed;
   }
-  return "";
+  return seed;
 }
 
 void render_menu(SDL_Renderer* renderer){
