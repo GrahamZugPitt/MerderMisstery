@@ -63,7 +63,7 @@ std::string BLString;
 std::string BRString;
 std::string ResponseString = "Greetings, Detective.";
 
-const int text_size = 25;
+const int text_size = 45;
 
 // Render a string to a rectangle onscreen, wrapping around if the text is too long
 void renderStringOnRect(std::string message, SDL_Rect insideRect, SDL_Renderer *renderer){
@@ -71,6 +71,11 @@ void renderStringOnRect(std::string message, SDL_Rect insideRect, SDL_Renderer *
   // wrap to the next line at that pixel
   surfaceMessage_dialogue = TTF_RenderText_Blended_Wrapped(TNR, message.c_str(), Yellow, insideRect.w);
   textureMessage_dialogue = SDL_CreateTextureFromSurface(renderer, surfaceMessage_dialogue);
+
+  int textW, textH;
+  SDL_QueryTexture(textureMessage_dialogue, NULL, NULL, &textW, &textH);
+  insideRect.w = textW;
+  insideRect.h = textH;
 
   SDL_RenderCopy(renderer, textureMessage_dialogue, NULL, &insideRect);
 
