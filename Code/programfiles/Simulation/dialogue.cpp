@@ -528,6 +528,19 @@ std::string getTime(int time){
 	return statement;
 }
 
+void growVector(){
+      if(answers_vec_size == answer_vec_background_size){
+        answer_vec_background_size++;
+        multiple_answers_vec.push_back("");
+      }
+}
+
+void setVector(){
+	multiple_answers_page = 0;
+        answers_vec_size = 0;
+	answer_vec_background_size = 0;
+}
+
 // Not 100% on why this one exists, but I'm sure as shit not touching it
 bool compareNames(int npc1, std::string npc2){
 	if(!town[npc1].name.compare(npc2))
@@ -599,14 +612,16 @@ void doneWithSelf(int beingInterrogated, int npc){
 	for(int i = 0; i < town[beingInterrogated].memories.getSize(); i++){
 		Event* e = town[beingInterrogated].memories.getMemory(i);
 		if(compareNames(npc,e->npcName1) && e->event != INTRODUCE && e->event != SOCIALIZE && !suspeciousEvent(e->event)){
-			printEventDialogueFPS(e);
+			growVector();
+			multiple_answers_vec.at(answers_vec_size++) = printEventDialogueFPS(e);
 			anyEvent = true;
 			}
 		if(compareNames(npc,e->npcName2)
 		&& e->event != INTRODUCE
 		&& e->event != SOCIALIZE
 		&& sayPersonalEvent(e->event, beingInterrogated)){
-			printEventDialogueFPF(e);
+			growVector();
+			multiple_answers_vec.at(answers_vec_size++) = printEventDialogueFPF(e);
 			anyEvent = true;
 			}
 	}
@@ -619,10 +634,12 @@ void doneWith(int beingInterrogated, int npc){
 	for(int i = 0; i < town[beingInterrogated].observations.getSize(); i++){
 		Event* e = town[beingInterrogated].observations.getMemory(i);
 		if(compareNames(npc,e->npcName1) && e->event != INTRODUCE && e->event != SOCIALIZE){
+			growVector();
 			multiple_answers_vec.at(answers_vec_size++) = printEventDialogue(e);
 			anyEvent = true;
 			}
 		if(compareNames(npc,e->npcName2) && e->event != INTRODUCE && e->event != SOCIALIZE){
+			growVector();
 			multiple_answers_vec.at(answers_vec_size++) = printEventDialogue(e);
 			anyEvent = true;
 			}
@@ -678,10 +695,7 @@ void heard(int beingInterrogated){
 		}
 		if(!alreadyMentioned && !wasInvolvedInEvent(town, town[beingInterrogated].hearSay.getMemory(i),beingInterrogated)){
       // If we found a gossip that we want to say, stick it into our vector
-      if(answers_vec_size == answer_vec_background_size){
-        answer_vec_background_size++;
-        multiple_answers_vec.push_back("");
-      }
+	growVector();
 			multiple_answers_vec.at(answers_vec_size++) = printEventDialogueGossip(town[beingInterrogated].hearSay.getMemory(i));
       gossip[j++] = town[beingInterrogated].hearSay.getMemory(i);
 		}
@@ -839,8 +853,7 @@ void init_four_keyhandler(const Uint8 *keyState, int talkingToNum){
       }
       else if(selected == 3){ // 3 will give you the first page of a (possibly) multi-page answer
         dialogueState = MULTIPLE_ANSWERS;
-        multiple_answers_page = 0;
-        answers_vec_size = 0;
+        setVector();
 
         heard(talkingToNum); // The function that creates our multi-answer vec - tbh it's a black box to me
 
@@ -883,8 +896,7 @@ void what_two_keyhandler(const Uint8 *keyState, int talkingToNum){
       // Both are multi-page answers
       if(selected == 1){
         dialogueState = MULTIPLE_ANSWERS;
-        multiple_answers_page = 0;
-        answers_vec_size = 0;
+        setVector();
 
         doneWith(talkingToNum, getNPC());
 
@@ -898,8 +910,7 @@ void what_two_keyhandler(const Uint8 *keyState, int talkingToNum){
       }
       else if(selected == 2){
         dialogueState = MULTIPLE_ANSWERS;
-        multiple_answers_page = 0;
-        answers_vec_size = 0;
+        setVector();
 
         doneWithSelf(talkingToNum, getNPC()); // The function that creates our multi-answer vec - tbh it's a black box to me
 
