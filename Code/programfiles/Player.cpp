@@ -39,7 +39,7 @@ Player::Player(std::string playerTexturePath, SDL_Renderer *renderer, int player
     isRunning = false;
 }
 
-
+// Misc stuff to collide with
 SDL_Rect ponds[17] = {{1510, 564, 336, 124},{2028, 564, 337, 124},{2290, 1056, 337, 125},{1256, 1946, 460, 126},
                     {1498, 732, 93, 76}, {1085, 1929, 95, 74}, {1090, 935, 468, 32}, {998, 1068, 563, 28},
                     {873, 1840, 379, 31},{1572, 1815, 99, 31}, {1609, 1295, 288, 35}, {1999, 1295, 288, 34},
@@ -119,8 +119,7 @@ void Player::move(float change, const Uint8 *keyState, bool farnan, NPC *npcs, C
               hasCollided = 3;
           }
           if(hasCollided){
-            std::cout << collide.w << std::endl;
-            alterPositionHoriz(&collide);
+              alterPositionHoriz(&collide);
           }
           hasCollided = 0;
         positionPNG.y += yvel;
@@ -154,7 +153,6 @@ void Player::move(float change, const Uint8 *keyState, bool farnan, NPC *npcs, C
               hasCollided = 3;
           }
           if(hasCollided){
-            std::cout << collide.h << " " << collide.w <<std::endl;
             alterPositionVert(&collide);
           }
           hasCollided = 0;

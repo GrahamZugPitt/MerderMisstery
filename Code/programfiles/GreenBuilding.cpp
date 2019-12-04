@@ -1,11 +1,6 @@
 #include "GreenBuilding.hpp"
 
 GreenBuilding::GreenBuilding(){
-    // walls[0].setRectValues(2283, 1950, 677, 15);
-    // walls[1].setRectValues(2942, 1475, 17, 489);
-    // walls[2].setRectValues(2110, 1475, 849, 17);
-    // walls[3].setRectValues(2110, 1475, 17, 491);
-    // walls[4].setRectValues(2110, 1947, 69, 19);
     walls[0].setRectValues(2109, 1474, 17, 492);
     walls[1].setRectValues(2126, 1474, 818, 17);
     walls[2].setRectValues(2944, 1474, 16, 492);
