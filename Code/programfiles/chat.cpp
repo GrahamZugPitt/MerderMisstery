@@ -325,7 +325,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
       }
     }
     //if the user has pressed enter
-    if (send_text){
+    else if (send_text){
       if(text.size() > 0){
         text = this_user.get_username() + ": " + text;
 
