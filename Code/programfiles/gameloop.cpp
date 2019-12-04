@@ -190,7 +190,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         frames_rendered++;
         fr_timer += (curr_time - last_time);
         if(fr_timer >= 1000){
-          std::cout << "fps: " << frames_rendered << std::endl;
           fr_timer = 0;
           frames_rendered = 0;
         }
