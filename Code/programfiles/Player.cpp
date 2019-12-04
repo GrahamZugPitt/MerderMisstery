@@ -2,6 +2,7 @@
 #include "main_helper.hpp"
 #include "worldObjects.hpp"
 
+constexpr int NPC_NUM = 12;
 Player::Player(std::string playerTexturePath, SDL_Renderer *renderer, int player_x, int player_y){
     // Load several textures
     playerTexture = loadFiles(playerTexturePath, renderer);
@@ -131,6 +132,7 @@ void Player::move(float change, const Uint8 *keyState, bool farnan, NPC *npcs, C
               hasCollided = 3;
           }
           if(hasCollided){
+            std::cout << collide.h << " " << collide.w <<std::endl;
             alterPositionVert(&collide);
           }
           hasCollided = 0;
@@ -232,9 +234,9 @@ void Player::alterPositionHoriz(SDL_Rect *collide){
 
 void Player::alterPositionVert(SDL_Rect *collide){
     if( direction & UP){
-        positionPNG.y += collide->h;
+        positionPNG.y += collide->h+1;
     } else if ( direction & DOWN){
-        positionPNG.y -= collide->h;
+        positionPNG.y -= collide->h+1;
     }
 }
 

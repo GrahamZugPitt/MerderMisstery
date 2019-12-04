@@ -14,7 +14,6 @@ constexpr char UP = 0x01;
 constexpr char DOWN = 0x02;
 constexpr char LEFT = 0x04;
 constexpr char RIGHT = 0x08;
-constexpr int NPC_NUM = 12;
 class Player {
 	public:
 		Player(std::string playerTexturePath, SDL_Renderer *renderer, int player_x, int player_y);
