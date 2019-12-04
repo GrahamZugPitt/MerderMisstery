@@ -124,7 +124,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
   //This will be subject to change with the username password thing hostname page
   //First string is the host name and second is the port number
-  if ((rv = getaddrinfo("colton-VirtualBox", "9034", &hints, &servinfo)) != 0){
+  if ((rv = getaddrinfo("NeuroMancer", "9034", &hints, &servinfo)) != 0){
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
     return;
   }

@@ -16,7 +16,6 @@ bool RedBuilding::checkCollision(SDL_Rect *playerRect, SDL_Rect *overlap){
     } else {
         for(auto wall: walls){
             if (wall.checkCollision(playerRect, overlap)){
-                std::cout << "wall collision" << overlap->x << " " << overlap->y << " " << overlap->w << " " << overlap->h << std::endl;
                 return true;
             }
         }
