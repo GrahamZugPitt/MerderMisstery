@@ -13,6 +13,7 @@ const std::string ext = ".png";
 std::vector <std::string> infostrs{"info1", "info2", "info3", "info4"};
 
 bool getInfo;
+bool triggerPressed = false;
 int currPage = 1;
 int cursor_x;
 int cursor_y;
@@ -41,28 +42,33 @@ void info_page(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* ren
       cursor_x = e.motion.x;
       cursor_y = e.motion.y;
 
-      // check if click was in Y range of buttons
-      // if it wasn't in Y range, no need to check X range
-      if((cursor_y < ALL_BUTTON_BOTTOM) && (cursor_y > ALL_BUTTON_TOP))
-      {
-        // cursor_x value comparisons to button ranges
-        if((cursor_x > PREV_BUTTON_LEFT) && (cursor_x < PREV_BUTTON_RIGHT)){
-          if(currPage > 1)
-          {
-            currPage--;
-            get_page(renderer);
-            break;
+      if(!triggerPressed){
+        // check if click was in Y range of buttons
+        // if it wasn't in Y range, no need to check X range
+        if((cursor_y < ALL_BUTTON_BOTTOM) && (cursor_y > ALL_BUTTON_TOP))
+        {
+          // cursor_x value comparisons to button ranges
+          if((cursor_x > PREV_BUTTON_LEFT) && (cursor_x < PREV_BUTTON_RIGHT)){
+            if(currPage > 1)
+            {
+              currPage--;
+              get_page(renderer);
+              triggerPressed = true;
+            }
           }
-        }
-        else if((cursor_x > NEXT_BUTTON_LEFT) && (cursor_x < NEXT_BUTTON_RIGHT)){
-          if(currPage < 4)
-          {
-            currPage++;
-            get_page(renderer);
-            break;
+          else if((cursor_x > NEXT_BUTTON_LEFT) && (cursor_x < NEXT_BUTTON_RIGHT)){
+            if(currPage < 4)
+            {
+              currPage++;
+              get_page(renderer);
+              triggerPressed = true;
+            }
           }
         }
       }
+    }
+    else{
+      triggerPressed = false;
     }
 
     // Get the Keyboard State
