@@ -11,7 +11,10 @@ const int NUMBER_OF_STATES = 10;
 const int DIALOGUE_OPTIONS_PER_STATE = 4;
 const int CHOOSE_NPC_MODE = 1;
 
-std::string discussionBoxPath = "Art/DiscussionImages/DiscussionBox.png";
+std::string normaldiscussionBoxPath = "Art/DiscussionImages/DiaScrQ2.png";
+std::string answerdiscussionBoxPath = "Art/DiscussionImages/DiaScrA2.png";
+std::string multipleanswersdiscussionBoxPath = "Art/DiscussionImages/DiaScrAs2.png";
+
 std::string selectedBoxPath = "Art/DiscussionImages/TextBoxSelected.png";
 std::string deselectedBoxPath = "Art/DiscussionImages/TextBoxDeselected.png";
 std::string singlePlayerPathDisc = "Art/Player/SinglePlayer.png";
@@ -26,7 +29,10 @@ int selected = 1;
 NPClite *town;
 bool triggerPressed_dialogue = false;
 
-SDL_Texture* discussionBoxTex;
+SDL_Texture* normaldiscussionBoxTex;
+SDL_Texture* answerdiscussionBoxTex;
+SDL_Texture* multipleanswersdiscussionBoxTex;
+
 SDL_Texture* selectedBoxTex;
 SDL_Texture* deselectedBoxTex;
 SDL_Texture* playerTex;
@@ -57,15 +63,24 @@ std::string BLString;
 std::string BRString;
 std::string ResponseString = "Greetings, Detective.";
 
-const int text_size = 24;
+const int text_size = 45;
 
 // Render a string to a rectangle onscreen, wrapping around if the text is too long
-int writeString(std::string message, SDL_Rect insideRect, SDL_Renderer *renderer){
+void renderStringOnRect(std::string message, SDL_Rect insideRect, SDL_Renderer *renderer){
 	// set message text surface and convert into texture, 1215 sets the text to
   // wrap to the next line at that pixel
-  surfaceMessage_dialogue = TTF_RenderText_Blended_Wrapped(TNR, message.c_str(), Yellow, 1215);
+  surfaceMessage_dialogue = TTF_RenderText_Blended_Wrapped(TNR, message.c_str(), Yellow, insideRect.w);
   textureMessage_dialogue = SDL_CreateTextureFromSurface(renderer, surfaceMessage_dialogue);
 
+  int textW, textH;
+  SDL_QueryTexture(textureMessage_dialogue, NULL, NULL, &textW, &textH);
+  insideRect.w = textW;
+  insideRect.h = textH;
+
+  SDL_RenderCopy(renderer, textureMessage_dialogue, NULL, &insideRect);
+
+  SDL_FreeSurface(surfaceMessage_dialogue);
+  SDL_DestroyTexture(textureMessage_dialogue);
 }
 
 // Returns the index of the dead NPC
@@ -912,7 +927,9 @@ int key_handler(const Uint8 *keyState, int talkingToNum){
   // If you wanna quit, we're out, no problem
   keyState = SDL_GetKeyboardState(NULL);
   if (keyState[SDL_SCANCODE_Q]){
-    SDL_DestroyTexture(discussionBoxTex);
+    SDL_DestroyTexture(normaldiscussionBoxTex);
+    SDL_DestroyTexture(answerdiscussionBoxTex);
+    SDL_DestroyTexture(multipleanswersdiscussionBoxTex);
     SDL_DestroyTexture(selectedBoxTex);
     SDL_DestroyTexture(deselectedBoxTex);
     SDL_DestroyTexture(playerTex);
@@ -948,11 +965,40 @@ int key_handler(const Uint8 *keyState, int talkingToNum){
   return 1;
 }
 
+// Draws the text in the four init rectangles
+void draw_init_text(SDL_Renderer *renderer){
+  SDL_Rect target = {tl_x + 10, tl_y + 10, boxw - 20, boxh - 20};
+  renderStringOnRect(TLString, target, renderer);
+  target.x = tr_x + 10;
+  target.y = tr_y + 10;
+  renderStringOnRect(TRString, target, renderer);
+  target.x = bl_x + 10;
+  target.y = bl_y + 10;
+  renderStringOnRect(BLString, target, renderer);
+  target.x = br_x + 10;
+  target.y = br_y + 10;
+  renderStringOnRect(BRString, target, renderer);
+}
+
+// Draws the text in the two other rectangles
+void draw_secondary_text(SDL_Renderer *renderer){
+  SDL_Rect target = {tl_x + 10, tl_y + 10, boxw - 20, boxh - 20};
+  renderStringOnRect(TLString, target, renderer);
+  target.x = tr_x + 10;
+  target.y = tr_y + 10;
+  renderStringOnRect(TRString, target, renderer);
+}
+
+// Draws the text when responding to the player's question
+void draw_response_text(SDL_Renderer *renderer){
+  SDL_Rect target = {100, SCREEN_HEIGHT - h + 100, w - 200, h - 200};
+  renderStringOnRect(ResponseString, target, renderer);
+}
+
 // Draws the model to the screen.
 void draw_handler(SDL_Renderer *renderer){
   SDL_RenderClear(renderer);
   // Draw the menu box, detective, npc, and npc's name every time for sure
-  renderTexture(renderer, discussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
   draw_peoples(renderer, playerTex, npcTex);
 
   // Get the NPC's name on the screen (also for sure)
@@ -960,7 +1006,9 @@ void draw_handler(SDL_Renderer *renderer){
 
   // Then the conditional stuff
   if(dialogueState == INITIAL_FOUR){
+    renderTexture(renderer, normaldiscussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
     draw_boxes(selected, renderer, selectedBoxTex, deselectedBoxTex, w, h, true);
+    draw_init_text(renderer);
     printf("Selected is: %d\n", selected);
     printf("1: %s\n", TLString.c_str());
     printf("2: %s\n", TRString.c_str());
@@ -968,15 +1016,21 @@ void draw_handler(SDL_Renderer *renderer){
     printf("4: %s\n", BRString.c_str());
   }
   else if(dialogueState == WHAT_HAVE_YOU_TWO){
+    renderTexture(renderer, normaldiscussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
     draw_boxes(selected, renderer, selectedBoxTex, deselectedBoxTex, w, h, false);
+    draw_secondary_text(renderer);
     printf("Selected is: %d\n", selected);
     printf("1: %s\n", TLString.c_str());
     printf("2: %s\n", TRString.c_str());
   }
   else if(dialogueState == ONE_ANSWER){
+    renderTexture(renderer, answerdiscussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
+    draw_response_text(renderer);
     printf("ResponseString: %s\n", ResponseString.c_str());
   }
   else if(dialogueState == MULTIPLE_ANSWERS){
+    renderTexture(renderer, multipleanswersdiscussionBoxTex, useless, 0, SCREEN_HEIGHT - h, w, h, false);
+    draw_response_text(renderer);
     printf("On page %d of %d\n", multiple_answers_page + 1, answers_vec_size);
     printf("ResponseString: %s\n", ResponseString.c_str());
   }
@@ -990,7 +1044,10 @@ void dialogue(NPClite* our_town, SDL_Event e, bool *quit, const Uint8 *keyState,
 	// Discussion Code
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"); // No bluriness on resize
 	// Load the textures necessary for the menu
-  discussionBoxTex = loadFiles(discussionBoxPath, renderer);
+  normaldiscussionBoxTex = loadFiles(normaldiscussionBoxPath, renderer);
+  answerdiscussionBoxTex = loadFiles(answerdiscussionBoxPath, renderer);
+  multipleanswersdiscussionBoxTex = loadFiles(multipleanswersdiscussionBoxPath, renderer);
+
   selectedBoxTex = loadFiles(selectedBoxPath, renderer);
   deselectedBoxTex = loadFiles(deselectedBoxPath, renderer);
   playerTex = loadFiles(singlePlayerPathDisc, renderer);
@@ -999,7 +1056,7 @@ void dialogue(NPClite* our_town, SDL_Event e, bool *quit, const Uint8 *keyState,
   town = our_town;
 
 	// Initialize a bunch of values
-  setup_vars(selectedBoxTex, discussionBoxTex);
+  setup_vars(selectedBoxTex, normaldiscussionBoxTex);
 
 	// Set up the text variables, values, etc
   TNR = TTF_OpenFont("Art/Font/times-new-roman.ttf", text_size); // Opens the font and sets the size

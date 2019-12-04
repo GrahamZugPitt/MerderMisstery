@@ -4,13 +4,17 @@
 
 using namespace std;
 
-// The Chat screen template
+// The Chat and friends screen template
 const std::string chatScreenPath = "Art/Chat/chat_template.png";
-//initialize chatScreen texture
-SDL_Texture* chatScreen;
+const std::string friendScreenPath = "Art/Chat/friends.png";
 
-//inChat boolean value
+//initialize chatScreen and friendScreen texture
+SDL_Texture* chatScreen;
+SDL_Texture* friendScreen;
+
+//inChat and inFriends boolean value
 bool inChat;
+bool inFriends;
 
 //Set White variable in rgb format
 const SDL_Color textWhite = {255, 255, 255};
@@ -23,18 +27,27 @@ int textW = 0;
 int textH = 0;
 
 //Initialize string that holds the user's input and messages from server
-std::string inputText, textFromServer;
+std::string inputText, textFromServer, friendsFromServer;
 
 //initialize surface and texture for server messages and input text
 SDL_Surface* surfaceMessage;
 SDL_Surface* surfaceInputText;
+SDL_Surface* surfaceFriends;
 
 SDL_Texture* textureMessage;
 SDL_Texture* textureInputText;
+SDL_Texture* textureFriends;
 
 //create a rect for the text textures to appear in
 SDL_Rect inputRect;
 SDL_Rect serverMessageRect;
+SDL_Rect friendsRect;
+
+//wifi symbol dimensions
+const int WIFI_TOP = 32;
+const int WIFI_BOTTOM = 95;
+const int WIFI_LEFT = 812;
+const int WIFI_RIGHT = 902;
 
 /*layout dimensions
     User input box left X: 32
@@ -48,6 +61,9 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
   //set inChat boolean value
   inChat = true;
+
+  int cursor_x;
+  int cursor_y;
 
   //set chatScreen texture
   chatScreen = loadFiles(chatScreenPath, renderer);
@@ -109,7 +125,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
   //This will be subject to change with the username password thing hostname page
   //First string is the host name and second is the port number
-  if ((rv = getaddrinfo("colton-VirtualBox", "9034", &hints, &servinfo)) != 0){
+  if ((rv = getaddrinfo("NeuroMancer", "9034", &hints, &servinfo)) != 0){
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
     return;
   }
@@ -174,6 +190,85 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
     bool send_text = false;
 
     while (SDL_PollEvent(&e) != 0) {
+
+      // if mouse is clicked and released
+      if(e.type == SDL_MOUSEBUTTONUP) {
+        // Get mouse position
+        cursor_x = e.motion.x;
+        cursor_y = e.motion.y;
+
+        // ALL_BUTTON_TOP Y value: 532
+        // ALL_BUTTON_BOTTOM Y value: 618
+        // check if click was in Y range of buttons
+        // if it wasn't in Y range, no need to check X range
+        if((cursor_y < WIFI_BOTTOM) && (cursor_y > WIFI_TOP) &&
+        (cursor_x > WIFI_LEFT) && (cursor_x < WIFI_RIGHT))
+        {
+          //set friendScreen texture
+          friendScreen = loadFiles(friendScreenPath, renderer);
+
+          //render friend screen
+          // SDL_RenderClear(renderer);
+          SDL_RenderCopy(renderer, friendScreen, NULL, NULL);
+
+
+
+
+          //set friendsFromServer string to be friends
+          friendsFromServer = "THIS REPLACED BY SERVER TEXT OF FRIENDS";
+          /////////^^^^^^^^REPLACE THIS ONE WITH INPUT FROMS ERVER^^^^^^^///////
+
+
+
+
+          //convert server text into 'friends' char needed for TTF_RenderText_Blended_Wrapped
+          char friends[friendsFromServer.size() + 1];
+          std::copy(friendsFromServer.begin(), friendsFromServer.end(), friends);
+          friends[friendsFromServer.size()] = '\0';
+
+          //set friends text surface and convert into texture, 1000 sets the text to
+          //wrap to the next line at that pixel
+          surfaceFriends = TTF_RenderText_Blended_Wrapped(fontStyle, friends, textWhite, 1000);
+          textureFriends = SDL_CreateTextureFromSurface(renderer, surfaceFriends);
+
+          //returns inherent width and height of font determed by size set in fontStyle variable
+          //stores these values in textH and textW variables
+          SDL_QueryTexture(textureFriends, NULL, NULL, &textW, &textH);
+
+          //rect for messages from server
+          friendsRect.x = 300;
+          friendsRect.y = 270;
+          friendsRect.w = textW;
+          friendsRect.h = textH;
+
+          SDL_RenderCopy(renderer, textureFriends, NULL, &friendsRect);
+          SDL_RenderPresent(renderer);
+
+          // Get the Keyboard State
+          keyState = SDL_GetKeyboardState(NULL);
+
+          while(inFriends && !(*quit)){
+            while(SDL_PollEvent(&e) != 0) {
+              if(e.type == SDL_QUIT) {
+                (*quit) = true;
+              }
+            }
+
+            if(keyState[SDL_SCANCODE_E]){
+              std::cout << "Exiting friends\n";
+              inFriends = false;
+
+              //clear friends ttf text
+              SDL_DestroyTexture(textureFriends);
+
+              //clear friends background
+              SDL_DestroyTexture(friendScreen);
+              SDL_RenderClear(renderer);
+            }
+          }
+        } //end if wifi is clicked
+      } //end if click
+
 
       //Quit application
       if(e.type == SDL_QUIT) {
