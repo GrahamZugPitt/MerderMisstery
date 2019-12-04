@@ -1,8 +1,8 @@
 #OBJS specifies which files to compile as part of the project
-OBJS = DialogueTester.cpp
+OBJS = dialogueTester.cpp
 
 #OBJ_NAME specifies the name of our exectuable
-OBJ_NAME = dialogue.o
+OBJ_NAME = dialogueTester.o
 
 #This is the target that compiles our executable
 all : $(OBJS)

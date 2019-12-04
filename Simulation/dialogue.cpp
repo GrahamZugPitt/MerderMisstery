@@ -1,4 +1,4 @@
-#include "simulation.cpp"
+#include "simulationWithGoals.cpp"
 
 const int DIALOGUE_OPTION_COUNT = 40;
 const int NUMBER_OF_STATES = 10;
@@ -98,13 +98,6 @@ class dialogueOptionList{
 
 };
 
-
-
-std::string response(int option){
-	switch(option){
-
-	}
-}
 
 int getNPC(NPClite* town){
 	for(int i = 0; i < TOWN_SIZE; i++){
