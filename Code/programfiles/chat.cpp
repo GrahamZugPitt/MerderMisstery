@@ -12,8 +12,9 @@ const std::string friendScreenPath = "Art/Chat/friends.png";
 SDL_Texture* chatScreen;
 SDL_Texture* friendScreen;
 
-//inChat boolean value
+//inChat and inFriends boolean value
 bool inChat;
+bool inFriends;
 
 //Set White variable in rgb format
 const SDL_Color textWhite = {255, 255, 255};
@@ -240,25 +241,29 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
           friendsRect.w = textW;
           friendsRect.h = textH;
 
+          SDL_RenderCopy(renderer, textureFriends, NULL, &friendsRect);
           SDL_RenderPresent(renderer);
 
           // Get the Keyboard State
           keyState = SDL_GetKeyboardState(NULL);
 
-          while(true){
-            if(keyState[SDL_SCANCODE_LCTRL] || keyState[SDL_SCANCODE_RCTRL]){
-              if (keyState[SDL_SCANCODE_E]){
-                std::cout << "Exiting friends\n";
-
-                //clear friends ttf text
-                SDL_DestroyTexture(textureFriends);
-
-                //clear friends background
-                SDL_DestroyTexture(friendScreen);
-                SDL_RenderClear(renderer);
-
-                break;
+          while(inFriends && !(*quit)){
+            while(SDL_PollEvent(&e) != 0) {
+              if(e.type == SDL_QUIT) {
+                (*quit) = true;
               }
+            }
+
+            if(keyState[SDL_SCANCODE_E]){
+              std::cout << "Exiting friends\n";
+              inFriends = false;
+
+              //clear friends ttf text
+              SDL_DestroyTexture(textureFriends);
+
+              //clear friends background
+              SDL_DestroyTexture(friendScreen);
+              SDL_RenderClear(renderer);
             }
           }
         } //end if wifi is clicked
