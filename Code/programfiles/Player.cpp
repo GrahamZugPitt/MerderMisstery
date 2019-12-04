@@ -52,20 +52,17 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
             direction |= UP;
             cropPNG.y = frameHeight * 3;
             isRunning = true;
-        }
-        if(keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_S]) {
+        } else if(keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_S]) {
             yvel += static_cast<int>(playerSpeed * change);
             direction |= DOWN;
             cropPNG.y = 0;
             isRunning = true;
-        }
-        if(keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_A]) {
+        } else if(keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_A]) {
             xvel -= static_cast<int>(playerSpeed * change);
             direction |= LEFT;
             cropPNG.y = frameHeight;
             isRunning = true;
-        }
-        if(keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_D]) {
+        } else if(keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_D]) {
             xvel += static_cast<int>(playerSpeed * change);
             direction |= RIGHT;
             cropPNG.y = frameHeight * 2;
