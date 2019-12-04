@@ -190,7 +190,6 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         frames_rendered++;
         fr_timer += (curr_time - last_time);
         if(fr_timer >= 1000){
-          std::cout << "fps: " << frames_rendered << std::endl;
           fr_timer = 0;
           frames_rendered = 0;
         }
@@ -255,12 +254,14 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         SDL_Rect sign4;
         SDL_Rect sign5;
         SDL_Rect sign5p2;
+        SDL_Rect sign6;
 
         SDL_Texture* townHallMessage;
         SDL_Texture* murderMessage;
         SDL_Texture* innMessage;
         SDL_Texture* churchMessage;
         SDL_Texture* factoryMessage;
+        SDL_Texture* marketCentralMessage;
         SDL_Rect messageDestination;
 
         townHallMessage = loadFiles("Art/Messages/townHall.png", renderer);
@@ -268,6 +269,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         innMessage = loadFiles("Art/Messages/inn.png", renderer);
         churchMessage = loadFiles("Art/Messages/church.png", renderer);
         factoryMessage = loadFiles("Art/Messages/factory.png", renderer);
+        marketCentralMessage = loadFiles("Art/Messages/marketCentral.png", renderer);
 
         //Sign rect positions and widths
         sign1.x = 1000;
@@ -302,6 +304,11 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         sign5p2.y = 450;
         sign5p2.w = 200;
         sign5p2.h = 725;
+
+        sign6.x = 1600;
+        sign6.y = 700;
+        sign6.w = 750;
+        sign6.h = 600;
 
         positionPNG.w = 30;
         positionPNG.h = 30;
@@ -365,6 +372,16 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
                 messageDestination.w = 300;
                 messageDestination.h = 100;
                 SDL_RenderCopy(renderer, factoryMessage, NULL, &messageDestination);
+          }
+
+          if(SDL_HasIntersection(&(player->positionPNG), &sign6))
+          {
+
+                messageDestination.x = 0;
+                messageDestination.y = 600;
+                messageDestination.w = 300;
+                messageDestination.h = 100;
+                SDL_RenderCopy(renderer, marketCentralMessage, NULL, &messageDestination);
           }
 
           //Check building collisions
