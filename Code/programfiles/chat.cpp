@@ -125,7 +125,7 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
   //This will be subject to change with the username password thing hostname page
   //First string is the host name and second is the port number
-  if ((rv = getaddrinfo("NeuroMancer", "9034", &hints, &servinfo)) != 0){
+  if ((rv = getaddrinfo("192.168.1.16", "9034", &hints, &servinfo)) != 0){
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
     return;
   }
@@ -215,7 +215,8 @@ void enter_chat(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* re
 
 
           //set friendsFromServer string to be friends
-          friendsFromServer = "THIS REPLACED BY SERVER TEXT OF FRIENDS";
+          //cout << this_user.get_friends().stringList() << endl;
+          friendsFromServer = "Your Friend List: " + this_user.get_friends().stringList();
           /////////^^^^^^^^REPLACE THIS ONE WITH INPUT FROMS ERVER^^^^^^^///////
 
 
