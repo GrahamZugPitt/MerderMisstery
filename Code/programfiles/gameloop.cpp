@@ -10,6 +10,7 @@ std::string playerImgPath = "Art/Player/PlayerSpriteSheet.png";
 std::string interactImgPath = "Art/Messages/interact.png";
 const int NPC_NUM = 12;
 const int WORLD_OBJECT_NUM = 4;
+const int PERSONALITY_TRAITS = 5;
 
 //NPC Constants
 const int NPC_WIDTH = 60;
@@ -17,6 +18,16 @@ const int NPC_HEIGHT = 88;
 
 int npcdiscuss = 0;
 bool discussbool = false;
+
+NPClite* npcToNPClite(NPClite* town, NPC* npcs){
+	for(int i = 0; i < NPC_NUM; i++){
+		town[i].name = npcs[i].getName();
+		for(int j = 0; j < PERSONALITY_TRAITS; j++){
+			town[i].personality[j] = (npcs[i].getPersonality(j) + 100)/2; 
+		}
+	}
+	return town;
+}
 
 // Return the seed so we can use it later if necessary
 std::string simTown(NPClite *town, std::string seed){
@@ -39,7 +50,7 @@ std::string simTown(NPClite *town, std::string seed){
   const char *seedCharray = seed.c_str();
   int i;
   for(i = 0; i < seed.length(); i++){
-    seedint = seedCharray[i];
+    seedint = ((seedCharray[i] * seedint) % M) + 1;
   }
 
   std::cout << "Your seed is: " << seed << std::endl;
@@ -86,9 +97,6 @@ std::string simTown(NPClite *town, std::string seed){
 
 // Has to return the seed because we'll need it later
 std::string init(NPC *npcs, SDL_Renderer *renderer, WorldObject *worldObjects, std::string seed, NPClite *town){
-  // Runs the simulation. I know, it looks so innocuous. Kinda nifty, right?
-  seed = simTown(town, seed);
-  std::cout << "Your seed is: " << seed << std::endl;
 
   // Set up the front end NPCs
   //   Presumably this is where the backend info will be pushed to the front end
@@ -126,6 +134,10 @@ std::string init(NPC *npcs, SDL_Renderer *renderer, WorldObject *worldObjects, s
   // Church Person at the Church
   npcs[11].initSprite("Charles", "Art/NPCs/Vicar.bmp", WHITE, WHITE, PURPLE,
                       renderer, NPC_WIDTH, NPC_HEIGHT, 2248, 1670);
+  // Runs the simulation. I know, it looks so innocuous. Kinda nifty, right?
+  npcToNPClite(town,npcs);
+  seed = simTown(town, seed);
+  std::cout << "Your seed is: " << seed << std::endl;
 
   // Weapons
   worldObjects[0].initObject("Art/Merder Objects/bat.png", renderer, 960, 855, 100, 50, 5, 5, 100, 50);
