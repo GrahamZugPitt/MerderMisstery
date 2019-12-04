@@ -105,6 +105,7 @@ void Player::move(float change, const Uint8 *keyState, bool farnan, NPC *npcs, C
               hasCollided = 3;
           }
           if(hasCollided){
+            std::cout << collide.w << std::endl;
             alterPositionHoriz(&collide);
           }
           hasCollided = 0;
@@ -226,9 +227,9 @@ bool Player::collision(SDL_Renderer *rendererPointer, const Uint8 *keyState){
 // }
 void Player::alterPositionHoriz(SDL_Rect *collide){
     if( direction & LEFT ){
-        positionPNG.x += collide->w;
+        positionPNG.x += collide->w+1;
     } else if (direction & RIGHT){
-        positionPNG.x -= collide->w;
+        positionPNG.x -= collide->w+1;
     }
 }
 
