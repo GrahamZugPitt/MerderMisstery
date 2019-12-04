@@ -208,9 +208,26 @@ bool isEventType(NPClite* town, Event* e, int eventType){
 }
 
 int findObserver(NPClite* town, int firstNPC, int secondNPC){
+	int obs[TOWN_SIZE];
+	int obsCount = 0;
 	for(int i = 0; i < TOWN_SIZE; i++){
-		if(i != firstNPC && i != secondNPC && town[i].schedule[CLOCK%12] == town[firstNPC].schedule[CLOCK%12])
-	return i;
+		obs[i] = -1;
+	}
+	for(int i = 0; i < TOWN_SIZE; i++){
+		if(i != firstNPC && i != secondNPC && town[i].schedule[CLOCK%12] == town[firstNPC].schedule[CLOCK%12]){
+		obs[i] = i;
+		obsCount++;
+		}
+	}
+	if(!obsCount)
+		return - 1;
+	int theObserver = z_rand() % obsCount;
+	for(int i = 0; i < TOWN_SIZE; i++){
+		if(i != firstNPC && i != secondNPC && town[i].schedule[CLOCK%12] == town[firstNPC].schedule[CLOCK%12]){
+		if(!theObserver)
+			return i;
+		theObserver--;
+		}
 	}
 return -1;
 }
