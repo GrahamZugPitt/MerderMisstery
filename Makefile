@@ -4,9 +4,7 @@
 #FILES TO COMPILE
 START_FILES = murder.o
 
-
-SOURCE_FILES = bmp_edit chat chatLogin discussion dialogue event simulation inventory winCode npc gameloop menuloop main_helper Player main collision worldObjects building seed credits objects CyanBuilding BlueBuilding GreenBuilding YellowBuilding RedBuilding
-
+SOURCE_FILES = bmp_edit chat chatLogin dialogue event simulation inventory winCode npc gameloop menuloop main_helper Player main collision worldObjects building seed credits objects CyanBuilding BlueBuilding GreenBuilding YellowBuilding RedBuilding info
 
 #OUTPUT
 OUT_NAMES = $(patsubst %.cpp,%.o,$(START_FILES))
@@ -44,7 +42,7 @@ murder.o: $(OBJ_FILES) #wo.o
 	$(CC) -o $@ $^ $(LINKER_FLAGS) -std=c++14
 
 clean:
-	rm *.o ./Art/NPCs/*m.bmp
+	rm *.o ./Art/NPCs/*m.bmp save.txt
 
 farnan:
 	make

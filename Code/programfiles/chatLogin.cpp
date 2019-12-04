@@ -8,6 +8,11 @@ const std::string chatLoginPath = "Art/Chat/chat_login.png";
 //initialize chatScreen texture
 SDL_Texture* chatLoginScreen;
 
+// The Chat error template
+const std::string chatErrorPath = "Art/Chat/chat_error.png";
+//initialize chatError texture
+SDL_Texture* chatError;
+
 //inLogin boolean value
 bool inLogin;
 
@@ -44,8 +49,10 @@ SDL_Rect hostRect;
     
 */
 
-void enter_login(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
+vector<string> enter_login(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* renderer){
   std::cout << "Entered Chat Login Loop\n";
+
+  vector<string> credentials;
 
   //set inLogin boolean value
   inLogin = true;
@@ -101,89 +108,6 @@ void enter_login(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* r
 
   //Enable text input
   SDL_StartTextInput();
-
-  //Adding Client Code Initialization
-  /*
-  int sockfd;
-  struct addrinfo hints, *servinfo, *p;
-  struct timeval tv;
-  int rv;
-  //char s[INET6_ADDRSTRLEN];
-  fd_set master;
-  fd_set temp;
-
-  tv.tv_sec = 0;
-
-  FD_ZERO(&master);
-  FD_ZERO(&temp);
-  //FD_SET(sockfd, &master);
-
-  User this_user;
-
-  memset(&hints, 0, sizeof hints);
-  hints.ai_family = AF_UNSPEC;
-  hints.ai_socktype = SOCK_STREAM;
-
-  //This will be subject to change with the username password thing hostname page
-  //First string is the host name and second is the port number
-  if ((rv = getaddrinfo("colton-VirtualBox", "9034", &hints, &servinfo)) != 0){
-    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-    return;
-  }
-
-  for(p = servinfo; p != NULL; p = p->ai_next){
-    if((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
-      perror("client: socket");
-      continue;
-    }
-    if(connect(sockfd, p->ai_addr, p->ai_addrlen) == -1){
-      close(sockfd);
-      perror("client connect");
-      continue;
-    }
-    break;
-  }
-
-  if(p == NULL){
-    fprintf(stderr, "client: failed to connect\n");
-    return;
-  }
-
-  freeaddrinfo(servinfo);
-
-  //commandline username and password until front end is up
-  while(true){
-    string username;
-    cout << "\nEnter your username: ";
-    cin >> username;
-
-    string password;
-    cout << "\nEnter your password: ";
-    cin >> password;
-
-    //find the username in the database and make sure it's valid
-    this_user = this_user.find_user(username);
-    if(this_user.get_username().compare(username) != 0){
-      cout << "\nSorry, this username does not exist\n";
-      continue;
-    }
-
-    if(this_user.check_password(username, password) == false){
-      cout << "\nSorry, your password is incorrect\n";
-      continue;
-    }
-    else{
-      break;
-    }
-  }
-
-  //info to send and receive data
-  char buf[4096];
-  FD_SET(sockfd, &master);
-
-  string text;
-
-  */
 
   int pressedEnter = 0;
   //Wait for user to exit chat
@@ -259,37 +183,6 @@ void enter_login(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* r
       }
     }
 
-    /*
-    temp = master;
-    select(sockfd+1, &temp, nullptr, nullptr, &tv);
-
-
-    //if the socket has information to receive
-    if (FD_ISSET(sockfd, &temp)){ //if(text.size() > 0){
-      memset(&buf, 0, sizeof buf);
-      int bytesReceived = recv(sockfd, buf, 4096, 0);//this guy blocks until it receives from the server
-      if(bytesReceived > 0){
-        text = string(buf, 0, bytesReceived);
-        renderText = true;
-      }
-      else{
-        break;
-      }
-    }
-    //if the user has pressed enter
-    if (send_text){ 
-      if(text.size() > 0){
-        text = this_user.get_username() + ": " + text;
-
-        int sendResult = send(sockfd, text.c_str(), text.size() + 1, 0);
-        send_text = false;
-
-        if(sendResult <= 0){
-          break;
-        }
-      }
-    }
-    */
 
     //----------------------------------------Rerender user text if needed
     if(renderUserText) {
@@ -414,7 +307,10 @@ void enter_login(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* r
 
       SDL_RenderClear(renderer);
       //make sure to end things
-      return;
+      credentials.push_back(userText);
+      credentials.push_back(passText);
+      credentials.push_back(hostText);
+      return credentials;
     }
   }
 } //end enter_chat

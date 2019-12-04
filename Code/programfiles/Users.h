@@ -57,6 +57,21 @@ class Linkedlist {
 				counter++;
 			}
 		}
+		string stringList(){
+			LinkedNode *temp = new LinkedNode;
+			temp = head;
+			int counter = 1;
+			string str;
+			while(temp != nullptr){
+				str.append(temp->data);
+				temp = temp->next;
+				if(temp != nullptr){
+					str.append(",");
+				}
+				counter++;
+			}
+			return str;
+		}
 		
 };
 
