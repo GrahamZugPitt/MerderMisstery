@@ -232,7 +232,8 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         }
 
         //Move Player
-        player->move(time_change, keyState, farnan);
+        //player->move(time_change, keyState, farnan);
+        player->move(time_change, keyState, farnan, npcs, cBuilding, bBuilding, gBuilding, yBuilding, rBuilding);
 
         //Clear screen
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -317,11 +318,11 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         // Loop through twice to accomidate corner sections where the player may collide with 2 objects
         for (int axisI = 0; axisI < 2; axisI++){
           // Check NPC Collisions
-          for(i = 0; i < NPC_NUM; i++){
-              if (npcs[i].NPCCollider.checkCollision(&(player->positionPNG), &collide)){
-                  hasCollided = 2;
-              }
-          }
+          // for(i = 0; i < NPC_NUM; i++){
+          //     if (npcs[i].NPCCollider.checkCollision(&(player->positionPNG), &collide)){
+          //         hasCollided = 2;
+          //     }
+          // }
 
           //Locate player and show appropriate sign
           if(SDL_HasIntersection(&(player->positionPNG), &sign1) || SDL_HasIntersection(&(player->positionPNG), &sign1p2))
@@ -385,26 +386,26 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
           }
 
           //Check building collisions
-          if (cBuilding.checkCollision(&(player->positionPNG), &collide)) {
-              hasCollided = 3;
-          }
-          if (bBuilding.checkCollision(&(player->positionPNG), &collide)) {
-              hasCollided = 3;
-          }
-          if (gBuilding.checkCollision(&(player->positionPNG), &collide)) {
-              hasCollided = 3;
-          }
-          if (yBuilding.checkCollision(&(player->positionPNG), &collide)) {
-              hasCollided = 3;
-          }
-          if (rBuilding.checkCollision(&(player->positionPNG), &collide)) {
-              hasCollided = 3;
-          }
-          if(hasCollided){
-            player->alterPosition(&collide);
-          } else {
-            axisI = 2;
-          }
+          // if (cBuilding.checkCollision(&(player->positionPNG), &collide)) {
+          //     hasCollided = 3;
+          // }
+          // if (bBuilding.checkCollision(&(player->positionPNG), &collide)) {
+          //     hasCollided = 3;
+          // }
+          // if (gBuilding.checkCollision(&(player->positionPNG), &collide)) {
+          //     hasCollided = 3;
+          // }
+          // if (yBuilding.checkCollision(&(player->positionPNG), &collide)) {
+          //     hasCollided = 3;
+          // }
+          // if (rBuilding.checkCollision(&(player->positionPNG), &collide)) {
+          //     hasCollided = 3;
+          // }
+          // if(hasCollided){
+          //   player->alterPosition(&collide);
+          // } else {
+          //   axisI = 2;
+          // }
           hasCollided = 0;
         }
 
@@ -459,7 +460,7 @@ void gameloop(SDL_Event e, bool *quit, const Uint8 *keyState, SDL_Renderer* rend
         player->render(renderer, &cam);
 
         // Check Collisions
-        player->collision(renderer, keyState);
+        //player->collision(renderer, keyState);
 
         //Update Screen
         SDL_RenderPresent(renderer);

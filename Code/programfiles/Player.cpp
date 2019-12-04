@@ -38,12 +38,15 @@ Player::Player(std::string playerTexturePath, SDL_Renderer *renderer, int player
     isRunning = false;
 }
 
-void Player::move(float change, const Uint8 *keyState, bool farnan){
+void Player::move(float change, const Uint8 *keyState, bool farnan, NPC *npcs, CyanBuilding cBuilding,
+    BlueBuilding bBuilding, GreenBuilding gBuilding, YellowBuilding yBuilding, RedBuilding rBuilding){
     //True by default, animation is stopped if not running
     // Should probably revisit this code
     isRunning = true;
     xvel = yvel = 0;
     direction = 0;
+    SDL_Rect collide = {0,0,0,0};
+    int hasCollided = 0;
     if(!farnan){
         isRunning = false;
         //Determine which directional keypad arrow is clicked and apply appropriate movement / image
@@ -52,17 +55,20 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
             direction |= UP;
             cropPNG.y = frameHeight * 3;
             isRunning = true;
-        } else if(keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_S]) {
+        }
+        if(keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_S]) {
             yvel += static_cast<int>(playerSpeed * change);
             direction |= DOWN;
             cropPNG.y = 0;
             isRunning = true;
-        } else if(keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_A]) {
+        }
+        if(keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_A]) {
             xvel -= static_cast<int>(playerSpeed * change);
             direction |= LEFT;
             cropPNG.y = frameHeight;
             isRunning = true;
-        } else if(keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_D]) {
+        }
+        if(keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_D]) {
             xvel += static_cast<int>(playerSpeed * change);
             direction |= RIGHT;
             cropPNG.y = frameHeight * 2;
@@ -74,7 +80,60 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
             yvel = static_cast<int>(yvel * 0.8);
         }
         positionPNG.x += xvel;
+        // Check NPC Collisions
+        int i = 0;
+          for(i = 0; i < NPC_NUM; i++){
+              if (npcs[i].NPCCollider.checkCollision(&(positionPNG), &collide)){
+                  hasCollided = 2;
+              }
+          }
+          //Check building collisions
+          if (cBuilding.checkCollision(&(positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (bBuilding.checkCollision(&(positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (gBuilding.checkCollision(&(positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (yBuilding.checkCollision(&(positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (rBuilding.checkCollision(&(positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if(hasCollided){
+            alterPositionHoriz(&collide);
+          }
+          hasCollided = 0;
         positionPNG.y += yvel;
+        // Check NPC Collisions
+          for(i = 0; i < NPC_NUM; i++){
+              if (npcs[i].NPCCollider.checkCollision(&(positionPNG), &collide)){
+                  hasCollided = 2;
+              }
+          }
+          //Check building collisions
+          if (cBuilding.checkCollision(&(positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (bBuilding.checkCollision(&(positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (gBuilding.checkCollision(&(positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (yBuilding.checkCollision(&(positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if (rBuilding.checkCollision(&(positionPNG), &collide)) {
+              hasCollided = 3;
+          }
+          if(hasCollided){
+            alterPositionVert(&collide);
+          }
+          hasCollided = 0;
     } else {
         //Determine which directional keypad arrow is clicked and apply appropriate movement / image
         if(keyState[SDL_SCANCODE_UP] && keyState[SDL_SCANCODE_W] && keyState[SDL_SCANCODE_M]) {
@@ -128,7 +187,7 @@ void Player::move(float change, const Uint8 *keyState, bool farnan){
         positionPNG.y -= playerSpeed * change;
     }
 
-
+    
     lastX = positionPNG.x;
     lastY = positionPNG.y;
 }
@@ -163,6 +222,21 @@ bool Player::collision(SDL_Renderer *rendererPointer, const Uint8 *keyState){
 //     lastX = positionPNG.x;
 //     lastY = positionPNG.y;
 // }
+void Player::alterPositionHoriz(SDL_Rect *collide){
+    if( direction & LEFT ){
+        positionPNG.x += collide->w;
+    } else if (direction & RIGHT){
+        positionPNG.x -= collide->w;
+    }
+}
+
+void Player::alterPositionVert(SDL_Rect *collide){
+    if( direction & UP){
+        positionPNG.y += collide->h;
+    } else if ( direction & DOWN){
+        positionPNG.y -= collide->h;
+    }
+}
 
 void Player::alterPosition(SDL_Rect *collide) {
     // collision from moving left
