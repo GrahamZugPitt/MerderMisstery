@@ -97,11 +97,11 @@ public class Shop : NetworkBehaviour
                 ships[i].GetComponent<ShipInShop>().movement_display.GetComponent<StatHolder>().UpdateValue(ships[i].GetComponent<ShipInShop>().ship.GetComponent<ShipScript>().movement);
                 ships[i].GetComponent<ShipInShop>().movement_display.GetComponent<StatHolder>().text_display.transform.SetParent(ships[i].GetComponent<ShipInShop>().movement_display.transform);
 
-                /*ships[i].GetComponent<ShipInShop>().cargo_display = Instantiate(displayPrefab, ships[i].transform.position + new Vector3((float).3, (float)-.25, 0), Quaternion.identity);
+                ships[i].GetComponent<ShipInShop>().cargo_display = Instantiate(displayPrefab, ships[i].transform.position + new Vector3((float).3, (float)-.25, 0), Quaternion.identity);
                 ships[i].GetComponent<ShipInShop>().cargo_display.transform.SetParent(ships[i].transform);
-                ships[i].GetComponent<ShipInShop>().cargo_display.GetComponent<StatHolder>().UpdateValue(ships[i].GetComponent<ShipInShop>().ship.GetComponent<ShipScript>().cargoSpace);
+                ships[i].GetComponent<ShipInShop>().cargo_display.GetComponent<StatHolder>().UpdateValue(ships[i].GetComponent<ShipInShop>().ship.GetComponent<ShipScript>().attackScore);
                 ships[i].GetComponent<ShipInShop>().cargo_display.GetComponent<SpriteRenderer>().sprite = cargo_sprite;
-                ships[i].GetComponent<ShipInShop>().cargo_display.GetComponent<StatHolder>().text_display.transform.SetParent(ships[i].GetComponent<ShipInShop>().cargo_display.transform);*/
+                ships[i].GetComponent<ShipInShop>().cargo_display.GetComponent<StatHolder>().text_display.transform.SetParent(ships[i].GetComponent<ShipInShop>().cargo_display.transform);
 
             }
         }

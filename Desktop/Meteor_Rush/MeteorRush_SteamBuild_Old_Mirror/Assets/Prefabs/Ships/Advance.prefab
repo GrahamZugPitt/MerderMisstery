@@ -64,6 +64,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1327731952189388761, guid: 2aea8a0a21da8dd4d8f51440e33737b0,
         type: 3}
+      propertyPath: attackScore
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1327731952189388761, guid: 2aea8a0a21da8dd4d8f51440e33737b0,
+        type: 3}
       propertyPath: deactivated
       value: 
       objectReference: {fileID: 5339065698705713928, guid: fc36c727e11c3464cb0c6040d7f17669,

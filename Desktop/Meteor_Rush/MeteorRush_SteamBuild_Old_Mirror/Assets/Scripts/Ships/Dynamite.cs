@@ -27,7 +27,7 @@ public class Dynamite : ShipScript
             return;
         }
         ship.isBeingKicked = true;
-        ship.showRange(kickingDistance, movementSquare, enemySquare);
+        ship.showRange(attackScore, movementSquare, enemySquare);
         ship.isMoving = true;
         ship.origin = GetComponentInParent<BoardScript>().GetShipByPosition(dest).GetPosition();
         hasChosenKickingTarget = true;

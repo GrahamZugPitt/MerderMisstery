@@ -8,7 +8,7 @@ public class ShipCard : MonoBehaviour
     public GameObject text_display_prefab;
     public GameObject ship_sprite_display;
 
-    public void SetShip(GameObject ship, GameObject priceDisplay, GameObject movementDisplay)
+    public void SetShip(GameObject ship, GameObject priceDisplay, GameObject movementDisplay, GameObject cargoDisplay)
     {
         GameObject ship_display = Instantiate(ship_sprite_display, transform.position + new Vector3(0, 1, 0), Quaternion.identity);
         color(ship);
@@ -23,7 +23,7 @@ public class ShipCard : MonoBehaviour
 
         SetStats(Instantiate(priceDisplay, transform.position, Quaternion.identity), transform.position + new Vector3((float)-.9,(float)1.9,0));
         SetStats(Instantiate(movementDisplay, transform.position, Quaternion.identity), transform.position + new Vector3((float)-.9, (float)-1.9, 0));
-        //SetStats(Instantiate(cargoDisplay, transform.position, Quaternion.identity), transform.position + new Vector3((float).9, (float)-1.9, 0));
+        SetStats(Instantiate(cargoDisplay, transform.position, Quaternion.identity), transform.position + new Vector3((float).9, (float)-1.9, 0));
 
 
     }

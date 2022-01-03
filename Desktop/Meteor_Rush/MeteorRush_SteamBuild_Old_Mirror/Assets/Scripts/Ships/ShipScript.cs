@@ -66,6 +66,7 @@ public class ShipScript : NetworkBehaviour
     public bool isShowingRangeToEnemy = false;
     public bool displayingInterruptedByKick = false;
     public bool temp_movement = false;
+    public bool in_graveyard = false;
 
     public int movement;
     public int temp_movement_number;
@@ -73,12 +74,13 @@ public class ShipScript : NetworkBehaviour
     public int miningSpeed;
     public int metalCount;
     public int platCount = 0;
-    public int kickingDistance = 2;
+    public int attackScore = 2;
     public int identifier; 
 
     public GameObject meteor_text;
     public GameObject text_display_prefab; //this is for displaying cargo and movement, but not meteor value
     public GameObject movement_value_display;
+    public GameObject cargo_value_display;
     public GameObject mining_symbol_prefab;
     public GameObject mining_symbol;
     public GameObject building_symbol;
@@ -205,7 +207,7 @@ public class ShipScript : NetworkBehaviour
                     i++;
                 }
 
-                if (any && dist >= squares[m].GetComponent<movementSquare>().dist + 1 && !shipsInRange.Contains(locations[m] + units[j]) && spaceTakenByShip(locations[m] + units[j]) && GetComponentInParent<BoardScript>().GetShipByPosition(locations[m] + units[j]).isKickable && !isBeingKicked && !isEnemyBase(locations[m] + units[j])) //&& free(locations[m] + units[j]))
+                if (any && dist >= squares[m].GetComponent<movementSquare>().dist + 1 && !shipsInRange.Contains(locations[m] + units[j]) && spaceTakenByShip(locations[m] + units[j]) && GetComponentInParent<BoardScript>().GetShipByPosition(locations[m] + units[j]).isKickable && attackScore > 0 && !isBeingKicked && !isEnemyBase(locations[m] + units[j])) //&& free(locations[m] + units[j]))
                 {
                     shipsInRange[b] = locations[m] + units[j];
                     b++;
@@ -226,6 +228,7 @@ public class ShipScript : NetworkBehaviour
                 !locations.Contains(transform.position + units[c]) 
                 && spaceTakenByShip(transform.position + units[c]) 
                 && GetComponentInParent<BoardScript>().GetShipByPosition(transform.position + units[c]).isKickable 
+                && attackScore > 0
                 && !isBeingKicked)
             {
                 locations[i] = transform.position + units[c];
@@ -312,18 +315,21 @@ public class ShipScript : NetworkBehaviour
         return dist;
     }
 
-    public void OnMouseDown()
+    public void StopAllMovement()
+    {
+        GetComponentInParent<BaseScript>().kicking_ship = null;
+        for (int i = 0; i < GetComponentInParent<BoardScript>().player_count; i++)
+            GetComponentInParent<BoardScript>().GetComponentsInChildren<BaseScript>()[i].StopMovement();
+    }
+
+    /*public void OnMouseDown()
     {
         if (isMoving)
         {
-            GetComponentInParent<BaseScript>().kicking_ship = null;
-            for (int i = 0; i < GetComponentInParent<BoardScript>().player_count; i++)
-                GetComponentInParent<BoardScript>().GetComponentsInChildren<BaseScript>()[i].StopMovement();
+            StopAllMovement();
             return;
         }
-        GetComponentInParent<BaseScript>().kicking_ship = null; 
-        for (int i = 0; i < GetComponentInParent<BoardScript>().player_count; i++)
-            GetComponentInParent<BoardScript>().GetComponentsInChildren<BaseScript>()[i].StopMovement();
+        StopAllMovement();
 
         if ((isMining && !isBeingKicked) || !hasAuthority || isLiterallyMoving || !GetComponentInParent<BaseScript>().my_turn || isDeactivated || isMining) // || GetComponentInParent<BoardScript>().moving_ship_semaphore != 0 || GetComponentInParent<BoardScript>().kicked_ship_semaphore != 0)
         {
@@ -348,13 +354,17 @@ public class ShipScript : NetworkBehaviour
             return;
         }
         showRange(movement, movementSquare, enemySquare);
-    }
+    }*/
 
     public virtual void StopMoving()
     {
         hasChosenKickingTarget = false;
         isMoving = false;
-        isKicking = false;
+        if (isKicking)
+        {
+            GetComponent<BoxCollider2D>().enabled = true;
+            isKicking = false;
+        }
         isBeingKicked = false;
         GetComponentInParent<BaseScript>().has_a_moving_ship = false;
         for (int j = 0; j < length; j++)
@@ -370,10 +380,16 @@ public class ShipScript : NetworkBehaviour
     public void Update()
     {
 
+        if (in_graveyard)
+        {
+            return;
+        }
+
         if (isKicking && GetComponentInParent<BoardScript>().GetShipByPosition(dest) == null)
         {
             CmdStopMining();
             CmdMove(dest);
+            GetComponent<BoxCollider2D>().enabled = true;
             isKicking = false;
         }
 
@@ -387,6 +403,10 @@ public class ShipScript : NetworkBehaviour
         if(isLiterallyMoving && dest.Equals(transform.position))
         {
             OnArrival();
+            if (findSpaceType() == (int)Spaces.GOAL)
+            {
+                CashIn(player_number);
+            }
             GetComponentInParent<BaseScript>().kicking_ship = null; //Really bad. Works though. Logic is this: if a normal ship is moving it's whatever. If a kicking ship stops, this needs to be nullified
             if (GetComponentInParent<BaseScript>().player_number != GetComponentInParent<BoardScript>().player_turn)
             {
@@ -410,15 +430,12 @@ public class ShipScript : NetworkBehaviour
             {
                 structure.LandingFunction(this);
             }
-            //if (GetComponentInParent<BoardScript>().moving_ship_semaphore == 0)
-            //{
+            
+            
                 UpdateButton();
-            //}
+            
             UpdateSprite();
         }
-
-        //if (!hasAuthority && !isBeingKicked)
-          //  return;
 
         if (!isBeingKicked)
         {
@@ -429,16 +446,17 @@ public class ShipScript : NetworkBehaviour
 
     public virtual void ChooseDest(Vector3 pos)
     {
-        for (int j = 0; j < length; j++)
+        /*for (int j = 0; j < length; j++)
             if (squares[j] != null)
             {
                 GetComponentInParent<BaseScript>().enemy_squares_displayed[(int)squares[j].transform.position.x, (int)squares[j].transform.position.y] = false;
                 Destroy(squares[j]);
-            }
+            }*/
         dest = pos;
         if (shipsInRange.Contains(dest))
         {
             isKicking = true;
+            GetComponent<BoxCollider2D>().enabled = false;
             GetComponentInParent<BaseScript>().kicking_ship = this;
             CmdSetKickingShip();
             Kick();
@@ -487,7 +505,7 @@ public class ShipScript : NetworkBehaviour
             ship.kickedByFriendly = true;
         }
         ship.isBeingKicked = true;
-        ship.showRange(kickingDistance, movementSquare, enemySquare);
+        ship.showRange(attackScore, movementSquare, enemySquare);
         ship.isMoving = true;
         ship.origin = GetComponentInParent<BoardScript>().GetShipByPosition(dest).GetPosition();
         hasChosenKickingTarget = true;
@@ -532,8 +550,7 @@ public class ShipScript : NetworkBehaviour
     [ClientRpc]
     public virtual void RpcDestroy()
     {
-        GetComponentInParent<BoardScript>().CmdUpdateMeteorCount(platCount);
-        this.Destroy();
+        Destroy();
     }
 
 
@@ -648,7 +665,7 @@ public class ShipScript : NetworkBehaviour
             switch (building_cycle)
             {
                 case 0:
-                    UpdatePlatCount(platCount + GetComponentInParent<BoardScript>().GetMeteorByPosition(transform.position).GetComponent<Meteor>().Mine(mine_value, this));
+                    UpdatePlatCount(attackScore + GetComponentInParent<BoardScript>().GetMeteorByPosition(transform.position).GetComponent<Meteor>().Mine(mine_value, this));
                     spaceType = (int)Spaces.BLANK;
                     break;
                 //GetComponent<SpriteRenderer>().sprite = isDeactivated ? deactivated : activated; Very Strange you have to do this
@@ -714,7 +731,8 @@ public class ShipScript : NetworkBehaviour
 
         if (hasAuthority && Input.GetMouseButtonDown(1) && GetComponentInParent<BaseScript>().my_turn && findSpaceType() == (int)Spaces.GOAL && GetComponentInParent<BoardScript>().GetGoalByPosition(transform.position).GetComponent<GoalSquare>().square_color == GetComponentInParent<BaseScript>().player_number) //This is KIND OF a magic number. Look for trouble here when adding more players
         {
-            CmdCashIn(GetComponentInParent<BoardScript>().get_player_number());
+            StopAllMovement();
+            //CmdCashIn(GetComponentInParent<BoardScript>().get_player_number());
             return;
         }
 
@@ -780,9 +798,29 @@ public class ShipScript : NetworkBehaviour
 
     public virtual void EndTurn()
     {
+        int final_dest = 0;
+        for(int i = 1; i <= movement; i++)
+        {
+            if(GetComponentInParent<BoardScript>().GetSpaceType(transform.position + new Vector3(color_multiplier(player_number)*i, 0, 0)) == (int)Spaces.GOAL)
+            {
+                final_dest = i;
+                break;
+            }
+            final_dest = i;
+        }
+        ChooseDest(transform.position + new Vector3(color_multiplier(player_number) * final_dest, 0, 0));
         temp_movement = false;
         isDeactivated = true;
         UpdateSprite();
+    }
+
+    public int color_multiplier(int player_number)
+    {
+        if(player_number == 0)
+        {
+            return 1;
+        }
+        return -1;
     }
 
     public virtual int getRemainingCargoSpace()
@@ -807,28 +845,29 @@ public class ShipScript : NetworkBehaviour
         movement_value_display.GetComponent<StatHolder>().UpdateValue(movement);
     }
 
-    [Command]
+    /*[Command]
     public virtual void CmdCashIn(int player_number)
     {
         RpcCashIn(player_number);
-    }
+    }*/
 
-    [ClientRpc]
-    public virtual void RpcCashIn(int player_number)
+    //[ClientRpc]
+    public virtual void CashIn(int player_number)
     {
+        
         cashingIn = true;
         GetComponentInParent<BoardScript>().cargo_tracker.GetComponent<TileTracker>().unload();
         GetComponentInParent<BoardScript>().CmdUpdateMeteorCount(0);
-        GetComponentInParent<BaseScript>().captured_platinum = GetComponentInParent<BaseScript>().captured_platinum + platCount;
-        GetComponentInParent<BoardScript>().scoreBoards[player_number].GetComponent<ScoreKeeper>().AddToScore(platCount);
-        GetComponentInParent<BoardScript>().scoreBoards[2].GetComponent<ScoreKeeper>().DecrementShipBoard();
+        //GetComponentInParent<BaseScript>().captured_platinum = GetComponentInParent<BaseScript>().captured_platinum + platCount;
+        GetComponentInParent<BoardScript>().scoreBoards[(player_number + 1) % 2].GetComponent<ScoreKeeper>().AddToScore(-attackScore);
+        //GetComponentInParent<BoardScript>().scoreBoards[2].GetComponent<ScoreKeeper>().DecrementShipBoard();
         UpdatePlatCount(0);
         Destroy();
     }
 
     public virtual void UpdatePlatCount(int newPlatValue)
     {
-        if(meteor_text == null)
+        /*if(meteor_text == null)
         {
             meteor_text = Instantiate(text_display, transform.position, Quaternion.identity);
             meteor_text.transform.SetParent(transform);
@@ -838,8 +877,9 @@ public class ShipScript : NetworkBehaviour
         {
             meteor_text.GetComponent<TextMeshPro>().SetText("");
             return;
-        }
-        meteor_text.GetComponent<TextMeshPro>().SetText(platCount.ToString());
+        }*/
+        attackScore = newPlatValue;
+        cargo_value_display.GetComponent<StatHolder>().UpdateValue(newPlatValue.ToString());
     }
 
     [Command]
@@ -956,7 +996,13 @@ public class ShipScript : NetworkBehaviour
 
     public void Destroy()
     {
-        Destroy(gameObject);
+        if (cashingIn)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        in_graveyard = true;
+        GetComponentInParent<BaseScript>().GetComponentInChildren<Graveyard>().Push(gameObject);
         isMining = false;
     }
 

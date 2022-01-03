@@ -18,7 +18,7 @@ public class ShipInShop : NetworkBehaviour
     public SpawnShip spawner;
     public GameObject priceDisplay;
     public GameObject movement_display;
-    //public GameObject cargo_display;
+    public GameObject cargo_display;
     public GameObject card_prefab;
     public SpawnShip[] spawners;
 
@@ -28,8 +28,7 @@ public class ShipInShop : NetworkBehaviour
         {
             GameObject card = Instantiate(card_prefab, transform.position, Quaternion.identity);
             card.transform.SetParent(GetComponentInParent<BoardScript>().transform);
-            //card.GetComponent<ShipCard>().SetShip(ship, priceDisplay, movement_display, cargo_display);
-            card.GetComponent<ShipCard>().SetShip(ship, priceDisplay, movement_display);
+            card.GetComponent<ShipCard>().SetShip(ship, priceDisplay, movement_display, cargo_display);
         }
     }
 
@@ -61,15 +60,16 @@ public class ShipInShop : NetworkBehaviour
         Transform pTransform = transform.parent.GetComponentInParent(typeof(Transform)) as Transform;
         BoardScript board = pTransform.parent.GetComponentInParent(typeof(BoardScript)) as BoardScript;
         GameObject player = board.bases[0].GetComponent<NetworkIdentity>().isLocalPlayer ? board.bases[0] : board.bases[1];
-        findValidPlacements(player, board.structures);
+        GoalSquare[] goal_squares = board.GetComponentsInChildren<GoalSquare>();
+        findValidPlacements(player, board.structures, goal_squares);
     }
 
 
-    public void findValidPlacements(GameObject playerBase, GameObject[] planets)
+    public void findValidPlacements(GameObject playerBase, GameObject[] planets, GoalSquare[] goal_squares)
     {
-        spawners = new SpawnShip[planets.Length + 1];
+        spawners = new SpawnShip[planets.Length + 1 + goal_squares.Length];
         BaseScript theBase = playerBase.GetComponent(typeof(BaseScript)) as BaseScript;
-        if (theBase.avaliable_metal >= price && GetComponentInParent<BoardScript>().GetShipByPosition(theBase.transform.position) == null && theBase.activated)
+        /*if (theBase.avaliable_metal >= price && GetComponentInParent<BoardScript>().GetShipByPosition(theBase.transform.position) == null && theBase.activated)
         {
             GameObject theHighlighter = Instantiate(highlighter, playerBase.transform.position, Quaternion.identity);
             spawner = theHighlighter.GetComponent(typeof(SpawnShip)) as SpawnShip;
@@ -78,8 +78,7 @@ public class ShipInShop : NetworkBehaviour
             spawner.setBase(playerBase);
             spawner.setShipNumber(shop_number);
             spawner.SetSpawnerParent(transform);
-        }
-
+        }*/
         for (int i = 0; i < planets.Length; i++)
         {
             if(planets[i] == null)
@@ -98,6 +97,20 @@ public class ShipInShop : NetworkBehaviour
                 spawnerP.setBase(playerBase);
                 spawnerP.setShipNumber(shop_number);
             }
+        }
+        for(int i = planets.Length; i < planets.Length + goal_squares.Length; i++)
+        {
+            if(goal_squares[i - planets.Length].square_color != playerBase.GetComponent<BaseScript>().player_number)
+            {
+                continue;
+            }
+            GameObject theHighlighterP = Instantiate(highlighter, goal_squares[i - planets.Length].transform.position, Quaternion.identity);
+            SpawnShip spawnerP = theHighlighterP.GetComponent(typeof(SpawnShip)) as SpawnShip;
+            spawners[i - planets.Length] = spawnerP;
+            spawnerP.SetSpawnerParent(transform);
+            spawnerP.setShip(ship);
+            spawnerP.setBase(playerBase);
+            spawnerP.setShipNumber(shop_number);
         }
     }
 

@@ -6,10 +6,9 @@ using Mirror;
 
 public class Soldier : ShipScript
 {
-    public int friendlyKickingDistance = 2;
     override public void Kick()
     {
-        int trueDistance = kickingDistance;
+        int trueDistance = attackScore;
         ShipScript ship = GetComponentInParent<BoardScript>().GetShipByPosition(dest);
         for (int j = 0; j < length; j++)
             if (squares[j] != null)
@@ -17,7 +16,7 @@ public class Soldier : ShipScript
         if (ship.hasAuthority)
         {
             ship.kickedByFriendly = true;
-            trueDistance = friendlyKickingDistance;
+            trueDistance = trueDistance - 2;
         }
         ship.isBeingKicked = true;
         ship.showRange(trueDistance, movementSquare, enemySquare);

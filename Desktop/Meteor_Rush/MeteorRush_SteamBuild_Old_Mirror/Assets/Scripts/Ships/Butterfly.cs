@@ -10,10 +10,10 @@ using System.Linq;
 
 public class Butterfly : ShipScript
 {
-    public int butterfly_normal_movement = 4;
+    /*public int butterfly_normal_movement = 4;
     public int butterfly_slowed_movement = 1;
 
-    /*override public void Mine()
+    override public void Mine()
     {
         int mine_value = Math.Min(getRemainingCargoSpace(), miningSpeed);
         if (isMining)
@@ -47,7 +47,7 @@ public class Butterfly : ShipScript
             UpdateMovement(butterfly_default_movement);
         }
         return;
-    }*/
+    }
 
     override public void ShowNextTurnRange()
     {
@@ -113,5 +113,5 @@ public class Butterfly : ShipScript
             return;
         }
         meteor_text.GetComponent<TextMeshPro>().SetText(platCount.ToString());
-    }
+    }*/
 }

@@ -169,7 +169,7 @@ MonoBehaviour:
   enemy_movement_square_prefab: {fileID: 350168336936077439, guid: 8d8c788fd6226b44aaaedebc984c6faa,
     type: 3}
   movementPerSecond: 5
-  description: "Cannot be kicked \nwhile mining,\nconstructing or\ncollecting."
+  description: "\nCannot be kicked \nwhile mining,\nconstructing or\ncollecting."
 --- !u!61 &1805861693722567420
 BoxCollider2D:
   m_ObjectHideFlags: 0

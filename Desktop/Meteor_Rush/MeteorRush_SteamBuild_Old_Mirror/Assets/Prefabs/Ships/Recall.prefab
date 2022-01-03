@@ -117,7 +117,7 @@ MonoBehaviour:
   enemy_movement_square_prefab: {fileID: 350168336936077439, guid: 8d8c788fd6226b44aaaedebc984c6faa,
     type: 3}
   movementPerSecond: 5
-  description: "If your base is not\noccupied when a\nrecall cashes,\nthe recall
+  description: "\n\nIf your base is not\noccupied when a\nrecall cashes,\nthe recall
     is moved\nto your base instead \nof being destroyed. "
 --- !u!212 &6612431985730743903
 SpriteRenderer:

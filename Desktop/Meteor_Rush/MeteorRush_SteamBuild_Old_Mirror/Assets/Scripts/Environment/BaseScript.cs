@@ -9,6 +9,7 @@ public class BaseScript : NetworkBehaviour
     public float avaliable_metal = 3;
     public int captured_platinum = 0;
     public GameObject next_ship;
+    public GameObject graveyard;
     public ShipScript kicking_ship = null;
     public int player_number;
     public bool my_turn;
@@ -46,19 +47,52 @@ public class BaseScript : NetworkBehaviour
     [ClientRpc]
     public void updateBoard(GameObject theShip, int price, Vector3 location)
     {
+        theShip.GetComponent<ShipScript>().isDeactivated = false;
         theShip.transform.SetParent(transform);
         theShip.GetComponent<ShipScript>().color();
         theShip.GetComponent<ShipScript>().UpdateSprite();
         theShip.GetComponent<ShipScript>().player_number = player_number;
         GameObject movement_value_display = theShip.GetComponent<ShipScript>().movement_value_display;
         CreateDisplay(theShip, movement_value_display);
-        //GameObject cargo_value_display = theShip.GetComponent<ShipScript>().cargo_value_display;
-        //CreateDisplayCargo(theShip, cargo_value_display);
+        GameObject cargo_value_display = theShip.GetComponent<ShipScript>().cargo_value_display;
+        CreateDisplayCargo(theShip, cargo_value_display);
         
         BoardScript board = theShip.GetComponentInParent<BoardScript>();
         avaliable_metal = avaliable_metal - price;
         UpdateMetalCount(avaliable_metal);
         if(location.x == transform.position.x && location.y == transform.position.y)
+        {
+            Deactivate();
+        }
+        if (board.GetStructureByPosition(location) != null)
+        {
+            board.GetStructureByPosition(location).GetComponent<Structure>().Deactivate();
+        }
+        BaseScript enemy;
+        UpdateButton();
+        if (hasAuthority)
+        {
+            enemy = GetComponentInParent<BoardScript>().bases[(player_number + 1) % 2].GetComponent<BaseScript>();
+        }
+        else
+        {
+            enemy = GetComponentInParent<BoardScript>().bases[player_number].GetComponent<BaseScript>();
+        }
+        enemy.GetComponent<BaseScript>().ResetMovement();
+        if (enemy.displaying_to_enemy && !theShip.GetComponent<ShipScript>().hasAuthority)
+        {
+            theShip.GetComponent<ShipScript>().ShowNextTurnRange();
+        }
+
+    }
+
+    public void updateBoardGraveyard(GameObject theShip, int price, Vector3 location)
+    {
+        theShip.GetComponent<ShipScript>().UpdateSprite();
+        BoardScript board = theShip.GetComponentInParent<BoardScript>();
+        avaliable_metal = avaliable_metal - price;
+        UpdateMetalCount(avaliable_metal);
+        if (location.x == transform.position.x && location.y == transform.position.y)
         {
             Deactivate();
         }
@@ -147,18 +181,18 @@ public class BaseScript : NetworkBehaviour
         theShip.GetComponent<ShipScript>().movement_value_display = display;
     }
 
-    /*public void CreateDisplayCargo(GameObject theShip, GameObject display)
+    public void CreateDisplayCargo(GameObject theShip, GameObject display)
     {
         display = Instantiate(theShip.GetComponent<ShipScript>().text_display_prefab, theShip.transform.position, Quaternion.identity);
         display.GetComponent<SpriteRenderer>().sprite = cargo_counter_display;
         display.transform.SetParent(theShip.transform, false);
         display.transform.position = new Vector3((float)(theShip.transform.position.x + .3), (float)(theShip.transform.position.y - .25), 0);
         display.GetComponent<StatHolder>().text_display = Instantiate(display.GetComponent<StatHolder>().text_display_prefab, display.transform.position, Quaternion.identity);
-        display.GetComponent<StatHolder>().text_display.GetComponent<TextMeshPro>().color = white;
-        display.GetComponent<StatHolder>().UpdateValue(theShip.GetComponent<ShipScript>().cargoSpace);
+        //display.GetComponent<StatHolder>().text_display.GetComponent<TextMeshPro>().color = white;
+        display.GetComponent<StatHolder>().UpdateValue(theShip.GetComponent<ShipScript>().attackScore);
         display.GetComponent<StatHolder>().text_display.transform.SetParent(display.transform);
         theShip.GetComponent<ShipScript>().cargo_value_display = display;
-    }*/
+    }
 
 
     public void StartTurn()
@@ -268,5 +302,17 @@ public class BaseScript : NetworkBehaviour
     {
         GetComponent<SpriteRenderer>().sprite = deactivated_spr;
         activated = false;
+    }
+
+    [Command]
+    public void CmdPop(Vector3 pos)
+    {
+        RpcPop(pos);
+    }
+
+    [ClientRpc]
+    public void RpcPop(Vector3 pos)
+    {
+        GetComponentInChildren<Graveyard>().Pop(pos);
     }
 }

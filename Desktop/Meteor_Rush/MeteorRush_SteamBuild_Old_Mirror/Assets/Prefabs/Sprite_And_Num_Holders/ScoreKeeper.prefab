@@ -11,8 +11,6 @@ GameObject:
   - component: {fileID: 5457344979823858105}
   - component: {fileID: 4761597243603988705}
   - component: {fileID: 6537450786825821078}
-  - component: {fileID: 7812690285740329461}
-  - component: {fileID: 5471848141392349491}
   - component: {fileID: 8820040578828267078}
   - component: {fileID: 4273313561531864236}
   m_Layer: 0
@@ -96,8 +94,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  score: 0
-  thisPlayer: 
+  score: 20
   thisColor:
     serializedVersion: 2
     rgba: 0
@@ -110,22 +107,9 @@ MonoBehaviour:
   yellow:
     serializedVersion: 2
     rgba: 4294967065
---- !u!33 &7812690285740329461
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9214719583482527048}
-  m_Mesh: {fileID: 0}
---- !u!222 &5471848141392349491
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9214719583482527048}
-  m_CullTransparentMesh: 0
+  white:
+    serializedVersion: 2
+    rgba: 4294967295
 --- !u!114 &8820040578828267078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -169,7 +153,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -183,7 +167,7 @@ MonoBehaviour:
   m_fontStyle: 1
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
-  m_textAlignment: 257
+  m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0

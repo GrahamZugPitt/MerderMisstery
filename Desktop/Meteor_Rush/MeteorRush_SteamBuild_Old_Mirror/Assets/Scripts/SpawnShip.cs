@@ -11,7 +11,12 @@ public class SpawnShip : NetworkBehaviour
 
     public void OnMouseDown()
     {
-        BaseScript baseScript = playerBase.GetComponent(typeof(BaseScript)) as BaseScript;
+        if(GetComponentInParent<Graveyard>() != null)
+        {
+            GetComponentInParent<BaseScript>().CmdPop(transform.position);
+            return;
+        }
+        BaseScript baseScript = playerBase.GetComponent<BaseScript>();
         baseScript.CmdSpawnShip(transform.position, shipNumber);
         GetComponentInParent<ShipInShop>().StopShopping();
     }

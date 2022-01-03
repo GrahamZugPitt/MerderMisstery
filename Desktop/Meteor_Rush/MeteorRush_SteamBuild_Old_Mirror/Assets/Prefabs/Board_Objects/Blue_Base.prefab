@@ -37,6 +37,12 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 1487612745570633791, guid: fd096bd6366a966498aad292507a8ab6,
         type: 3}
+      propertyPath: graveyard
+      value: 
+      objectReference: {fileID: 90469106805658377, guid: ef5cde854e7f17d4e9532ae6a51b7fde,
+        type: 3}
+    - target: {fileID: 1487612745570633791, guid: fd096bd6366a966498aad292507a8ab6,
+        type: 3}
       propertyPath: next_ship
       value: 
       objectReference: {fileID: 0}

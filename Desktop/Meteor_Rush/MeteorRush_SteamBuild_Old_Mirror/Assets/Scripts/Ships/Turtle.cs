@@ -38,7 +38,7 @@ public class Turtle : ShipScript
             switch (building_cycle)
             {
                 case 0:
-                    UpdatePlatCount(platCount + GetComponentInParent<BoardScript>().GetMeteorByPosition(transform.position).GetComponent<Meteor>().Mine(mine_value, this));
+                    UpdatePlatCount(attackScore + GetComponentInParent<BoardScript>().GetMeteorByPosition(transform.position).GetComponent<Meteor>().Mine(mine_value, this));
                     spaceType = (int)Spaces.BLANK;
                     break;
                 //GetComponent<SpriteRenderer>().sprite = isDeactivated ? deactivated : activated; Very Strange you have to do this

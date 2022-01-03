@@ -25,7 +25,7 @@ public class BoardScript : NetworkBehaviour
     public int kicked_ship_semaphore;
     public GameObject[] meteors;
     public GameObject[] structures;
-    private GameObject[] goal_squares = new GameObject[22];
+    public GameObject[] goal_squares = new GameObject[22];
     public GameObject[] ships = new GameObject[10]; //This is the ships in the shop, not the ships in the game
     public Sprite[] blueSprites = new Sprite[10];
     public GameObject meteorPrefab;
@@ -100,8 +100,6 @@ public class BoardScript : NetworkBehaviour
         GenerateMeteors();
         Rpc_first_turn();
         RpcSetShopParent(shop);
-
-
     }
 
     [ClientRpc]
@@ -168,8 +166,8 @@ public class BoardScript : NetworkBehaviour
             }
         }
         //GetComponentInChildren<EndTurnButton>().EndGame();
-        PlayerPrefs.SetInt("red_score", scoreBoards[0].GetComponent<ScoreKeeper>().score);
-        PlayerPrefs.SetInt("blue_score", scoreBoards[1].GetComponent<ScoreKeeper>().score);
+        PlayerPrefs.SetInt("red_score", -scoreBoards[0].GetComponent<ScoreKeeper>().score);
+        PlayerPrefs.SetInt("blue_score", -scoreBoards[1].GetComponent<ScoreKeeper>().score);
         PlayerPrefs.SetInt("my_color", get_player_number());
         if (get_player_number() == 0)
         {
@@ -180,7 +178,7 @@ public class BoardScript : NetworkBehaviour
 
     public void Surrender(int player_number)
     {
-        scoreBoards[player_number].GetComponent<ScoreKeeper>().score = -1;
+        scoreBoards[player_number].GetComponent<ScoreKeeper>().score = -1000;
         EndGame();
     }
 
@@ -193,10 +191,10 @@ public class BoardScript : NetworkBehaviour
     {
         scoreBoards[0] = Instantiate(scorePrefab, new Vector3((float)24.9, (float).8, 0), Quaternion.identity);
         scoreBoards[1] = Instantiate(scorePrefab, new Vector3((float)24.9, (float)-.2, 0), Quaternion.identity);
-        scoreBoards[2] = Instantiate(scorePrefab, new Vector3((float)24.9, (float)-1.2, 0), Quaternion.identity);
+        //scoreBoards[2] = Instantiate(scorePrefab, new Vector3((float)24.9, (float)-1.2, 0), Quaternion.identity);
         NetworkServer.Spawn(scoreBoards[0]);
         NetworkServer.Spawn(scoreBoards[1]);
-        NetworkServer.Spawn(scoreBoards[2]);
+        //NetworkServer.Spawn(scoreBoards[2]);
         RpcSetBoardOnClient(scoreBoards);
 
     }
@@ -204,15 +202,12 @@ public class BoardScript : NetworkBehaviour
     [ClientRpc]
     public void RpcSetBoardOnClient(GameObject[] score)
     {
-        scoreBoards[0] = score[0];
-        scoreBoards[1] = score[1];
-        scoreBoards[2] = score[2];
-        scoreBoards[0].transform.SetParent(transform, false);
-        scoreBoards[1].transform.SetParent(transform, false);
-        scoreBoards[2].transform.SetParent(transform, false);
-        scoreBoards[0].GetComponent<ScoreKeeper>().setUp(0);
-        scoreBoards[1].GetComponent<ScoreKeeper>().setUp(1);
-        scoreBoards[2].GetComponent<ScoreKeeper>().setUp(2);
+        for (int i = 0; i < 2; i++)
+        {
+            scoreBoards[i] = score[i];
+            scoreBoards[i].transform.SetParent(transform, false);
+            scoreBoards[i].GetComponent<ScoreKeeper>().setUp(i);
+        }
     }
 
 
@@ -251,6 +246,9 @@ public class BoardScript : NetworkBehaviour
         {
             bases[i].GetComponent<BaseScript>().enemy_squares_displayed = new bool[boardSize.x,boardSize.y];
             bases[i].GetComponent<BaseScript>().avaliable_metal = starting_metal_value;
+            GameObject graveyard = Instantiate(bases[i].GetComponent<BaseScript>().graveyard, new Vector3(12, i, 0), Quaternion.identity);
+            graveyard.transform.SetParent(bases[i].transform);
+            graveyard.GetComponent<Graveyard>().Initialize();
             bases[i].transform.parent = transform;
             bases[i].GetComponent<BaseScript>().player_number = i;
             GetComponentsInChildren<BaseScript>()[i].SetUpMetalCount(starting_metal_value);
@@ -417,7 +415,7 @@ public class BoardScript : NetworkBehaviour
         {
             goal_squares[i] = Instantiate(goalPrefab, new Vector3(0, i - 11, 0), Quaternion.identity);
             NetworkServer.Spawn(goal_squares[i]);
-            SetGoalParentsBlue(goal_squares[i], i);
+            SetGoalParentsRed(goal_squares[i], i);
         }
     }
 
@@ -446,17 +444,17 @@ public class BoardScript : NetworkBehaviour
         Vector3 pos = goal_square.transform.position;
         goal_square.transform.SetParent(transform, false);
         goal_square.transform.position = pos;
-        goal_square.GetComponent<GoalSquare>().color((int)Team.RED);
+        goal_square.GetComponent<GoalSquare>().color((int)Team.BLUE);
     }
 
     [ClientRpc]
-    public void SetGoalParentsBlue(GameObject goal_square, int i)
+    public void SetGoalParentsRed(GameObject goal_square, int i)
     {
         goal_squares[i] = goal_square;
         Vector3 pos = goal_square.transform.position;
         goal_square.transform.SetParent(transform, false);
         goal_square.transform.position = pos;
-        goal_square.GetComponent<GoalSquare>().color((int)Team.BLUE);
+        goal_square.GetComponent<GoalSquare>().color((int)Team.RED);
     }
 
     [Command (ignoreAuthority = true)]
@@ -533,6 +531,7 @@ public class BoardScript : NetworkBehaviour
 
         GetComponentInChildren<Shop>().UpdateShops();
         bases[player_turn].GetComponent<BaseScript>().my_turn = true;
+        bases[player_turn].GetComponent<BaseScript>().UpdateMetalCount(bases[player_turn].GetComponent<BaseScript>().avaliable_metal + (float).5);
         GetComponentInChildren<EndTurnButton>().UpdateButton();
         for (int i = 0; i < structure_count; i++)
         {

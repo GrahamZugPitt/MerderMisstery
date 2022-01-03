@@ -66,6 +66,8 @@ MonoBehaviour:
   avaliable_metal: 3
   captured_platinum: 0
   next_ship: {fileID: 0}
+  graveyard: {fileID: 598952154052955635, guid: 2d5611a1c132a174c8df98d406bc4e95,
+    type: 3}
   kicking_ship: {fileID: 0}
   player_number: 0
   my_turn: 0

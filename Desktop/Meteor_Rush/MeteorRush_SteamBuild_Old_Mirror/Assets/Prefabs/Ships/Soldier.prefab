@@ -150,13 +150,14 @@ MonoBehaviour:
   isShowingRangeToEnemy: 0
   displayingInterruptedByKick: 0
   temp_movement: 0
+  in_graveyard: 0
   movement: 2
   temp_movement_number: 0
   cargoSpace: 10000
   miningSpeed: 1
   metalCount: 0
   platCount: 0
-  kickingDistance: 4
+  attackScore: 4
   identifier: 10
   meteor_text: {fileID: 0}
   text_display_prefab: {fileID: 1921821302752869109, guid: e08a8306373e1d7489c6f127eede15ec,
@@ -170,7 +171,6 @@ MonoBehaviour:
     type: 3}
   movementPerSecond: 5
   description: "Can kick \nenemy ships \nup to four squares."
-  friendlyKickingDistance: 2
 --- !u!61 &6273488045182694425
 BoxCollider2D:
   m_ObjectHideFlags: 0

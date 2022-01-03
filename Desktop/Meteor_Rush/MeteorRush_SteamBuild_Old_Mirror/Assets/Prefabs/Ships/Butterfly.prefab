@@ -151,18 +151,20 @@ MonoBehaviour:
   isShowingRangeToEnemy: 0
   displayingInterruptedByKick: 0
   temp_movement: 0
+  in_graveyard: 0
   movement: 3
   temp_movement_number: 0
   cargoSpace: 10000
   miningSpeed: 1
   metalCount: 0
   platCount: 0
-  kickingDistance: 2
+  attackScore: 1
   identifier: 2
   meteor_text: {fileID: 0}
   text_display_prefab: {fileID: 1921821302752869109, guid: e08a8306373e1d7489c6f127eede15ec,
     type: 3}
   movement_value_display: {fileID: 0}
+  cargo_value_display: {fileID: 0}
   mining_symbol_prefab: {fileID: 7261260567399521100, guid: e48e8e23e2d6f3941967234405cb8c18,
     type: 3}
   mining_symbol: {fileID: 0}
@@ -170,9 +172,7 @@ MonoBehaviour:
   enemy_movement_square_prefab: {fileID: 350168336936077439, guid: 8d8c788fd6226b44aaaedebc984c6faa,
     type: 3}
   movementPerSecond: 5
-  description: "Has movement 1 \nwhen carrying cargo."
-  butterfly_normal_movement: 3
-  butterfly_slowed_movement: 1
+  description: 
 --- !u!61 &2319227557733132943
 BoxCollider2D:
   m_ObjectHideFlags: 0

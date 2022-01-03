@@ -75,7 +75,7 @@ public class Momentum : ShipScript
             switch (building_cycle)
             {
                 case 0:
-                    UpdatePlatCount(platCount + GetComponentInParent<BoardScript>().GetMeteorByPosition(transform.position).GetComponent<Meteor>().Mine(mine_value, this));
+                    UpdatePlatCount(attackScore + GetComponentInParent<BoardScript>().GetMeteorByPosition(transform.position).GetComponent<Meteor>().Mine(mine_value, this));
                     spaceType = (int)Spaces.BLANK;
                     break;
                 //GetComponent<SpriteRenderer>().sprite = isDeactivated ? deactivated : activated; Very Strange you have to do this
@@ -95,23 +95,12 @@ public class Momentum : ShipScript
             }
         }
         UpdateSprite();
-        UpdateMovement(1 + platCount + metalCount);
+        UpdateMovement(attackScore);
         return;
     }
     override public void UpdatePlatCount(int newPlatValue)
     {
-        UpdateMovement(1 + newPlatValue);
-        if (meteor_text == null)
-        {
-            meteor_text = Instantiate(text_display, transform.position, Quaternion.identity);
-            meteor_text.transform.SetParent(transform);
-        }
-        platCount = newPlatValue;
-        if (newPlatValue == 0)
-        {
-            meteor_text.GetComponent<TextMeshPro>().SetText("");
-            return;
-        }
-        meteor_text.GetComponent<TextMeshPro>().SetText(platCount.ToString());
+        attackScore = newPlatValue;
+        cargo_value_display.GetComponent<StatHolder>().UpdateValue(newPlatValue.ToString());
     }
 }

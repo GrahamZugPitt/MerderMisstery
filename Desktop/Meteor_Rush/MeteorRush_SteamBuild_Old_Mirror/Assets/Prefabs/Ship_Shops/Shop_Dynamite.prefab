@@ -129,7 +129,7 @@ MonoBehaviour:
   blueSprite_off: {fileID: 4910120115132644739, guid: 861e6ec42876f4941a7f344c474e751a,
     type: 3}
   shop_number: 0
-  price: 2
+  price: 3
   color_int: 0
   isConsideringBuying: 0
   spawner: {fileID: 0}

@@ -6,7 +6,7 @@ using Mirror;
 
 public class ScoreKeeper : NetworkBehaviour
 {
-    public int score = 0;
+    public int score = 20;
     public Color32 thisColor;
     public Color32 red = new Color32(255, 50, 50, 255);
     public Color32 blue = new Color32(50, 50, 255, 255);
@@ -32,6 +32,10 @@ public class ScoreKeeper : NetworkBehaviour
     {
         score = score + scoreToAdd;
         GetComponent<TextMeshPro>().SetText(score.ToString());
+        if (score <= 0)
+        {
+            GetComponentInParent<BoardScript>().EndGame();
+        }
     }
 
     [Command(ignoreAuthority = true)]
@@ -78,10 +82,6 @@ public class ScoreKeeper : NetworkBehaviour
     {
         score = score - 1;
         GetComponent<TextMeshPro>().SetText(score.ToString());
-        if(score == 0)
-        {
-            GetComponentInParent<BoardScript>().EndGame();
-        }
     }
 
 }
