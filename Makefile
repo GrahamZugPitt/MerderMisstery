@@ -3,11 +3,14 @@
 
 #FILES TO COMPILE
 START_FILES = murder.o
-SOURCE_FILES = bmp_edit chat discussion npc gameloop menuloop main_helper Player main collision worldObjects building seed credits objects CyanBuilding BlueBuilding GreenBuilding YellowBuilding RedBuilding
+
+SOURCE_FILES = bmp_edit chat chatLogin dialogue event simulation inventory winCode npc gameloop menuloop main_helper Player main collision worldObjects building seed credits objects CyanBuilding BlueBuilding GreenBuilding YellowBuilding RedBuilding info
+
 #OUTPUT
 OUT_NAMES = $(patsubst %.cpp,%.o,$(START_FILES))
 OBJDIR := Code/programfiles/
 NPC_DIR := Code/NPC_Gen/
+SIM_DIR := Code/programfiles/Simulation/
 NPC_HEADERS = Code/NPC_Gen/bmp_edit.hpp Code/NPC_Gen/npc.hpp
 
 OBJ_FILES = $(patsubst %,%.o, $(SOURCE_FILES))
@@ -32,11 +35,14 @@ start: $(START_FILES)
 %.o: $(NPC_DIR)/%.cpp $(NPC_HEADERS)
 	$(CC) -c -o $@ $< $(COMPILER_FLAGS) -std=c++14
 
+%.o: $(SIM_DIR)/%.cpp $(SIM_DIR)
+	$(CC) -c -o $@ $< $(COMPILER_FLAGS) -std=c++14
+
 murder.o: $(OBJ_FILES) #wo.o
 	$(CC) -o $@ $^ $(LINKER_FLAGS) -std=c++14
 
 clean:
-	rm *.o ./Art/NPCs/*m.bmp
+	rm *.o ./Art/NPCs/*m.bmp save.txt
 
 farnan:
 	make

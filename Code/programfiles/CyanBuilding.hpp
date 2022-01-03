@@ -12,10 +12,10 @@ public:
 
 
 private:
-	SDL_Rect rect = {887, 593, 562, 608};
-	Chair chairs[4];
-	Table tables[2];
-	Collidable walls[7];
+	SDL_Rect rect = {911, 365, 557, 750};
+	Chair chairs[6];
+	Table tables[3];
+	Collidable walls[8];
 	//Collidable fences[7];
 	//Sign sign;
 

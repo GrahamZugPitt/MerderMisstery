@@ -12,6 +12,8 @@
 #include <streambuf>
 #include <unistd.h>
 
+#include "Users.h"
+
 using namespace std;
 
 #define PORT "9034"
@@ -34,6 +36,8 @@ int main()
     int i, j, rv;
 
     struct addrinfo hints, *ai, *p;
+
+    ChatBank chat;
 
     FD_ZERO(&master);    // clear the master and temp sets
     FD_ZERO(&copy);
@@ -117,9 +121,10 @@ int main()
 	                	fdmax = client;
 	                }
 
-	                // Send a welcome message to the connected client
-	                string welcomeMsg = "\nWelcome to Merder Misstery chat!\r\n";
-	                send(client, welcomeMsg.c_str(), welcomeMsg.size() + 1, 0);
+	                if(!chat.returnComments().empty()){
+	                	send(client, chat.returnComments().c_str(), chat.returnComments().size(), 0);
+	                }
+	               
 	            }
 	            else // It's an inbound message
 	            {
@@ -138,69 +143,23 @@ int main()
 	                {
 	                    //Client is looking for specific data
 						string buffer(buf);
-						if(buffer == "uDN0oyTNjaAENW9KLocdjXP85ou3bAtBAhBAOPXLU8P0Iip8AcaELgAvewFNTpzM") {
-							ifstream file;
-							file.open("forum_data.txt");
-							
-							if(file.fail()) {
-								ofstream create;
-								create.open("forum_data.txt");
-								cout << "File did not exist, file created" << endl;
-							}
 						
-							string data;
-							file.seekg(0, ios::end);
-							data.reserve(file.tellg());
-							file.seekg(0, ios::beg);
-							data.assign((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
-							file.close();
-							
-							//Send back to listener
-							for(int i = 0; i <= fdmax; i++) {
-								int outSock = i;
-								if(outSock == listener || outSock == temp) {
-									ostringstream ss;
-									ss << data;
-									string strOut = ss.str();
-									
-									send(outSock, strOut.c_str(), strOut.size() + 1, 0);
-								}
-							}
-						}
-						//Client wants to send the updated data
-						else if(buffer.size() > 64 && buffer.substr(buffer.size()-64).compare("uDN0oyTNjaAENW9KLocdjXP85ou3bAtBAhBAOPXLU8P0Iip8AcaELgAvewFNTpzM") == 0) {
-							ofstream file;
-							file.open("forum_data.txt", ios::out | ios::trunc);
-							file << buffer.substr(0, buffer.size()-64);
-							file.close();
-							
-							//Send back to listener
-							for(int i = 0; i <= fdmax; i++) {
-								int outSock = i;
-								if(outSock == listener || outSock == temp) {
-									string strOut = "Data updated successfully";
-									
-									send(outSock, strOut.c_str(), strOut.size() + 1, 0);
-								}
-							}
-						}
-						else {
-							// Send message to other clients, and not listening socket, unless message is exit
-							for (int i = 0; i <= fdmax; i++)
-							{
-								int outSock = i;
-								if (outSock != listener && outSock != temp)
-								{
-									string strOut;
-	
-									ostringstream ss;
-									ss << buf;
-									strOut = ss.str();		
+						//change the chat data structure and send out to the chat UI
+						chat.addChat(buf);
 
-									send(outSock, strOut.c_str(), strOut.size() + 1, 0);
-								}
+						//test line displaying to the server the current state of the data structure
+						chat.printComments();
+						printf("\n");
+
+						// Send message to all clients, and not listening socket
+						for (int i = 0; i <= fdmax; i++)
+						{
+							int outSock = i;
+							if (outSock != listener)
+							{
+								send(outSock, chat.returnComments().c_str(), chat.returnComments().size(), 0);
 							}
-						}
+						}	
 	                }
 	            }
 	        }

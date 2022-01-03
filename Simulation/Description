@@ -1,0 +1,5 @@
+This is a version of the simulation that includes goals as outlined in our original design goals document.
+
+Goals make the game worse in my opinion, because they reduce the number of people who dislike the murdered person, making it easier to discover who they are. So we decided to leave them out.
+
+If you'd like, you can play the game with it with the front end stripped with the simulation + goals. But be careful to enter the integers exactly, we didn't implement an error check for these because in the real game we didn't need to. 

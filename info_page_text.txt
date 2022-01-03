@@ -1,0 +1,59 @@
+Welcome to MerderMisstery:
+
+A merder has occurred. As the detective, it is your job to find the merderer.
+
+To find the merderer, you will need to interrogate members of the town.
+
+The merderer will a person who significantly disliked the merdered.
+
+
+
+
+People will tell the truth about the gossip they hear.
+
+People will never withhold information about things they have observed others do.
+
+People will never withhold information about  whether someone else disliked the person who was merdered.
+
+People will sometimes withhold information about themselves if they think it makes them look suspicious.
+
+
+
+
+The merderer, and only the merderer, will make up events that happened between other people that make it look like they are the merderers.
+
+The merderer is more likely to withhold information than others.
+
+Each person can perform only one action at a given time (For example, a person cannot both socialize with and rob someone in the same morning)
+
+
+
+
+If people are on either side of these events:
+
+Robbery
+Physical fighting
+Breaking up
+Verbal fighting
+Asking for Distance
+Glaring
+
+They will dislike the person on the other side.
+
+If a person witnesses:
+A person sleeping with someone who they have dated (disliked more than robbery)
+A physical fight (disliked as much as glaring)
+
+They will dislike both of the people involved
+
+If a person hears about:
+Someone sleeping with someone they have dated (disliked as much as a verbal fight)
+
+They will dislike both people involved.
+
+People will like people more who:
+Sleep with them
+Date them
+Flirt with them
+
+The higher up an event is on its list, the more significantly a person will like/dislike the other person/people involved.
