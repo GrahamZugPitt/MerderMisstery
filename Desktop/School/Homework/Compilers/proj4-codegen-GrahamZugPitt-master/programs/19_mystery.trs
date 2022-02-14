@@ -1,0 +1,70 @@
+
+fn main() {
+	let x21 = new Node(-2 - -34);
+	let x13 = new Node(120 - 15);
+	let x11 = new Node(120 - 17);
+	let x24 = new Node(0b1111001);
+	let x27 = new Node(32 + 78);
+	let x25 = new Node(17 * 2 - 2);
+	let x22 = new Node(240 / 2 - 3);
+	let x26 = new Node(25 * 4 + 7);
+	let x6  = new Node(33 * 3);
+	let x29 = new Node(2+3+4+5+6+7+8+9+10+11+12+13+14);
+	let x28 = new Node((1_000_000 - 3) % 100);
+	let x3  = new Node(23 * 5);
+	let x8  = new Node(11 * 11);
+	let x15 = new Node(100 - 3);
+	let x12 = new Node(120 - 10);
+	let x18 = new Node(57 + 57);
+	let x7  = new Node(1 << 5);
+	let x5  = new Node(540 / 5);
+	let x10 = new Node(0b100000);
+	let x17 = new Node(256 / 8);
+	let x4  = new Node(-3 + 100);
+	let x20 = new Node(111 - 9);
+	let x14 = new Node(0x35FC >> 7);
+	let x9  = new Node(101 + 8);
+	let x23 = new Node(222 / 2);
+	let x19 = new Node(100 + 10 + 1);
+	let x30 = new Node(7 * 12);
+	let x2  = new Node(120 - 5);
+	let x1  = new Node(11 * 3);
+	let x16 = new Node(4 * 29);
+
+	x2.next = x1; x14.next = x13; x8.next = x7; x25.next = x24;
+	x10.next = x9; x21.next = x20; x20.next = x19; x6.next = x5;
+	x13.next = x12; x3.next = x2; x27.next = x26; x15.next = x14;
+	x28.next = x27; x19.next = x18; x18.next = x17; x24.next = x23;
+	x29.next = x28; x7.next = x6; x4.next = x3; x30.next = x29;
+	x26.next = x25; x9.next = x8; x12.next = x11; x17.next = x16;
+	x22.next = x21; x23.next = x22; x16.next = x15; x5.next = x4;
+	x11.next = x10;
+
+	print_list(x30);
+}
+
+struct Node {
+	value: int,
+	next: Node,
+
+	fn constructor(value: int) {
+		this.value = value;
+	}
+}
+
+// hack to make a null value since I somehow did not design that into the language
+fn make_null(): Node {
+	let n = new Node(0);
+	return n.next;
+}
+
+fn print_list(n: Node) {
+	let null = make_null();
+
+	while n != null {
+		print_c(n.value);
+		n = n.next;
+	}
+
+	println_s("");
+}

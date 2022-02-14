@@ -1,0 +1,15 @@
+fn main() {
+	let x = 5;
+	print_s("x = ");
+	println_i(x);
+	x = -x;
+	print_s("x = ");
+	println_i(x);
+
+	let b = true;
+	print_s("b = ");
+	println_b(b);
+	b = not b;
+	print_s("b = ");
+	println_b(b);
+}

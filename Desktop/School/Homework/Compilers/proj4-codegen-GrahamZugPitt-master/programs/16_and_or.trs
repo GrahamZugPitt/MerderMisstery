@@ -1,0 +1,39 @@
+fn main() {
+	println_s("test(false, false):");
+	test(false, false);
+	println_s("test(true, false):");
+	test(true, false);
+	println_s("test(false, true):");
+	test(false, true);
+	println_s("test(true, true):");
+	test(true, true);
+
+	println_s("compound(false, false, false):");
+	compound(false, false, false);
+	println_s("compound(false, true, false):");
+	compound(false, true, false);
+	println_s("compound(true, true, false):");
+	compound(true, true, false);
+	println_s("compound(false, false, true):");
+	compound(false, false, true);
+}
+
+fn test(x: bool, y: bool) {
+	if x and y {
+		println_s("  x and y");
+	}
+
+	if x or y {
+		println_s("  x or y");
+	}
+
+	if not x and not y {
+		println_s("  neither x nor y!");
+	}
+}
+
+fn compound(x: bool, y: bool, z: bool) {
+	if (x and y) or z {
+		println_s("  you got the right combination!");
+	}
+}

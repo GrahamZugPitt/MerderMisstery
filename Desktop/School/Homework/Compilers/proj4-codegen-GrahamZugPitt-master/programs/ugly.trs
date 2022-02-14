@@ -1,0 +1,106 @@
+let g1 = 100;
+let g2 = true;
+let g3 = "hello";
+
+struct Test {
+	b1: bool,
+	b2: bool,
+	i: int,
+	s: string,
+	b3: bool,
+}
+
+fn main() {
+	let t = new Test();
+	println_i(t.i);
+}
+
+fn id(x: int): int {
+	return x;
+}
+
+fn pp(): fn(int): () {
+	return println_i;
+}
+
+fn neg(x: int): int {
+	x = -id(-x);
+	return x;
+}
+
+fn NOT(x: bool): bool {
+	x = not x;
+	return not x;
+}
+
+fn binops(x: int, y: int) {
+	let a = x + y;
+	let b = x - y;
+	let c = x < y;
+	let d = x >> y;
+
+	let e = (a + b) / (d * 9);
+}
+
+struct NoCtor {
+	x: int,
+	b: bool,
+	y: int,
+}
+
+fn new_no_ctor() {
+	let c = new NoCtor();
+	let x = c.x;
+	let y = c.y;
+	let b = c.b;
+
+	c.b = true;
+	c.x = 9;
+
+	(new NoCtor()).x = id(10);
+}
+
+fn while_loop() {
+	let i = 0;
+
+	while i < 10 {
+		println_i(i);
+		i = i + 1;
+	}
+}
+
+fn if_else() {
+	let x = 0;
+
+	if x < 10 {
+		println_i(0);
+	} else if x < 20 {
+		println_i(1);
+	} else {
+		println_i(2);
+	}
+}
+
+fn concat(a: string, b: string): string {
+	return a + b;
+}
+
+fn for_loop(n: int) {
+	for i in 0, n * 3 {
+		println_i(i);
+	}
+}
+
+fn logical_ops(x: bool, y: bool) {
+	if x and y {
+		println_s("one");
+	}
+
+	if x or y {
+		println_s("two");
+	}
+
+	if (x and y) or (3 == 4) {
+		println_s("three");
+	}
+}

@@ -1,0 +1,87 @@
+
+// OH MY GODDDDDDDDDDDDDDDDDDDDDDDDDDDD
+// secret project 5: reimplement the truss compiler in truss (jk lol)
+// (you can't even do string processing or get any input)
+
+fn main() {
+	let ast = make_add(make_mul(make_int(3), make_int(5)), make_int(12));
+	ast.print();
+	print_s(" => ");
+	println_i(ast.eval());
+}
+
+// no constants in our language, but just... don't reassign these and it will be fine
+let KIND_INT = 0;
+let KIND_ADD = 1;
+let KIND_MUL = 2;
+
+// hack to make a null value since I somehow did not design that into the language
+fn make_null(): AstNode {
+	let n = new AstNode(0);
+	return n.left;
+}
+
+struct AstNode {
+	kind: int,
+	value: int,
+	left: AstNode,
+	right: AstNode,
+
+	fn constructor(kind: int) {
+		this.kind = kind;
+	}
+
+	fn eval(): int {
+		if this.kind == KIND_INT {
+			return this.value;
+		} else if this.kind == KIND_ADD {
+			return this.left.eval() + this.right.eval();
+		} else if this.kind == KIND_MUL {
+			return this.left.eval() * this.right.eval();
+		} else {
+			// this will crash
+			return make_null().eval();
+		}
+	}
+
+	fn print() {
+		if this.kind == KIND_INT {
+			print_i(this.value);
+		} else if this.kind == KIND_ADD {
+			print_s("(");
+			this.left.print();
+			print_s(" + ");
+			this.right.print();
+			print_s(")");
+		} else if this.kind == KIND_MUL {
+			print_s("(");
+			this.left.print();
+			print_s(" * ");
+			this.right.print();
+			print_s(")");
+		} else {
+			// this will crash
+			make_null().print();
+		}
+	}
+}
+
+fn make_int(n: int): AstNode {
+	let ret = new AstNode(KIND_INT);
+	ret.value = n;
+	return ret;
+}
+
+fn make_add(left: AstNode, right: AstNode): AstNode {
+	let ret = new AstNode(KIND_ADD);
+	ret.left = left;
+	ret.right = right;
+	return ret;
+}
+
+fn make_mul(left: AstNode, right: AstNode): AstNode {
+	let ret = new AstNode(KIND_MUL);
+	ret.left = left;
+	ret.right = right;
+	return ret;
+}

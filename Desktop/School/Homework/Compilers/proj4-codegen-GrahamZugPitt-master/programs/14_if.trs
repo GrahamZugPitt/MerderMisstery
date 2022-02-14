@@ -1,0 +1,36 @@
+fn main() {
+	less_than_10(20);
+	less_than_10(3);
+
+	print_s("fact(5) = ");
+	print_i(fact(5));
+	println_s(" (should be 120)");
+
+	three_way(3);
+	three_way(13);
+	three_way(23);
+}
+
+fn less_than_10(x: int) {
+	if x < 10 {
+		print_s("yes, "); print_i(x); println_s(" < 10.");
+	}
+}
+
+fn fact(n: int): int {
+	if n <= 1 {
+		return 1;
+	} else {
+		return n * fact(n - 1); // some recursion for fun
+	}
+}
+
+fn three_way(x: int) {
+	if x < 10 {
+		println_s("x is small.");
+	} else if x < 20 {
+		println_s("x is medium.");
+	} else {
+		println_s("x is large.");
+	}
+}

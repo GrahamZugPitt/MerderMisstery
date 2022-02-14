@@ -1,0 +1,5 @@
+fn main() {
+	// if this were a calculator, it'd look like hello...
+	print_i(0);
+	println_i(7734);
+}

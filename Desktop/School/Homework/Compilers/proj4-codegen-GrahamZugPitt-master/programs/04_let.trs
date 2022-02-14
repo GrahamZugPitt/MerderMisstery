@@ -1,0 +1,4 @@
+fn main() {
+	let msg = "this is a variable.";
+	println_s(msg);
+}

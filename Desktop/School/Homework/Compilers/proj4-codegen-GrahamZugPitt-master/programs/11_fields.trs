@@ -1,0 +1,15 @@
+struct S {
+	x: int,
+	b: bool,
+	y: int,
+}
+
+fn main() {
+	let s = new S();
+	s.x = 10;
+	s.y = 20;
+	s.b = s.x == s.y;
+	print_s("s.x = "); println_i(s.x);
+	print_s("s.y = "); println_i(s.y);
+	print_s("s.b = "); println_b(s.b);
+}

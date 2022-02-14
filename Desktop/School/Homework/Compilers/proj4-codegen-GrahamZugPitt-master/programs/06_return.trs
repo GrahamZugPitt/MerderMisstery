@@ -1,0 +1,15 @@
+fn main() {
+	test_no_val();
+	let x = test_val();
+	println_i(x);
+}
+
+fn test_no_val() {
+	println_s("test_no_val running");
+	return;
+}
+
+fn test_val(): int {
+	println_s("test_val running");
+	return 5;
+}
