@@ -1,5 +1,0 @@
-fn main() {
-	let hello = "hello";
-	let world = "world!";
-	println_s(hello + ", " + world);
-}
